@@ -10,6 +10,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSnakeCaseNamingConvention();
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Manager>().HasMany(x => x.Teams).WithOne().HasForeignKey(x => x.ManagerId).IsRequired();
+    }
 }
 
 public class Entity
@@ -41,10 +46,14 @@ public class Manager : Entity
 
     public void AddTeam(Team team)
     {
+        if (Teams.Exists(x => x.Name == team.Name))
+        {
+            throw new InvalidOperationException("Team by that name already exists");
+        }
         Teams.Add(team);
     }
     
     public string Name { get; set; }
     public string Email { get; set; }
-    public List<Team> Teams { get; set; }
+    public List<Team> Teams { get; init; } = [];
 }
