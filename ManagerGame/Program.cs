@@ -1,4 +1,5 @@
 using ManagerGame;
+using ManagerGame.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication().AddJwtBearer();
@@ -16,6 +17,9 @@ builder.Services.AddCors();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<CreateTeamCommandHandler>();
+builder.Services.AddTransient<CreateManagerCommandHandler>();
 
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
@@ -37,3 +41,6 @@ app.UseHttpsRedirection();
 
 app.MapApi();
 app.Run();
+
+// Make the implicit Program class public so test projects can access it
+public partial class Program { }
