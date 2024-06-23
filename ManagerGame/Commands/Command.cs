@@ -1,4 +1,4 @@
-namespace ManagerGame;
+namespace ManagerGame.Commands;
 
 public interface ICommand : IBaseCommand
 {

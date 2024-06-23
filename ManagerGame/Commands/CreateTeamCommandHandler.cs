@@ -1,13 +1,15 @@
+using ManagerGame.Domain;
+
 namespace ManagerGame.Commands;
 
-public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateTeamRequest>
+public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateTeamRequest, Team>
 {
-    public async Task<Result> Handle(CreateTeamRequest request, CancellationToken cancellationToken)
+    public async Task<Result<Team>> Handle(CreateTeamRequest request, CancellationToken cancellationToken)
     {
         var manager = await dbContext.Managers.FindAsync([request.ManagerId], cancellationToken);
         if (manager == null)
         {
-            return Result.Failure(Error.NotFound);
+            return Result<Team>.Failure(Error.NotFound);
         }
         var team = new Team(request.Name, manager.Id);
 
@@ -16,6 +18,6 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommand
         dbContext.Add(team);
         await dbContext.SaveChangesAsync(cancellationToken);
         
-        return Result.Success();
+        return Result<Team>.Success(team);
     }
 }

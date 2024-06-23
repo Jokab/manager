@@ -1,15 +1,16 @@
+using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Commands;
 
-public class CreateManagerCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateManagerRequest>
+public class CreateManagerCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateManagerRequest, Manager>
 {
-    public async Task<Result> Handle(CreateManagerRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<Manager>> Handle(CreateManagerRequest request, CancellationToken cancellationToken = default)
     {
         var exists = await dbContext.Managers.AnyAsync(x => x.Email == request.Email, cancellationToken);
         if (exists)
         {
-            return Result.Failure(Error.NotFound);
+            return Result<Manager>.Failure(Error.NotFound);
         }
         
         var manager = new Manager(request.Name, request.Email);
@@ -17,6 +18,6 @@ public class CreateManagerCommandHandler(ApplicationDbContext dbContext) : IComm
         dbContext.Managers.Add(manager);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return Result<Manager>.Success(manager);
     }
 }

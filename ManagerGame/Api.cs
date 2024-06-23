@@ -1,4 +1,5 @@
 using ManagerGame.Commands;
+using ManagerGame.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame;
@@ -8,10 +9,12 @@ internal static class Api
     public static RouteGroupBuilder MapApi(this IEndpointRouteBuilder builder)
     {
         var api = builder.MapGroup("api");
-        api.MapPost("teams", CreateTeam);
+        
         api.MapPost("managers", CreateManager);
-        api.MapGet("teams/{id:guid}", GetTeam);
         api.MapGet("managers/{id:guid}", GetManager);
+
+        api.MapPost("teams", CreateTeam);
+        api.MapGet("teams/{id:guid}", GetTeam);
 
         return api;
     }
@@ -26,13 +29,13 @@ internal static class Api
         return TypedResults.Problem(result.Error.Code);
     }
     
-    private static async Task<Results<Ok, ProblemHttpResult>> CreateManager(
+    private static async Task<Results<Ok<Manager>, ProblemHttpResult>> CreateManager(
         CreateManagerRequest request, 
         CreateManagerCommandHandler handler, 
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok();
+        if (result.IsSuccess) return TypedResults.Ok(result.Value);
         return TypedResults.Problem(result.Error.Code);
     }
 

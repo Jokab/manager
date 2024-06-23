@@ -1,4 +1,6 @@
-namespace ManagerGame;
+using ManagerGame.Domain;
+
+namespace ManagerGame.Commands;
 
 public class CreateManagerRequest : ICommand
 {
