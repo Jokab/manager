@@ -7,37 +7,39 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSnakeCaseNamingConvention();
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Manager>().HasMany(x => x.Teams).WithOne().HasForeignKey(x => x.ManagerId).IsRequired();
     }
 }
 
-public class Entity
+public abstract class Entity
 {
-    protected Entity()
-    {
-        Id = Guid.NewGuid();
-    }
-    [Key]
-    public Guid Id { get; set; }
-    public DateTime CreatedDate { get; set; }
+	public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public DateTime DeletedDate { get; set; }
 }
 
 public class Team(string name, Guid managerId) : Entity
 {
+	[Key]
+	public Guid Id { get; private init; }
     public string Name { get; init; } = name;
     public Guid ManagerId { get; init; } = managerId;
 }
 
 public class Manager : Entity
 {
+	[Key]
+	public Guid Id { get; private init; }
+	public string Name { get; private init; }
+	public string Email { get; private init; }
+	public List<Team> Teams { get; init; } = [];
+
     public Manager(string name, string email)
     {
         Name = name;
@@ -52,8 +54,4 @@ public class Manager : Entity
         }
         Teams.Add(team);
     }
-    
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public List<Team> Teams { get; init; } = [];
 }

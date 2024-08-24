@@ -8,11 +8,11 @@ namespace ManagerGame.Test;
 public sealed class Fixture : WebApplicationFactory<Program>
 {
     protected override IHost CreateHost(IHostBuilder builder)
-    {   
+    {
         builder.ConfigureServices(services =>
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseNpgsql($"Host=localhost;Database={Guid.NewGuid().ToString()};User Id=postgres;Password=1234").Options;
+                .UseNpgsql($"Host=localhost;Database={Guid.NewGuid().ToString()}").Options;
             var dbContext = new ApplicationDbContext(options);
             services.AddSingleton(dbContext);
             dbContext.Database.Migrate();

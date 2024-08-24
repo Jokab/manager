@@ -4,7 +4,6 @@ using ManagerGame.Commands;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication().AddJwtBearer();
 
-
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("user", policy =>
         policy
