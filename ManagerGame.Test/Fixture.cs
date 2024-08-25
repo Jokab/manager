@@ -8,7 +8,7 @@ namespace ManagerGame.Test;
 public sealed class Fixture : WebApplicationFactory<Program>
 {
     protected override IHost CreateHost(IHostBuilder builder)
-    {   
+    {
         builder.ConfigureServices(services =>
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()

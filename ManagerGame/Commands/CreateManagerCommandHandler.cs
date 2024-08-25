@@ -1,4 +1,3 @@
-using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Commands;
@@ -12,12 +11,12 @@ public class CreateManagerCommandHandler(ApplicationDbContext dbContext) : IComm
         {
             return Result<Manager>.Failure(Error.NotFound);
         }
-        
+
         var manager = new Manager(request.Name, request.Email);
 
-        dbContext.Managers.Add(manager);
+        var createdManager = dbContext.Managers.Add(manager);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<Manager>.Success(manager);
+        return Result<Manager>.Success(createdManager.Entity);
     }
 }
