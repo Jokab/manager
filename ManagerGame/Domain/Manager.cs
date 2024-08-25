@@ -1,7 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ManagerGame.Domain;
 
 public class Manager : Entity
 {
+    [Key]
+    public Guid Id { get; private init; }
+    public string Name { get; private init; }
+    public string Email { get; private init; }
+    public List<Team> Teams { get; init; } = [];
+
     public Manager(string name, string email)
     {
         Name = name;
@@ -16,8 +24,4 @@ public class Manager : Entity
         }
         Teams.Add(team);
     }
-    
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public List<Team> Teams { get; init; } = [];
 }

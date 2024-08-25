@@ -1,3 +1,4 @@
+using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Commands;

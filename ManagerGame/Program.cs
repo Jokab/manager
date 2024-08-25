@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<CreateTeamCommandHandler>();
 builder.Services.AddTransient<CreateManagerCommandHandler>();
+builder.Services.AddTransient<LoginCommandHandler>();
 
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));

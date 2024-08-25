@@ -1,4 +1,5 @@
 using ManagerGame.Commands;
+using ManagerGame.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame;
@@ -9,6 +10,8 @@ internal static class Api
     {
         var api = builder.MapGroup("api");
         
+        api.MapPost("login", Login);
+        
         api.MapPost("managers", CreateManager);
         api.MapGet("managers/{id:guid}", GetManager);
 
@@ -17,6 +20,18 @@ internal static class Api
 
         return api;
     }
+
+    private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login( 
+        LoginRequest request,
+        LoginCommandHandler commandHandler,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await commandHandler.Handle(request, cancellationToken);
+        if (result.IsSuccess) return TypedResults.Ok(new LoginResponseDto {Manager = new ManagerDto(result.Value.Manager), Token = result.Value.Token});
+        return TypedResults.Problem(result.Error.Code);
+    }
+
+
 
     private static async Task<Results<Ok, ProblemHttpResult>> CreateTeam(
         CreateTeamRequest request,
@@ -55,12 +70,16 @@ internal static class Api
 
 }
 
+public sealed record LoginResponse(Manager Manager, string Token);
+
+public class LoginRequest : ICommand<LoginResponse>
+{
+    public Guid ManagerId { get; set; }
+}
+
 public record ManagerDto
 {
-	public ManagerDto()
-	{
-
-	}
+	public ManagerDto() { }
 	public ManagerDto(Manager manager)
 	{
 		Id = manager.Id;
@@ -82,4 +101,10 @@ public record ManagerDto
 	public List<Team> Teams { get; init; } = [];
 
 
+}
+
+public class LoginResponseDto
+{
+    public ManagerDto Manager { get; set; }
+    public string Token { get; set; }
 }
