@@ -12,7 +12,8 @@ public sealed class Fixture : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseNpgsql($"Host=localhost;Database={Guid.NewGuid().ToString()};User Id=postgres;Password=1234").Options;
+                .UseNpgsql($"Host=localhost;Database={Guid.NewGuid().ToString()};User Id=postgres;Password=1234")
+                .Options;
             var dbContext = new ApplicationDbContext(options);
             services.AddSingleton(dbContext);
             dbContext.Database.Migrate();

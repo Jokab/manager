@@ -6,13 +6,10 @@ public class LoginCommandHandler(ApplicationDbContext dbContext) : ICommandHandl
         CancellationToken cancellationToken)
     {
         var manager = await dbContext.Managers.FindAsync([request.ManagerId], cancellationToken);
-        if (manager == null)
-        {
-            return Result<LoginResponse>.Failure(Error.NotFound);
-        }
+        if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
 
-        var token = "token";
-            
+        const string token = "token";
+
         return Result<LoginResponse>.Success(new LoginResponse(manager, token));
     }
 }

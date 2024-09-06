@@ -5,10 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication().AddJwtBearer();
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("user", policy =>
-        policy
-            .RequireRole("user")
-            .RequireClaim("scope", "api"));
+    .AddPolicy("user",
+        policy =>
+            policy
+                .RequireRole("user")
+                .RequireClaim("scope", "api"));
 
 builder.Services.AddCors();
 
@@ -45,5 +46,5 @@ app.Run();
 // Make the implicit Program class public so test projects can access it
 namespace ManagerGame
 {
-    public partial class Program { }
+    public abstract class Program;
 }

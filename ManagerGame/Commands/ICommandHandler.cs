@@ -8,7 +8,8 @@ namespace ManagerGame.Commands;
 
 public interface ICommandHandler<in TCommand, TResponse>
     where TCommand : ICommand<TResponse>
-	where TResponse : class
+    where TResponse : class
 {
-    public Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken = default);
+    public Task<Result<TResponse>> Handle(TCommand command,
+        CancellationToken cancellationToken = default);
 }

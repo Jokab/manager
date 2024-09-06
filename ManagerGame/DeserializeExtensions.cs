@@ -4,13 +4,14 @@ namespace ManagerGame;
 
 public static class DeserializeExtensions
 {
-	private static readonly JsonSerializerOptions? DefaultSerializerSettings = new()
-	{
-		PropertyNameCaseInsensitive = true
-	};
+    private static readonly JsonSerializerOptions? DefaultSerializerSettings = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        IncludeFields = true
+    };
 
-	public static T? Deserialize<T>(this string json)
-	{
-		return JsonSerializer.Deserialize<T>(json, DefaultSerializerSettings);
-	}
+    public static T? Deserialize<T>(this string json)
+    {
+        return JsonSerializer.Deserialize<T>(json, DefaultSerializerSettings);
+    }
 }

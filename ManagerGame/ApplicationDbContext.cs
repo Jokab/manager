@@ -9,7 +9,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Team> Teams { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSnakeCaseNamingConvention();
+    {
+        optionsBuilder.UseSnakeCaseNamingConvention();
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,5 +20,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne()
             .HasForeignKey(x => x.ManagerId)
             .IsRequired();
+
+        modelBuilder.Entity<Manager>().Property(x => x.Email).HasConversion(x => x.EmailAddress, x => new Email(x));
+        modelBuilder.Entity<Manager>().Property(x => x.Name).HasConversion(x => x.Name, x => new ManagerName(x));
+
+        modelBuilder.Entity<Team>().Property(x => x.Name).HasConversion(x => x.Name, x => new TeamName(x));
     }
 }

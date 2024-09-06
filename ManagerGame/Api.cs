@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using ManagerGame.Commands;
 using ManagerGame.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,9 +10,9 @@ internal static class Api
     public static RouteGroupBuilder MapApi(this IEndpointRouteBuilder builder)
     {
         var api = builder.MapGroup("api");
-        
+
         api.MapPost("login", Login);
-        
+
         api.MapPost("managers", CreateManager);
         api.MapGet("managers/{id:guid}", GetManager);
 
@@ -21,16 +22,17 @@ internal static class Api
         return api;
     }
 
-    private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login( 
+    private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
         LoginRequest request,
         LoginCommandHandler commandHandler,
         CancellationToken cancellationToken = default)
     {
         var result = await commandHandler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok(new LoginResponseDto {Manager = new ManagerDto(result.Value.Manager), Token = result.Value.Token});
+        if (result.IsSuccess)
+            return TypedResults.Ok(new LoginResponseDto
+                { Manager = new ManagerDto(result.Value.Manager), Token = result.Value.Token });
         return TypedResults.Problem(result.Error.Code);
     }
-
 
 
     private static async Task<Results<Ok, ProblemHttpResult>> CreateTeam(
@@ -49,25 +51,25 @@ internal static class Api
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value!));
+        if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value));
         return TypedResults.Problem(result.Error.Code);
     }
 
-    private static async Task<Ok<ManagerDto>> GetManager(Guid id, ApplicationDbContext dbContext,
+    private static async Task<Ok<ManagerDto>> GetManager(Guid id,
+        ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var manager = await dbContext.Managers.FindAsync([id, cancellationToken], cancellationToken: cancellationToken);
+        var manager = await dbContext.Managers.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new ManagerDto(manager!));
     }
 
-    private static async Task<Ok<Team>> GetTeam(Guid id, ApplicationDbContext dbContext,
+    private static async Task<Ok<Team>> GetTeam(Guid id,
+        ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var team = await dbContext.Teams.FindAsync(id, cancellationToken);
+        var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken: cancellationToken);
         return TypedResults.Ok(team);
     }
-
-
 }
 
 public sealed record LoginResponse(Manager Manager, string Token);
@@ -79,28 +81,28 @@ public class LoginRequest : ICommand<LoginResponse>
 
 public record ManagerDto
 {
-	public ManagerDto() { }
-	public ManagerDto(Manager manager)
-	{
-		Id = manager.Id;
-		CreatedDate = manager.CreatedDate;
-		UpdatedDate = manager.CreatedDate;
-		DeletedDate = manager.DeletedDate;
-		Name = manager.Name;
-		Email = manager.Email;
-	}
+    [JsonConstructor]
+    public ManagerDto() { }
 
-	public Guid Id { get; set; }
+    public ManagerDto(Manager manager)
+    {
+        Id = manager.Id;
+        CreatedDate = manager.CreatedDate;
+        UpdatedDate = manager.CreatedDate;
+        DeletedDate = manager.DeletedDate;
+        Name = manager.Name;
+        Email = manager.Email;
+    }
 
-	public DateTime CreatedDate { get; set; }
-	public DateTime UpdatedDate { get; set; }
-	public DateTime DeletedDate { get; set; }
+    public Guid Id { get; set; }
 
-	public string Name { get; set; }
-	public string Email { get; set; }
-	public List<Team> Teams { get; init; } = [];
+    public DateTime CreatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
+    public DateTime DeletedDate { get; set; }
 
-
+    public ManagerName Name { get; set; }
+    public Email Email { get; set; }
+    public List<Team> Teams { get; init; } = [];
 }
 
 public class LoginResponseDto
