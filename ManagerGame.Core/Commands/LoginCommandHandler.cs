@@ -1,4 +1,4 @@
-namespace ManagerGame.Commands;
+namespace ManagerGame.Core.Commands;
 
 public class LoginCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<LoginRequest, LoginResponse>
 {

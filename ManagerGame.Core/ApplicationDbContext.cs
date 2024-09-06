@@ -1,7 +1,7 @@
-using ManagerGame.Domain;
+using ManagerGame.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManagerGame;
+namespace ManagerGame.Core;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {

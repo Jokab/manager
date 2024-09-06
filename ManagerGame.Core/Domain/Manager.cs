@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ManagerGame.Domain;
+namespace ManagerGame.Core.Domain;
 
 public class Manager : Entity
 {

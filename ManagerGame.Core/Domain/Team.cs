@@ -1,4 +1,4 @@
-namespace ManagerGame.Domain;
+namespace ManagerGame.Core.Domain;
 
 public class Team : Entity
 {

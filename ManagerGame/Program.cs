@@ -1,5 +1,6 @@
 using ManagerGame;
-using ManagerGame.Commands;
+using ManagerGame.Core;
+using ManagerGame.Core.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication().AddJwtBearer();

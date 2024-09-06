@@ -1,6 +1,6 @@
-using ManagerGame.Domain;
+using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Commands;
+namespace ManagerGame.Core.Commands;
 
 public class CreateTeamRequest : ICommand<Team>
 {

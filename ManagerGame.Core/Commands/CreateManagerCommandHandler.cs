@@ -1,7 +1,7 @@
-using ManagerGame.Domain;
+using ManagerGame.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManagerGame.Commands;
+namespace ManagerGame.Core.Commands;
 
 public class CreateManagerCommandHandler(ApplicationDbContext dbContext)
     : ICommandHandler<CreateManagerRequest, Manager>

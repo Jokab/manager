@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using ManagerGame.Commands;
-using ManagerGame.Domain;
+using ManagerGame.Core.Commands;
+using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ManagerGame.Test;

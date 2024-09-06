@@ -1,4 +1,4 @@
-namespace ManagerGame.Commands;
+namespace ManagerGame.Core.Commands;
 
 // public interface ICommandHandler<in TCommand>
 //     where TCommand : ICommand

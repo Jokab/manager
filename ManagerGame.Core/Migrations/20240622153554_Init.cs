@@ -1,9 +1,8 @@
-﻿using System;
+﻿#nullable disable
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
-namespace ManagerGame.Migrations
+namespace ManagerGame.Core.Migrations
 {
     /// <inheritdoc />
     public partial class Init : Migration

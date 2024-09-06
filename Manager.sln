@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagerGame", "ManagerGame\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagerGame.Test", "ManagerGame.Test\ManagerGame.Test.csproj", "{A6667C82-E897-45C1-88F9-DD235C864A88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagerGame.Console", "ManagerGame.Console\ManagerGame.Console.csproj", "{61D3D2F6-84E1-4D1B-BE2E-F530C82B2FB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagerGame.Core", "ManagerGame.Core\ManagerGame.Core.csproj", "{21C7DACA-8432-458D-81B4-CAA6E401A5EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{A6667C82-E897-45C1-88F9-DD235C864A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6667C82-E897-45C1-88F9-DD235C864A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6667C82-E897-45C1-88F9-DD235C864A88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61D3D2F6-84E1-4D1B-BE2E-F530C82B2FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61D3D2F6-84E1-4D1B-BE2E-F530C82B2FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61D3D2F6-84E1-4D1B-BE2E-F530C82B2FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61D3D2F6-84E1-4D1B-BE2E-F530C82B2FB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21C7DACA-8432-458D-81B4-CAA6E401A5EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21C7DACA-8432-458D-81B4-CAA6E401A5EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21C7DACA-8432-458D-81B4-CAA6E401A5EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21C7DACA-8432-458D-81B4-CAA6E401A5EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-namespace ManagerGame.Commands;
+namespace ManagerGame.Core.Commands;
 
 public class Result<T>
 {
@@ -29,30 +29,6 @@ public class Result<T>
         return new Result<T>(false, error, default);
     }
 }
-
-// public class Result<T> where T : class
-// {
-// 	private Result(bool isSuccess, Error error, T? value)
-// 	{
-// 		if (isSuccess && error != Error.None)
-// 		{
-// 			throw new InvalidOperationException("Cannot be success and have error");
-// 		}
-//
-// 		IsSuccess = isSuccess;
-// 		Error = error;
-// 		Value = value;
-// 	}
-//
-// 	public T? Value { get; private set; }
-//
-// 	public bool IsSuccess { get; set; }
-// 	public bool IsFailure => !IsSuccess;
-// 	public Error Error { get; set; }
-//
-// 	public static Result<T> Success(T value) => new(true, Error.None, value);
-// 	public static Result<T> Failure(Error error) => new(false, error, null);
-// }
 
 public record Error(string Code)
 {

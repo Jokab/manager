@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
-using ManagerGame.Commands;
-using ManagerGame.Domain;
+using ManagerGame.Core;
+using ManagerGame.Core.Commands;
+using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame;
@@ -35,13 +35,13 @@ internal static class Api
     }
 
 
-    private static async Task<Results<Ok, ProblemHttpResult>> CreateTeam(
+    private static async Task<Results<Ok<TeamDto>, ProblemHttpResult>> CreateTeam(
         CreateTeamRequest request,
         CreateTeamCommandHandler handler,
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok();
+        if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value));
         return TypedResults.Problem(result.Error.Code);
     }
 
@@ -70,43 +70,4 @@ internal static class Api
         var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken: cancellationToken);
         return TypedResults.Ok(team);
     }
-}
-
-public sealed record LoginResponse(Manager Manager, string Token);
-
-public class LoginRequest : ICommand<LoginResponse>
-{
-    public Guid ManagerId { get; set; }
-}
-
-public record ManagerDto
-{
-    [JsonConstructor]
-    public ManagerDto() { }
-
-    public ManagerDto(Manager manager)
-    {
-        Id = manager.Id;
-        CreatedDate = manager.CreatedDate;
-        UpdatedDate = manager.CreatedDate;
-        DeletedDate = manager.DeletedDate;
-        Name = manager.Name;
-        Email = manager.Email;
-    }
-
-    public Guid Id { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-    public DateTime UpdatedDate { get; set; }
-    public DateTime DeletedDate { get; set; }
-
-    public ManagerName Name { get; set; }
-    public Email Email { get; set; }
-    public List<Team> Teams { get; init; } = [];
-}
-
-public class LoginResponseDto
-{
-    public ManagerDto Manager { get; set; }
-    public string Token { get; set; }
 }
