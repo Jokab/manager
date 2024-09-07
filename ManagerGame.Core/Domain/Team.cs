@@ -20,14 +20,3 @@ public class Team : Entity
         return new Team(Guid.NewGuid(), name, managerId);
     }
 }
-
-public record TeamName
-{
-    public TeamName(string? name)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(name);
-        Name = name;
-    }
-
-    public string Name { get; private set; }
-}

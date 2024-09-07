@@ -13,9 +13,9 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommand
 
         manager.AddTeam(team);
 
-        dbContext.Add(team);
+        var createdTeam = dbContext.Add(team);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<Team>.Success(team);
+        return Result<Team>.Success(createdTeam.Entity);
     }
 }
