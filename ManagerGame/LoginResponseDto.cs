@@ -2,6 +2,6 @@ namespace ManagerGame;
 
 public class LoginResponseDto
 {
-    public ManagerDto Manager { get; set; }
-    public string Token { get; set; }
+    public required ManagerDto Manager { get; set; }
+    public required string Token { get; set; }
 }

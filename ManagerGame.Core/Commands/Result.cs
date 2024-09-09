@@ -4,7 +4,7 @@ public class Result<T>
 {
     private Result(bool isSuccess,
         Error error,
-        T value)
+        T? value)
     {
         if (isSuccess && error != Error.None) throw new InvalidOperationException("Cannot be success and have error");
         if (!isSuccess && Value != null) throw new InvalidOperationException("Cannot be failure and have value");
@@ -17,7 +17,7 @@ public class Result<T>
     public bool IsSuccess { get; set; }
     public bool IsFailure => !IsSuccess;
     public Error Error { get; set; }
-    public T Value { get; set; }
+    public T? Value { get; set; }
 
     public static Result<T> Success(T value)
     {

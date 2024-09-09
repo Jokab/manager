@@ -30,7 +30,7 @@ internal static class Api
         var result = await commandHandler.Handle(request, cancellationToken);
         if (result.IsSuccess)
             return TypedResults.Ok(new LoginResponseDto
-                { Manager = new ManagerDto(result.Value.Manager), Token = result.Value.Token });
+                { Manager = new ManagerDto(result.Value!.Manager), Token = result.Value.Token });
         return TypedResults.Problem(result.Error.Code);
     }
 
@@ -41,7 +41,7 @@ internal static class Api
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value));
+        if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }
 
@@ -51,7 +51,7 @@ internal static class Api
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value));
+        if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }
 
@@ -67,7 +67,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken: cancellationToken);
+        var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(team);
     }
 }

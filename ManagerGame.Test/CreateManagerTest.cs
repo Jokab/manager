@@ -1,6 +1,4 @@
 using System.Net;
-using System.Text;
-using System.Text.Json;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
@@ -23,19 +21,14 @@ public class CreateManagerTest : IClassFixture<Fixture>
     [Fact]
     public async Task Test()
     {
-        var content = new StringContent(
-            JsonSerializer.Serialize(new CreateManagerRequest
-                { Name = new ManagerName("Jakob"), Email = new Email("jakob@jakobsson.com") }),
-            Encoding.UTF8,
-            "application/json");
+        var createManagerRequest = new CreateManagerRequest
+            { Name = new ManagerName("Jakob"), Email = new Email("jakob@jakobsson.com") };
 
-        var response = await _httpClient.PostAsync("/api/managers", content);
+        var response = await _httpClient.Post("/api/managers", createManagerRequest);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
         using var scope = _webApplicationFactory.Services.CreateScope();
         var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
-
         Assert.Single(db!.Managers);
     }
 }

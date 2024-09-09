@@ -11,16 +11,16 @@ public class Manager : Entity
         Name = name;
         Email = email;
     }
-    
+
+    public ManagerName Name { get; private init; }
+    public Email Email { get; private init; }
+    public List<Team> Teams { get; init; } = [];
+
     public static Manager Create(ManagerName name,
         Email email)
     {
         return new Manager(Guid.NewGuid(), name, email);
     }
-
-    public ManagerName Name { get; private init; }
-    public Email Email { get; private init; }
-    public List<Team> Teams { get; init; } = [];
 
     public void AddTeam(Team team)
     {

@@ -6,7 +6,11 @@ namespace ManagerGame;
 public record ManagerDto
 {
     [JsonConstructor]
-    public ManagerDto() { }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public ManagerDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public ManagerDto(Manager manager)
     {

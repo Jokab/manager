@@ -6,7 +6,11 @@ namespace ManagerGame;
 public record TeamDto
 {
     [JsonConstructor]
-    public TeamDto() { }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public TeamDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public TeamDto(Team team)
     {
@@ -19,10 +23,10 @@ public record TeamDto
     }
 
     public Guid Id { get; set; }
-    
+
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
-    
+
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public DateTime? DeletedDate { get; set; }

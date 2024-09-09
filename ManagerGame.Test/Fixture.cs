@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace ManagerGame.Test;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class Fixture : WebApplicationFactory<Program>
 {
     protected override IHost CreateHost(IHostBuilder builder)
