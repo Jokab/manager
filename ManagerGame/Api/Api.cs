@@ -2,6 +2,7 @@ using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame.Api;
@@ -17,7 +18,7 @@ internal static class Api
         api.MapPost("managers", CreateManager);
         api.MapGet("managers/{id:guid}", GetManager);
 
-        api.MapPost("teams", CreateTeam);
+        api.MapPost("teams", CreateTeam).RequireAuthorization("user");
         api.MapGet("teams/{id:guid}", GetTeam);
 
         return api;
@@ -35,14 +36,13 @@ internal static class Api
         return TypedResults.Problem(result.Error.Code);
     }
 
-
     private static async Task<Results<Ok<TeamDto>, ProblemHttpResult, UnauthorizedHttpResult>> CreateTeam(
         CreateTeamRequest request,
         CreateTeamCommandHandler handler,
         CancellationToken cancellationToken = default)
     {
-        if (request.Name.Name == "Lag") return TypedResults.Unauthorized();
         var result = await handler.Handle(request, cancellationToken);
+        
         if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }
