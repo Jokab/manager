@@ -1,12 +1,11 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
-using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManagerGame.Test;
+namespace ManagerGame.Test.Api;
 
 public class CreateTeamTest : IClassFixture<Fixture>
 {

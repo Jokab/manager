@@ -3,7 +3,7 @@ using System.Text.Json;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Test;
+namespace ManagerGame.Test.Api;
 
 public static class HttpClientExtensions
 {

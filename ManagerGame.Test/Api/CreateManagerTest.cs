@@ -2,7 +2,7 @@ using System.Net;
 using ManagerGame.Api.Dtos;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace ManagerGame.Test;
+namespace ManagerGame.Test.Api;
 
 public class CreateManagerTest : IClassFixture<Fixture>
 {

@@ -25,7 +25,7 @@ public class Manager : Entity
     public void AddTeam(Team team)
     {
         if (Teams.Exists(x => x.Name == team.Name))
-            throw new InvalidOperationException("Team by that name already exists");
+            throw new ArgumentException("Team by that name already exists");
         Teams.Add(team);
     }
 }

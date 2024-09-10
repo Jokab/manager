@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace ManagerGame.Test;
+namespace ManagerGame.Test.Api;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class Fixture : WebApplicationFactory<Program>
