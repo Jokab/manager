@@ -1,6 +1,4 @@
-using ManagerGame.Core.Commands;
-
-namespace ManagerGame;
+namespace ManagerGame.Core.Commands;
 
 public class LoginRequest : ICommand<LoginResponse>
 {

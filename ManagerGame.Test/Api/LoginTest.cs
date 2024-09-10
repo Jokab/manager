@@ -1,5 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Core.Commands;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ManagerGame.Test.Api;
