@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame;
+namespace ManagerGame.Api.Dtos;
 
 public record TeamDto
 {

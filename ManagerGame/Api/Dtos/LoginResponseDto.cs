@@ -1,4 +1,4 @@
-namespace ManagerGame;
+namespace ManagerGame.Api.Dtos;
 
 public class LoginResponseDto
 {

@@ -1,4 +1,5 @@
 using System.Net;
+using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;

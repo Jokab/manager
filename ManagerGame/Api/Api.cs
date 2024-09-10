@@ -1,9 +1,10 @@
+using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace ManagerGame;
+namespace ManagerGame.Api;
 
 internal static class Api
 {

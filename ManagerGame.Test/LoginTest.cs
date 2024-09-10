@@ -1,4 +1,5 @@
 using System.Net;
+using ManagerGame.Api.Dtos;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ManagerGame.Test;
