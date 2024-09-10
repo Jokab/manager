@@ -1,9 +1,7 @@
 using System.Net;
-using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test;
 
@@ -23,12 +21,11 @@ public class CreateManagerTest : IClassFixture<Fixture>
     {
         var createManagerRequest = new CreateManagerRequest
             { Name = new ManagerName("Jakob"), Email = new Email("jakob@jakobsson.com") };
-
+        var db = TestDbFactory.Create(_webApplicationFactory.Services);
+        
         var response = await _httpClient.Post("/api/managers", createManagerRequest);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        using var scope = _webApplicationFactory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
-        Assert.Single(db!.Managers);
+        Assert.Single(db.Managers);
     }
 }

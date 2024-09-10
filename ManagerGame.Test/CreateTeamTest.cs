@@ -4,7 +4,6 @@ using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test;
 
@@ -26,9 +25,7 @@ public class CreateTeamTest : IClassFixture<Fixture>
         var manager = (await createManagerResponse.Content.ReadAsStringAsync()).Deserialize<ManagerDto>();
         var createTeamRequest = new CreateTeamRequest
             { Name = new TeamName("Jakobs lag"), ManagerId = manager!.Id };
-
-        using var scope = _webApplicationFactory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+        var db = TestDbFactory.Create(_webApplicationFactory.Services);
 
         var createTeamResponse = await _httpClient.Post("/api/teams", createTeamRequest);
 
