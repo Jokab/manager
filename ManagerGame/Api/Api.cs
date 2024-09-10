@@ -39,7 +39,7 @@ internal static class Api
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request, cancellationToken);
-        
+
         if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }

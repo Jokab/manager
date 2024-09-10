@@ -19,7 +19,7 @@ public class CreateManagerTest : IClassFixture<Fixture>
     public async Task Test()
     {
         var db = TestDbFactory.Create(_webApplicationFactory.Services);
-        
+
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
