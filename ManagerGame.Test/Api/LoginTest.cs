@@ -20,14 +20,14 @@ public class LoginTest : IClassFixture<Fixture>
     public async Task Test()
     {
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
-        var request = new LoginRequest { ManagerId = manager.Id };
+        var request = new LoginRequest { ManagerId = manager!.Id };
 
         var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        Assert.Equal(manager.Id, login.Manager.Id);
+        Assert.Equal(manager.Id, login!.Manager.Id);
         Assert.Equal("token", login.Token);
     }
 }

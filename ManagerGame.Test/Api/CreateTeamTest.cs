@@ -19,11 +19,11 @@ public class CreateTeamTest : IClassFixture<Fixture>
     }
 
     [Fact]
-    public async Task Test()
+    public async Task CreateTeam()
     {
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
         var createTeamRequest = new CreateTeamRequest
-            { Name = new TeamName("Jakobs lag"), ManagerId = manager.Id };
+            { Name = new TeamName("Jakobs lag"), ManagerId = manager!.Id };
         var db = TestDbFactory.Create(_webApplicationFactory.Services);
 
         var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
@@ -31,7 +31,7 @@ public class CreateTeamTest : IClassFixture<Fixture>
         Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
 
-        Assert.Equal(manager.Id, team.ManagerId);
+        Assert.Equal(manager.Id, team!.ManagerId);
         Assert.Equal("Jakobs lag", team.Name.Name);
 
         Assert.Single(db.Teams);
@@ -39,5 +39,17 @@ public class CreateTeamTest : IClassFixture<Fixture>
         var createdTeamInDb = createdManagerInDb.Teams.First(x => x.Id == team.Id);
         Assert.Equal(manager.Id, createdTeamInDb.ManagerId);
         Assert.Equal("Jakobs lag", createdTeamInDb.Name.Name);
+    }
+    
+    [Fact]
+    public async Task UnauthenticatedThrows()
+    {
+        var (_, manager) = await _httpClient.PostManager<ManagerDto>();
+        
+        var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams",
+            new CreateTeamRequest { Name = new TeamName("Lag"), ManagerId = manager!.Id });
+        
+        Assert.Equal(HttpStatusCode.Unauthorized, createTeamResponse.StatusCode);
+        Assert.Null(team);
     }
 }

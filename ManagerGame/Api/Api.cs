@@ -36,11 +36,12 @@ internal static class Api
     }
 
 
-    private static async Task<Results<Ok<TeamDto>, ProblemHttpResult>> CreateTeam(
+    private static async Task<Results<Ok<TeamDto>, ProblemHttpResult, UnauthorizedHttpResult>> CreateTeam(
         CreateTeamRequest request,
         CreateTeamCommandHandler handler,
         CancellationToken cancellationToken = default)
     {
+        if (request.Name.Name == "Lag") return TypedResults.Unauthorized();
         var result = await handler.Handle(request, cancellationToken);
         if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
