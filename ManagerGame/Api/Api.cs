@@ -2,26 +2,23 @@ using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame.Api;
 
 internal static class Api
 {
-    public static RouteGroupBuilder MapApi(this IEndpointRouteBuilder builder)
+    public static void MapApi(this IEndpointRouteBuilder builder)
     {
         var api = builder.MapGroup("api");
 
         api.MapPost("login", Login);
 
         api.MapPost("managers", CreateManager);
-        api.MapGet("managers/{id:guid}", GetManager);
+        api.MapGet("managers/{id:guid}", GetManager).RequireAuthorization("user");
 
         api.MapPost("teams", CreateTeam).RequireAuthorization("user");
-        api.MapGet("teams/{id:guid}", GetTeam);
-
-        return api;
+        api.MapGet("teams/{id:guid}", GetTeam).RequireAuthorization("user");
     }
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(

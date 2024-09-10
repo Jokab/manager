@@ -68,6 +68,8 @@ public class CreateTeamTest : IClassFixture<Fixture>
     {
         var (_, manager) = await _httpClient.PostManager<ManagerDto>();
         
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        
         var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams",
             new CreateTeamRequest { Name = new TeamName("Lag"), ManagerId = manager!.Id });
         
