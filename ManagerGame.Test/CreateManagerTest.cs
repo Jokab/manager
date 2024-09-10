@@ -1,6 +1,5 @@
 using System.Net;
-using ManagerGame.Core.Commands;
-using ManagerGame.Core.Domain;
+using ManagerGame.Api.Dtos;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ManagerGame.Test;
@@ -19,13 +18,14 @@ public class CreateManagerTest : IClassFixture<Fixture>
     [Fact]
     public async Task Test()
     {
-        var createManagerRequest = new CreateManagerRequest
-            { Name = new ManagerName("Jakob"), Email = new Email("jakob@jakobsson.com") };
         var db = TestDbFactory.Create(_webApplicationFactory.Services);
         
-        var response = await _httpClient.Post("/api/managers", createManagerRequest);
+        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
+        Assert.NotNull(manager);
+        Assert.NotEqual(Guid.Empty, manager.Id);
         Assert.Single(db.Managers);
+        Assert.NotEqual(Guid.Empty, db.Managers.First().Id);
     }
 }

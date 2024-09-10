@@ -7,22 +7,23 @@ namespace ManagerGame.Test;
 
 public static class HttpClientExtensions
 {
-    public static async Task<HttpResponseMessage> Post(this HttpClient httpClient,
+    public static async Task<(HttpResponseMessage, T)> Post<T>(this HttpClient httpClient,
         string uri,
-        object data)
-    {
-        return await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
+        object data) =>
+        await Deserialize<T>(await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
             new StringContent(
                 JsonSerializer.Serialize(data),
                 Encoding.UTF8,
-                "application/json"));
-    }
+                "application/json")));
 
-    public static async Task<HttpResponseMessage> PostManager(this HttpClient httpClient)
-    {
-        return await Post(httpClient,
+    private static async Task<(HttpResponseMessage, T)> Deserialize<T>(HttpResponseMessage responseMessage) =>
+        (responseMessage,
+            (await responseMessage.Content.ReadAsStringAsync()).Deserialize<T>() ??
+            throw new Exception($"Failed to deserialize {nameof(T)}"));
+
+    public static async Task<(HttpResponseMessage, T)> PostManager<T>(this HttpClient httpClient) =>
+        await Post<T>(httpClient,
             "/api/managers",
             new CreateManagerRequest
                 { Name = new ManagerName("Jakob"), Email = new Email("jakob@jakobsson.com") });
-    }
 }
