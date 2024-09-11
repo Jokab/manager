@@ -19,6 +19,12 @@ internal static class Api
 
         api.MapPost("teams", CreateTeam).RequireAuthorization("user");
         api.MapGet("teams/{id:guid}", GetTeam).RequireAuthorization("user");
+        api.MapPost("teams/sign", SignPlayer).RequireAuthorization("user");
+    }
+
+    private static Task<Ok<SignPlayerDto>> SignPlayer(SignPlayerRequest request)
+    {
+        return Task.FromResult(TypedResults.Ok(new SignPlayerDto()));
     }
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
@@ -69,4 +75,12 @@ internal static class Api
         var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(team);
     }
+}
+
+public class SignPlayerDto
+{
+}
+
+public class SignPlayerRequest
+{
 }
