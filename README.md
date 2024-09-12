@@ -1,3 +1,3 @@
 # Manager
 
-Fantasy football draft tool 
+Fantasy football draft tool. Highly work in progress
