@@ -24,12 +24,15 @@ public class AddPlayerTest : IClassFixture<Fixture>
     {
         var (manager, newTeam) = await SeedAndLogin();
 
-        var (httpResponseMessage, signPlayerDto) = await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest());
+        var (httpResponseMessage, signPlayerDto) = await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id));
 
         var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-        Assert.Equal(1, team!.Players.Count);
+        Assert.Single(team!.Players);
+        var playerInTeam = team.Players.First();
+        Assert.Equal("Jakob", playerInTeam.Name.Name);
+        Assert.Equal(Position.Defender, playerInTeam.Position);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()

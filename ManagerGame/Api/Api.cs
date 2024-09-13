@@ -22,9 +22,13 @@ internal static class Api
         api.MapPost("teams/sign", SignPlayer).RequireAuthorization("user");
     }
 
-    private static Task<Ok<SignPlayerDto>> SignPlayer(SignPlayerRequest request)
+    private static async Task<Ok<SignPlayerDto>> SignPlayer(
+	    SignPlayerRequest request,
+	    SignPlayerCommandHandler handler)
     {
-        return Task.FromResult(TypedResults.Ok(new SignPlayerDto()));
+        await handler.Handle(request);
+
+        return TypedResults.Ok<SignPlayerDto>(new SignPlayerDto());
     }
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
@@ -78,9 +82,5 @@ internal static class Api
 }
 
 public class SignPlayerDto
-{
-}
-
-public class SignPlayerRequest
 {
 }

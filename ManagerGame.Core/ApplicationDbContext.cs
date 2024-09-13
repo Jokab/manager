@@ -37,5 +37,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<Player>()
 	        .HasKey(x => x.Id);
+        modelBuilder.Entity<Player>()
+	        .Property(x => x.Name)
+	        .HasConversion(x => x.Name, x => new PlayerName(x));
     }
 }
