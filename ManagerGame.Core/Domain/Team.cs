@@ -1,22 +1,38 @@
+using System.Text.Json.Serialization;
+
 namespace ManagerGame.Core.Domain;
 
 public class Team : Entity
 {
-    private Team(Guid id,
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	[JsonConstructor]
+	private Team() : base(Guid.NewGuid())
+	{}
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	private Team(Guid id,
         TeamName name,
-        Guid managerId)
+        Guid managerId,
+        ICollection<Player> players)
         : base(id)
     {
         Name = name;
         ManagerId = managerId;
+        Players = players;
     }
 
-    public TeamName Name { get; init; }
-    public Guid ManagerId { get; init; }
+    public TeamName Name { get; set; }
+    public Guid ManagerId { get; set; }
+    public ICollection<Player> Players { get; set; }
 
     public static Team Create(TeamName name,
-        Guid managerId)
+        Guid managerId,
+        ICollection<Player> players)
     {
-        return new Team(Guid.NewGuid(), name, managerId);
+        return new Team(Guid.NewGuid(), name, managerId, players);
     }
+}
+
+public class Player(Guid id) : Entity(id)
+{
+	public Guid TeamId { get; set; }
 }

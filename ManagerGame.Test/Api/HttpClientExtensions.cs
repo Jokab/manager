@@ -36,4 +36,14 @@ public static class HttpClientExtensions
             new CreateManagerRequest
                 { Name = new ManagerName("Jakob"), Email = new Email($"jakob{Guid.NewGuid()}@jakobsson.com") });
     }
+
+    public static async Task<(HttpResponseMessage, T?)> Get<T>(this HttpClient httpClient,
+	    string uri)
+    {
+	    return await httpClient.GetAsync(new Uri(uri, UriKind.Relative)) switch
+	    {
+		    { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
+		    { } response => (response, default)
+	    };
+    }
 }

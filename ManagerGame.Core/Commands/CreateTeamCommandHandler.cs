@@ -9,7 +9,7 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommand
     {
         var manager = await dbContext.Managers.FindAsync([request.ManagerId], cancellationToken);
         if (manager == null) return Result<Team>.Failure(Error.NotFound);
-        var team = Team.Create(request.Name, manager.Id);
+        var team = Team.Create(request.Name, manager.Id, []);
 
         manager.AddTeam(team);
 

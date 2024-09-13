@@ -18,15 +18,18 @@ public class AddPlayerTest : IClassFixture<Fixture>
         _webApplicationFactory = fixture;
         _httpClient = _webApplicationFactory.CreateDefaultClient();
     }
-    
+
     [Fact]
     public async Task SignPlayer()
     {
-        var (manager, team) = await SeedAndLogin();
+        var (manager, newTeam) = await SeedAndLogin();
 
         var (httpResponseMessage, signPlayerDto) = await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest());
-        
+
+        var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
+
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+        Assert.Equal(1, team!.Players.Count);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()
