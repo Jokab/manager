@@ -20,7 +20,7 @@ while (!exit)
     {
         exit = true;
     }
-    
+
     await Loop(selection, dbContext);
 }
 
@@ -42,7 +42,7 @@ async Task Loop(string? selection,
 
             break;
     }
-    
+
     // Console.WriteLine("Manager med ID " + manager.Id + " skapad");
     // Console.WriteLine("Namn från db " + dbContext.Managers.First(x => x.Id == manager.Id).Name.Name);
     //

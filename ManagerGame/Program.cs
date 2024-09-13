@@ -1,7 +1,9 @@
 using System.Text;
+using ManagerGame.Infra;
 using ManagerGame.Api;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
+using ManagerGame.Core.Domain;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,8 @@ builder.Services.AddTransient<CreateManagerCommandHandler>();
 builder.Services.AddTransient<LoginCommandHandler>();
 builder.Services.AddTransient<SignPlayerCommandHandler>();
 
+builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
+builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
 

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-using ClassLibrary1;
+using ManagerGame.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
