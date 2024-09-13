@@ -25,9 +25,12 @@ public class SignPlayerTest : IClassFixture<Fixture>
     {
         var (manager, newTeam) = await SeedAndLogin();
         var db = TestDbFactory.Create(_webApplicationFactory.Services);
+        var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+        db.Players.Add(player);
+        await db.SaveChangesAsync();
 
         var (httpResponseMessage, signPlayerDto) =
-            await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id));
+	        await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
         var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
 

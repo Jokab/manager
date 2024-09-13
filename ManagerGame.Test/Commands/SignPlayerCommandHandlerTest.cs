@@ -11,11 +11,16 @@ public class SignPlayerCommandHandlerTest
 		var teamRepo = new FakeRepo<Team>();
 		var team = Team.Create(new TeamName("Laget"), Guid.NewGuid(), []);
 		await teamRepo.Add(team);
-		var sut = new SignPlayerCommandHandler(new FakeRepo<Player>(), teamRepo);
+		var playerRepo = new FakeRepo<Player>();
+		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+		await playerRepo.Add(player);
+		var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
 
-		var res = await sut.Handle(new SignPlayerRequest(team.Id));
+		await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
-		Assert.Single(res.Value!.Players);
-		Assert.Single((await teamRepo.Find(team.Id))!.Players);
+		var signedPlayer = (await teamRepo.Find(team.Id))!.Players.First();
+		Assert.Equal(player.Id, signedPlayer.Id);
+		Assert.Equal("Jakob", signedPlayer.Name.Name);
+		Assert.Equal(Position.Defender, signedPlayer.Position);
 	}
 }
