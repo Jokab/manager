@@ -1,6 +1,7 @@
 using ManagerGame.Core;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,9 +14,13 @@ public sealed class Fixture : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseNpgsql($"Host=localhost;Database={Guid.NewGuid().ToString()};User Id=postgres;Password=1234")
-                .Options;
+	        var config  = new ConfigurationBuilder()
+		        .AddJsonFile("appsettings.json", true, true)
+		        .AddEnvironmentVariables()
+		        .Build();
+	        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+		        .UseNpgsql(config.GetConnectionString("Db"))
+		        .Options;
             var dbContext = new ApplicationDbContext(options);
             services.AddSingleton(dbContext);
             dbContext.Database.Migrate();
