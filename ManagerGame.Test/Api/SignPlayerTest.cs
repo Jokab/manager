@@ -5,34 +5,40 @@ using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Api;
 
-public class AddPlayerTest : IClassFixture<Fixture>
+public class SignPlayerTest : IClassFixture<Fixture>
 {
     private readonly HttpClient _httpClient;
     private readonly WebApplicationFactory<Program> _webApplicationFactory;
 
-    public AddPlayerTest(Fixture fixture)
+    public SignPlayerTest(Fixture fixture)
     {
         _webApplicationFactory = fixture;
         _httpClient = _webApplicationFactory.CreateDefaultClient();
     }
 
     [Fact]
-    public async Task SignPlayer()
+    public async Task SignFirstPlayer()
     {
         var (manager, newTeam) = await SeedAndLogin();
+        var db = TestDbFactory.Create(_webApplicationFactory.Services);
 
-        var (httpResponseMessage, signPlayerDto) = await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id));
+        var (httpResponseMessage, signPlayerDto) =
+            await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id));
 
         var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);
-        var playerInTeam = team.Players.First();
-        Assert.Equal("Jakob", playerInTeam.Name.Name);
-        Assert.Equal(Position.Defender, playerInTeam.Position);
+
+        Assert.Equal("Jakob", team.Players.First().Name.Name);
+        Assert.Equal(Position.Defender, team.Players.First().Position);
+
+        Assert.Equal("Jakob", db.Teams.Include(t => t.Players).First().Players.First().Name.Name);
+        Assert.Equal(Position.Defender, db.Teams.Include(t => t.Players).First().Players.First().Position);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()

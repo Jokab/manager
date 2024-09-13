@@ -34,6 +34,10 @@ public class Team : Entity
 
     public void SignPlayer(Player player)
     {
+	    if (Players.Contains(player))
+	    {
+		    throw new ArgumentException($"Player with ID {player.Id} already added");
+	    }
 	    Players.Add(player);
     }
 }
@@ -51,6 +55,25 @@ public class Player : Entity
 	public Position Position { get; init; }
 	// public MarketValue MarketValue { get; init; }
 	// public Country Country { get; init; }
+
+	private sealed class IdNamePositionEqualityComparer : IEqualityComparer<Player>
+	{
+		public bool Equals(Player? x, Player? y)
+		{
+			if (ReferenceEquals(x, y)) return true;
+			if (ReferenceEquals(x, null)) return false;
+			if (ReferenceEquals(y, null)) return false;
+			if (x.GetType() != y.GetType()) return false;
+			return x.Id.Equals(y.Id) && x.Name.Equals(y.Name) && x.Position == y.Position;
+		}
+
+		public int GetHashCode(Player obj)
+		{
+			return HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
+		}
+	}
+
+	public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
 }
 
 public class MarketValue
