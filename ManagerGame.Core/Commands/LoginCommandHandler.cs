@@ -21,19 +21,17 @@ public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration 
 
     private static string GenerateToken(IConfiguration configuration)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtSecret = configuration["JWT:Secret"];
-        if (string.IsNullOrEmpty(jwtSecret))
-        {
-            throw new ArgumentException("Could not extract JWT secret from config");
-        }
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[] { new Claim("id", "hej") }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)), SecurityAlgorithms.HmacSha256Signature)
-        };
+	    var jwtSecret = configuration["JWT:Secret"];
+	    ArgumentException.ThrowIfNullOrEmpty(jwtSecret, "Could not extract JWT secret from config");
+
+	    var tokenHandler = new JwtSecurityTokenHandler();
+	    var tokenDescriptor = new SecurityTokenDescriptor
+	    {
+		    Subject = new ClaimsIdentity(new[] { new Claim("id", "hej") }),
+		    Expires = DateTime.UtcNow.AddDays(7),
+		    SigningCredentials =
+			    new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)), SecurityAlgorithms.HmacSha256Signature)
+	    };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
