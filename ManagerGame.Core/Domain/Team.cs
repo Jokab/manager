@@ -23,7 +23,7 @@ public class Team : Entity
 
     public TeamName Name { get; set; }
     public Guid ManagerId { get; set; }
-    public ICollection<Player> Players { get; set; }
+    public ICollection<Player> Players { get; set; } = [];
 
     public static Team Create(TeamName name,
         Guid managerId,
@@ -44,13 +44,14 @@ public class Team : Entity
 
 public class Player : Entity
 {
-	public Player(Guid id, PlayerName name, Position position) : base(id)
+	public Player(Guid id, Guid? teamId, PlayerName name, Position position) : base(id)
 	{
+		TeamId = teamId;
 		Name = name;
 		Position = position;
 	}
 
-	public Guid TeamId { get; init; }
+	public Guid? TeamId { get; init; }
 	public PlayerName Name { get; init; }
 	public Position Position { get; init; }
 	// public MarketValue MarketValue { get; init; }

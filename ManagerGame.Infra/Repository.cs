@@ -1,19 +1,27 @@
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Infra;
 
-public class Repository<T>(ApplicationDbContext dbContext) : IRepository<T> where T : Entity
+public class Repository<T> : IRepository<T> where T : Entity
 {
+	private readonly ApplicationDbContext _dbContext;
+	private readonly DbSet<T> _table;
+
+	public Repository(ApplicationDbContext dbContext)
+	{
+		_dbContext = dbContext;
+		_table = dbContext.Set<T>();
+	}
+
 	public async Task<T> Add(T entity, CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
-		var e = dbContext.Add(entity);
-		await dbContext.SaveChangesAsync(cancellationToken);
-
-		dbContext.Set<T>().FirstOrDefault(x => x.Id == Guid.Empty);
+		var e = _table.Add(entity);
+		await _dbContext.SaveChangesAsync(cancellationToken);
 
 		return e.Entity;
 	}
@@ -25,6 +33,13 @@ public class Repository<T>(ApplicationDbContext dbContext) : IRepository<T> wher
 			throw new ArgumentException("ID was empty");
 		}
 
-		return await dbContext.FindAsync<T>([id], cancellationToken);
+		var res = await _table.FindAsync([id], cancellationToken);
+		return res;
+	}
+
+	public async Task Update(T entity, CancellationToken cancellationToken = default)
+	{
+		_dbContext.Update(entity);
+		await _dbContext.SaveChangesAsync(cancellationToken);
 	}
 }

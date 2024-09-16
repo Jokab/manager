@@ -8,7 +8,7 @@ public class TeamTest
 	public void CanSignNewPlayer()
 	{
 		var team = Team.Create(new TeamName("Lag"), Guid.NewGuid(), []);
-		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+		var player = new Player(Guid.NewGuid(), team.Id, new PlayerName("Jakob"), Position.Defender);
 		Assert.Empty(team.Players);
 
 		team.SignPlayer(player);
@@ -20,7 +20,7 @@ public class TeamTest
 	public void CannotSignDuplicatePlayer()
 	{
 		var team = Team.Create(new TeamName("Lag"), Guid.NewGuid(), []);
-		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+		var player = new Player(Guid.NewGuid(), team.Id, new PlayerName("Jakob"), Position.Defender);
 		Assert.Empty(team.Players);
 
 		team.SignPlayer(player);

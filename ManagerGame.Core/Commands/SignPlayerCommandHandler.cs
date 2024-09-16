@@ -14,7 +14,7 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
 
 		team.SignPlayer(player);
 
-		await playerRepo.Add(player, cancellationToken);
+		await teamRepo.Update(team, cancellationToken);
 
 		return Result<Team>.Success(team);
 	}

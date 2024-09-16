@@ -12,7 +12,7 @@ public class SignPlayerCommandHandlerTest
 		var team = Team.Create(new TeamName("Laget"), Guid.NewGuid(), []);
 		await teamRepo.Add(team);
 		var playerRepo = new FakeRepo<Player>();
-		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+		var player = new Player(Guid.NewGuid(), team.Id, new PlayerName("Jakob"), Position.Defender);
 		await playerRepo.Add(player);
 		var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
 

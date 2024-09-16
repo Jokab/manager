@@ -17,4 +17,15 @@ public class FakeRepo<T> : IRepository<T> where T : Entity
 	{
 		return Task.FromResult(Entities.FirstOrDefault(x => x.Id == id));
 	}
+
+	public Task Update(T entity, CancellationToken cancellationToken = default)
+	{
+		var index = Entities.FindIndex(x => x.Id == entity.Id);  
+		if (index != -1) 
+		{
+			Entities[index] = entity;
+		}
+
+		return Task.CompletedTask;
+	}
 }

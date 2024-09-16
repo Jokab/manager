@@ -25,7 +25,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
     {
         var (manager, newTeam) = await SeedAndLogin();
         var db = TestDbFactory.Create(_webApplicationFactory.Services);
-        var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender);
+        var player = new Player(Guid.NewGuid(), null, new PlayerName("Jakob"), Position.Defender);
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
