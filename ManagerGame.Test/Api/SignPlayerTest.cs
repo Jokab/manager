@@ -40,6 +40,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
 
         Assert.Equal("Jakob", team.Players.First().Name.Name);
         Assert.Equal(Position.Defender, team.Players.First().Position);
+        Assert.Equal(team.Id, team.Players.First().TeamId);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()

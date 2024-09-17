@@ -16,6 +16,8 @@ public class SignPlayerCommandHandlerTest
 		var playerRepo = Substitute.For<IRepository<Player>>();
 		var player = new Player(Guid.NewGuid(), team.Id, new PlayerName("Jakob"), Position.Defender);
 		playerRepo.Find(player.Id).Returns(player);
+
+		Assert.Empty(team.Players);
 		
 		var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
 
