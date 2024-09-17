@@ -42,47 +42,48 @@ public class Team : Entity
     }
 }
 
-public class Player : Entity
+public record MarketValue
 {
-	public Player(Guid id, Guid? teamId, PlayerName name, Position position) : base(id)
+	public decimal Value { get; private init; }
+	
+	public MarketValue(decimal value)
 	{
-		TeamId = teamId;
-		Name = name;
-		Position = position;
+		if (value < 0)
+		{
+			throw new ArgumentException("Value cannot be < 0");
+		}
+		Value = value;
 	}
 
-	public Guid? TeamId { get; init; }
-	public PlayerName Name { get; init; }
-	public Position Position { get; init; }
-	// public MarketValue MarketValue { get; init; }
-	// public Country Country { get; init; }
-
-	private sealed class IdNamePositionEqualityComparer : IEqualityComparer<Player>
+	public override string ToString()
 	{
-		public bool Equals(Player? x, Player? y)
-		{
-			if (ReferenceEquals(x, y)) return true;
-			if (ReferenceEquals(x, null)) return false;
-			if (ReferenceEquals(y, null)) return false;
-			if (x.GetType() != y.GetType()) return false;
-			return x.Id.Equals(y.Id) && x.Name.Equals(y.Name) && x.Position == y.Position;
-		}
+		return Value.ToString("C");
+	}
+}
 
-		public int GetHashCode(Player obj)
-		{
-			return HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
-		}
+
+public enum Country
+{
+	Se
+}
+
+public record CountryRec
+{
+	private readonly Country _country;
+
+	public CountryRec(Country country)
+	{
+		_country = country;
 	}
 
-	public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
-}
-
-public class MarketValue
-{
-}
-
-public class Country
-{
+	public override string ToString()
+	{
+		return _country switch
+		{
+			Country.Se => "Sverige",
+			_ => throw new ArgumentOutOfRangeException(nameof(_country), "Unsupported country")
+		};
+	}
 }
 
 public enum Position
