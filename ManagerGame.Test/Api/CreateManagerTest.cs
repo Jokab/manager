@@ -1,25 +1,24 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ManagerGame.Test.Api;
 
 public class CreateManagerTest : IClassFixture<Fixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly WebApplicationFactory<Program> _webApplicationFactory;
+    private readonly Fixture _fixture;
 
     public CreateManagerTest(Fixture fixture)
     {
-        _webApplicationFactory = fixture;
-        _httpClient = _webApplicationFactory.CreateDefaultClient();
+        _fixture = fixture;
+        _httpClient = fixture.CreateDefaultClient();
     }
 
     [Fact]
     public async Task Test()
     {
-        var db = TestDbFactory.Create(_webApplicationFactory.Services);
-
+        var db = TestDbFactory.Create(_fixture);
+        
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);

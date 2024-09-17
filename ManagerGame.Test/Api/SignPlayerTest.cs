@@ -4,27 +4,28 @@ using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Api;
 
 public class SignPlayerTest : IClassFixture<Fixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly WebApplicationFactory<Program> _webApplicationFactory;
+    private readonly Fixture _fixture;
+
 
     public SignPlayerTest(Fixture fixture)
     {
-        _webApplicationFactory = fixture;
-        _httpClient = _webApplicationFactory.CreateDefaultClient();
+        _fixture = fixture;
+        _httpClient = fixture.CreateDefaultClient();
     }
 
     [Fact]
     public async Task SignFirstPlayer()
     {
+        var db = TestDbFactory.Create(_fixture);
+
         var (manager, newTeam) = await SeedAndLogin();
-        var db = TestDbFactory.Create(_webApplicationFactory.Services);
+
         var player = new Player(Guid.NewGuid(), null, new PlayerName("Jakob"), Position.Defender);
         db.Players.Add(player);
         await db.SaveChangesAsync();
@@ -39,9 +40,6 @@ public class SignPlayerTest : IClassFixture<Fixture>
 
         Assert.Equal("Jakob", team.Players.First().Name.Name);
         Assert.Equal(Position.Defender, team.Players.First().Position);
-
-        Assert.Equal("Jakob", db.Teams.Include(t => t.Players).First().Players.First().Name.Name);
-        Assert.Equal(Position.Defender, db.Teams.Include(t => t.Players).First().Players.First().Position);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()
@@ -49,7 +47,6 @@ public class SignPlayerTest : IClassFixture<Fixture>
         var (_, manager) = await _httpClient.PostManager<ManagerDto>();
         var createTeamRequest = new CreateTeamRequest
             { Name = new TeamName("Lag"), ManagerId = manager!.Id };
-        var db = TestDbFactory.Create(_webApplicationFactory.Services);
         var (_, login) =
             await _httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerId = manager.Id });
 

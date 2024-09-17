@@ -1,17 +1,15 @@
 using ManagerGame.Core;
-using Microsoft.Extensions.DependencyInjection;
+using ManagerGame.Test.Api;
 
 namespace ManagerGame.Test;
 
 public static class TestDbFactory
 {
-    public static ApplicationDbContext Create(IServiceProvider serviceProvider)
+    public static ApplicationDbContext Create(Fixture fixture)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(fixture);
 
-        using var scope = serviceProvider.CreateScope();
-        var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
-        if (db is null) throw new Exception("Failed to acquire db");
+        var db = fixture.CreateContext();
         return db;
     }
 }

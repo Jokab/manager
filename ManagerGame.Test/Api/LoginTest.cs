@@ -13,23 +13,27 @@ namespace ManagerGame.Test.Api;
 public class LoginTest : IClassFixture<Fixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly WebApplicationFactory<Program> _webApplicationFactory;
+    private readonly Fixture _fixture;
     private readonly IConfiguration _configuration;
 
     public LoginTest(Fixture fixture)
     {
-        _webApplicationFactory = fixture;
-        _httpClient = _webApplicationFactory.CreateDefaultClient();
-        this._configuration = _webApplicationFactory.Services.GetService<IConfiguration>()!;
+        _fixture = fixture;
+        _httpClient = fixture.CreateDefaultClient();
+        _configuration = fixture.Services.GetService<IConfiguration>()!;
     }
 
     [Fact]
     public async Task GeneratesJwtTokenForManager()
     {
+        var db = TestDbFactory.Create(_fixture);
+        
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
         var request = new LoginRequest { ManagerId = manager!.Id };
 
         var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
+        
+        db.ChangeTracker.Clear();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
