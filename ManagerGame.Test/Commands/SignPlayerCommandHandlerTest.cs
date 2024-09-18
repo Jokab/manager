@@ -14,7 +14,7 @@ public class SignPlayerCommandHandlerTest
 		teamRepo.Find(team.Id).Returns(team);
 		
 		var playerRepo = Substitute.For<IRepository<Player>>();
-		var player = new Player(Guid.NewGuid(), team.Id, new PlayerName("Jakob"), Position.Defender, new MarketValue(1000), new CountryRec(Country.Se));
+		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender, new MarketValue(1000), new CountryRec(Country.Se));
 		playerRepo.Find(player.Id).Returns(player);
 
 		Assert.Empty(team.Players);
@@ -25,6 +25,7 @@ public class SignPlayerCommandHandlerTest
 
 		await teamRepo.Received().Update(Arg.Is<Team>(t =>
 			t.Players.First().Id == player.Id
+			&& t.Players.First().TeamId == team.Id
 			&& t.Players.First().Name.Name == "Jakob"
 			&& t.Players.First().Position == Position.Defender
 			&& t.Players.First().MarketValue.Value == 1000

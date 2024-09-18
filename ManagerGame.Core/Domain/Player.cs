@@ -3,21 +3,19 @@ namespace ManagerGame.Core.Domain;
 public class Player : Entity
 {
     public Player(Guid id,
-        Guid? teamId,
         PlayerName name,
         Position position,
         MarketValue marketValue,
         CountryRec country)
         : base(id)
     {
-        TeamId = teamId;
         Name = name;
         Position = position;
         MarketValue = marketValue;
         Country = country;
     }
 
-    public Guid? TeamId { get; init; }
+    public Guid? TeamId { get; set; }
     public PlayerName Name { get; init; }
     public Position Position { get; init; }
     public MarketValue MarketValue { get; init; }

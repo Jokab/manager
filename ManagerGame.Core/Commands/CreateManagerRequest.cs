@@ -4,6 +4,6 @@ namespace ManagerGame.Core.Commands;
 
 public class CreateManagerRequest : ICommand<Manager>
 {
-    public required ManagerName Name { get; set; }
-    public required Email Email { get; set; }
+    public required ManagerName Name { get; init; }
+    public required Email Email { get; init; }
 }

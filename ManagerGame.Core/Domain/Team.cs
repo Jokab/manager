@@ -21,9 +21,9 @@ public class Team : Entity
         Players = players;
     }
 
-    public TeamName Name { get; set; }
-    public Guid ManagerId { get; set; }
-    public ICollection<Player> Players { get; set; } = [];
+    public TeamName Name { get; init; }
+    public Guid ManagerId { get; init; }
+    public ICollection<Player> Players { get; init; } = [];
 
     public static Team Create(TeamName name,
         Guid managerId,
@@ -39,5 +39,6 @@ public class Team : Entity
 		    throw new ArgumentException($"Player with ID {player.Id} already added");
 	    }
 	    Players.Add(player);
+	    player.TeamId = Id;
     }
 }
