@@ -26,7 +26,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
 
         var (manager, newTeam) = await SeedAndLogin();
 
-        var player = new Player(Guid.NewGuid(), null, new PlayerName("Jakob"), Position.Defender);
+        var player = new Player(Guid.NewGuid(), null, new PlayerName("Jakob"), Position.Defender, new MarketValue(1000), new CountryRec(Country.Se));
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
@@ -41,6 +41,8 @@ public class SignPlayerTest : IClassFixture<Fixture>
         Assert.Equal("Jakob", team.Players.First().Name.Name);
         Assert.Equal(Position.Defender, team.Players.First().Position);
         Assert.Equal(team.Id, team.Players.First().TeamId);
+        Assert.Equal(1000, team.Players.First().MarketValue.Value);
+        Assert.Equal(Country.Se, team.Players.First().Country.Country);
     }
 
     private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()

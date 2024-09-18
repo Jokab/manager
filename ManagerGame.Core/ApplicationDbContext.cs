@@ -40,5 +40,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Player>()
 	        .Property(x => x.Name)
 	        .HasConversion(x => x.Name, x => new PlayerName(x));
+        modelBuilder.Entity<Player>()
+	        .Property(x => x.MarketValue)
+	        .HasConversion(x => x.Value, x => new MarketValue(x));
+        modelBuilder.Entity<Player>()
+	        .Property(x => x.Country)
+	        .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
     }
 }
