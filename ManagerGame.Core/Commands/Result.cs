@@ -34,4 +34,5 @@ public record Error(string Code)
 {
     public static readonly Error None = new(string.Empty);
     public static readonly Error NotFound = new("Not Found");
+    public static readonly Error PlayerAlreadySigned = new("Player already signed");
 }

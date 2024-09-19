@@ -17,6 +17,7 @@ public class Player : Entity
     public PlayerName Name { get; init; }
     public Position Position { get; init; }
     public CountryRec Country { get; init; }
+    public bool IsSigned => TeamId != null;
 
     public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
 

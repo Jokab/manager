@@ -13,7 +13,8 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
 
         var player = await playerRepo.Find(command.PlayerId, cancellationToken);
         if (player is null) return Result<Team>.Failure(Error.NotFound);
-
+        if (player.IsSigned) return Result<Team>.Failure(Error.PlayerAlreadySigned);
+        
         team.SignPlayer(player);
 
         await teamRepo.Update(team, cancellationToken);
