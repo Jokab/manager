@@ -11,7 +11,6 @@ public class TeamTest
         var player = TestData.Player();
         Assert.Empty(team.Players);
 
-        // team.AddFunds(1500);
         team.SignPlayer(player);
 
         Assert.Contains(player, team.Players);

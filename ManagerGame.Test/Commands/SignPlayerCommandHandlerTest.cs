@@ -48,6 +48,8 @@ public class SignPlayerCommandHandlerTest
         Assert.Empty(team2.Players);
         var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
+        
+        Assert.True(player.IsSigned);
 
         var signResult = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
         
