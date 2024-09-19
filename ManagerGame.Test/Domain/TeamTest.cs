@@ -30,14 +30,14 @@ public class TeamTest
     
     [Theory]
     [InlineData(Country.Se, 0)]
-    [InlineData(Country.Se, 1)]
     [InlineData(Country.Dk, 0)]
     public void CannotSignMoreThanLimitFromSameCountry(Country country, int initialPlayersCountOverLimit)
     {
+        var players = Enumerable.Range(0, Team.PlayersFromSameCountryLimit + initialPlayersCountOverLimit)
+            .Select(_ => TestData.Player(country)).ToList();
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
-            Enumerable.Range(0, Team.PlayersFromSameCountryLimit + initialPlayersCountOverLimit)
-                .Select(_ => TestData.Player(country)).ToList());
+            players);
         
         var newPlayer = TestData.Player(country);
 
@@ -47,20 +47,44 @@ public class TeamTest
     [Theory]
     [InlineData(Country.Se, 1)]
     [InlineData(Country.Se, 2)]
-    [InlineData(Country.Se, 3)]
-    [InlineData(Country.Se, 4)]
-    [InlineData(Country.Dk, 4)]
+    [InlineData(Country.Dk, 1)]
     public void CanSignFromSameCountryUpToLimit(Country country, int initialPlayersCountBelowLimit)
     {
+        var players = Enumerable.Range(0, Team.PlayersFromSameCountryLimit - initialPlayersCountBelowLimit)
+            .Select(_ => TestData.Player(country)).ToList();
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
-            Enumerable.Range(0, Team.PlayersFromSameCountryLimit - initialPlayersCountBelowLimit)
-                .Select(_ => TestData.Player(country)).ToList());
+            players);
 
+        var newPlayer = TestData.Player(country);
+        team.SignPlayer(newPlayer);
+
+        Assert.Contains(newPlayer, team.Players);
+    }
+    
+    [Fact]
+    public void CannotSignMoreThanPlayerLimit()
+    {
+        var team = TestData.TeamWithValidFullSquad();
+
+        Assert.Throws<ArgumentException>(() => team.SignPlayer(TestData.Player()));
+    }
+    
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void CanSignPlayersBelowLimit(int initialPlayersCountBelowLimit)
+    {
+        var team = TestData.TeamWithValidFullSquad();
         for (var i = 0; i < initialPlayersCountBelowLimit; i++)
         {
-            var newPlayer = TestData.Player(country);
-            team.SignPlayer(newPlayer);
+            // Remove from full squad so we can add them in test 
+            team.Players.Remove(team.Players.ToList().First(x => x.Country.Country == Country.Se));
         }
+        var newPlayer = TestData.Player(Country.Se);
+
+        team.SignPlayer(newPlayer);
+
+        Assert.Contains(newPlayer, team.Players);
     }
 }

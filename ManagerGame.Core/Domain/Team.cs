@@ -26,12 +26,19 @@ public class Team : Entity
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
     public const int PlayersFromSameCountryLimit = 4;
+    public const int PlayerLimit = 22;
 
     public static Team Create(TeamName name,
         Guid managerId,
         ICollection<Player> players)
     {
-        return new Team(Guid.NewGuid(), name, managerId, players);
+        var team = new Team(Guid.NewGuid(), name, managerId, []);
+        foreach (var player in players)
+        {
+            team.SignPlayer(player);
+        }
+
+        return team;
     }
     
     public void SignPlayer(Player player)
@@ -39,6 +46,9 @@ public class Team : Entity
         if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
         if (Players.Count(x => x.Country == player.Country) >= PlayersFromSameCountryLimit)
             throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");
+        if (Players.Count >= PlayerLimit)
+            throw new ArgumentException($"Cannot have more than {PlayerLimit} players");
+        
         Players.Add(player);
         player.TeamId = Id;
     }
