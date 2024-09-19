@@ -14,7 +14,7 @@ public class SignPlayerCommandHandlerTest
 		teamRepo.Find(team.Id).Returns(team);
 		
 		var playerRepo = Substitute.For<IRepository<Player>>();
-		var player = new Player(Guid.NewGuid(), new PlayerName("Jakob"), Position.Defender, new MarketValue(1000), new CountryRec(Country.Se));
+		var player = TestData.Player();
 		playerRepo.Find(player.Id).Returns(player);
 
 		Assert.Empty(team.Players);
