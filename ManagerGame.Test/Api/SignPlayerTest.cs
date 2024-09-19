@@ -41,7 +41,6 @@ public class SignPlayerTest : IClassFixture<Fixture>
         Assert.Equal("Jakob", team.Players.First().Name.Name);
         Assert.Equal(Position.Defender, team.Players.First().Position);
         Assert.Equal(team.Id, team.Players.First().TeamId);
-        Assert.Equal(1000, team.Players.First().MarketValue.Value);
         Assert.Equal(Country.Se, team.Players.First().Country.Country);
     }
 

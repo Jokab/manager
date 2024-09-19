@@ -5,20 +5,17 @@ public class Player : Entity
     public Player(Guid id,
         PlayerName name,
         Position position,
-        MarketValue marketValue,
         CountryRec country)
         : base(id)
     {
         Name = name;
         Position = position;
-        MarketValue = marketValue;
         Country = country;
     }
 
     public Guid? TeamId { get; set; }
     public PlayerName Name { get; init; }
     public Position Position { get; init; }
-    public MarketValue MarketValue { get; init; }
     public CountryRec Country { get; init; }
 
     public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
@@ -39,22 +36,6 @@ public class Player : Entity
         {
             return HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
         }
-    }
-}
-
-public record MarketValue
-{
-    public MarketValue(decimal value)
-    {
-        if (value < 0) throw new ArgumentException("Value cannot be < 0");
-        Value = value;
-    }
-
-    public decimal Value { get; }
-
-    public override string ToString()
-    {
-        return Value.ToString("C");
     }
 }
 

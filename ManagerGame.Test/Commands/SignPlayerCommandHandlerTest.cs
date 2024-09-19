@@ -28,7 +28,6 @@ public class SignPlayerCommandHandlerTest
             && t.Players.First().TeamId == team.Id
             && t.Players.First().Name.Name == "Jakob"
             && t.Players.First().Position == Position.Defender
-            && t.Players.First().MarketValue.Value == 1000
             && t.Players.First().Country.Country == Country.Se));
     }
 }

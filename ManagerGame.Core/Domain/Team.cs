@@ -32,7 +32,7 @@ public class Team : Entity
     {
         return new Team(Guid.NewGuid(), name, managerId, players);
     }
-
+    
     public void SignPlayer(Player player)
     {
         if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
