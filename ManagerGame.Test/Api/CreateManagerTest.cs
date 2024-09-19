@@ -5,8 +5,8 @@ namespace ManagerGame.Test.Api;
 
 public class CreateManagerTest : IClassFixture<Fixture>
 {
-    private readonly HttpClient _httpClient;
     private readonly Fixture _fixture;
+    private readonly HttpClient _httpClient;
 
     public CreateManagerTest(Fixture fixture)
     {
@@ -18,7 +18,7 @@ public class CreateManagerTest : IClassFixture<Fixture>
     public async Task Test()
     {
         var db = TestDbFactory.Create(_fixture);
-        
+
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);

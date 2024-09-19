@@ -9,12 +9,11 @@ namespace ManagerGame.Test.Api;
 
 public class CreateTeamTest : IClassFixture<Fixture>
 {
-    private readonly HttpClient _httpClient;
     private readonly Fixture _fixture;
+    private readonly HttpClient _httpClient;
 
     public CreateTeamTest(Fixture fixture)
     {
-
         _fixture = fixture;
         _httpClient = fixture.CreateDefaultClient();
     }
@@ -51,12 +50,11 @@ public class CreateTeamTest : IClassFixture<Fixture>
 
 public class UnauthorizedTeamTest : IClassFixture<Fixture>
 {
-    private readonly HttpClient _httpClient;
     private readonly Fixture _fixture;
+    private readonly HttpClient _httpClient;
 
     public UnauthorizedTeamTest(Fixture fixture)
     {
-
         _fixture = fixture;
         _httpClient = fixture.CreateDefaultClient();
     }

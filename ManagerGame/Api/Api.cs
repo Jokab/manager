@@ -23,12 +23,12 @@ internal static class Api
     }
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(
-	    SignPlayerRequest request,
-	    SignPlayerCommandHandler handler)
+        SignPlayerRequest request,
+        SignPlayerCommandHandler handler)
     {
         await handler.Handle(request);
 
-        return TypedResults.Ok<SignPlayerDto>(new SignPlayerDto());
+        return TypedResults.Ok(new SignPlayerDto());
     }
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(

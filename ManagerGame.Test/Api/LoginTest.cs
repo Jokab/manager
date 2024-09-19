@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -12,9 +11,9 @@ namespace ManagerGame.Test.Api;
 
 public class LoginTest : IClassFixture<Fixture>
 {
-    private readonly HttpClient _httpClient;
-    private readonly Fixture _fixture;
     private readonly IConfiguration _configuration;
+    private readonly Fixture _fixture;
+    private readonly HttpClient _httpClient;
 
     public LoginTest(Fixture fixture)
     {
@@ -27,12 +26,12 @@ public class LoginTest : IClassFixture<Fixture>
     public async Task GeneratesJwtTokenForManager()
     {
         var db = TestDbFactory.Create(_fixture);
-        
+
         var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
         var request = new LoginRequest { ManagerId = manager!.Id };
 
         var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
-        
+
         db.ChangeTracker.Clear();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);

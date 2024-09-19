@@ -38,12 +38,12 @@ public static class HttpClientExtensions
     }
 
     public static async Task<(HttpResponseMessage, T?)> Get<T>(this HttpClient httpClient,
-	    string uri)
+        string uri)
     {
-	    return await httpClient.GetAsync(new Uri(uri, UriKind.Relative)) switch
-	    {
-		    { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
-		    { } response => (response, default)
-	    };
+        return await httpClient.GetAsync(new Uri(uri, UriKind.Relative)) switch
+        {
+            { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
+            { } response => (response, default)
+        };
     }
 }

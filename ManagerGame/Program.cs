@@ -1,9 +1,9 @@
 using System.Text;
-using ManagerGame.Infra;
 using ManagerGame.Api;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
+using ManagerGame.Infra;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);

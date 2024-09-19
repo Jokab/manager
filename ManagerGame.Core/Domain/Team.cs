@@ -5,12 +5,13 @@ namespace ManagerGame.Core.Domain;
 public class Team : Entity
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	[JsonConstructor]
-	private Team() : base(Guid.NewGuid())
-	{}
+    [JsonConstructor]
+    private Team() : base(Guid.NewGuid())
+    {
+    }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-	private Team(Guid id,
+    private Team(Guid id,
         TeamName name,
         Guid managerId,
         ICollection<Player> players)
@@ -34,11 +35,8 @@ public class Team : Entity
 
     public void SignPlayer(Player player)
     {
-	    if (Players.Contains(player))
-	    {
-		    throw new ArgumentException($"Player with ID {player.Id} already added");
-	    }
-	    Players.Add(player);
-	    player.TeamId = Id;
+        if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
+        Players.Add(player);
+        player.TeamId = Id;
     }
 }

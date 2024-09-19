@@ -21,9 +21,12 @@ public class Player : Entity
     public MarketValue MarketValue { get; init; }
     public CountryRec Country { get; init; }
 
+    public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
+
     private sealed class IdNamePositionEqualityComparer : IEqualityComparer<Player>
     {
-        public bool Equals(Player? x, Player? y)
+        public bool Equals(Player? x,
+            Player? y)
         {
             if (ReferenceEquals(x, y)) return true;
             if (ReferenceEquals(x, null)) return false;
@@ -37,30 +40,23 @@ public class Player : Entity
             return HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
         }
     }
-
-    public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
 }
-
 
 public record MarketValue
 {
-    public decimal Value { get; }
-	
     public MarketValue(decimal value)
     {
-        if (value < 0)
-        {
-            throw new ArgumentException("Value cannot be < 0");
-        }
+        if (value < 0) throw new ArgumentException("Value cannot be < 0");
         Value = value;
     }
+
+    public decimal Value { get; }
 
     public override string ToString()
     {
         return Value.ToString("C");
     }
 }
-
 
 public enum Country
 {
@@ -69,12 +65,12 @@ public enum Country
 
 public record CountryRec
 {
-    public Country Country { get; }
-
     public CountryRec(Country country)
     {
         Country = country;
     }
+
+    public Country Country { get; }
 
     public override string ToString()
     {

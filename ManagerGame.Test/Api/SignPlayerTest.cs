@@ -9,8 +9,8 @@ namespace ManagerGame.Test.Api;
 
 public class SignPlayerTest : IClassFixture<Fixture>
 {
-    private readonly HttpClient _httpClient;
     private readonly Fixture _fixture;
+    private readonly HttpClient _httpClient;
 
 
     public SignPlayerTest(Fixture fixture)
@@ -31,7 +31,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
         await db.SaveChangesAsync();
 
         var (httpResponseMessage, signPlayerDto) =
-	        await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
+            await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
         var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
 
@@ -60,4 +60,3 @@ public class SignPlayerTest : IClassFixture<Fixture>
         return (manager, team!);
     }
 }
-

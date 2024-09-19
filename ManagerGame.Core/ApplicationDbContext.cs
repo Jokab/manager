@@ -22,29 +22,29 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(x => x.ManagerId)
             .IsRequired();
         modelBuilder.Entity<Manager>()
-	        .Property(x => x.Email)
-	        .HasConversion(x => x.EmailAddress, x => new Email(x));
+            .Property(x => x.Email)
+            .HasConversion(x => x.EmailAddress, x => new Email(x));
         modelBuilder.Entity<Manager>()
-	        .Property(x => x.Name).HasConversion(x => x.Name, x => new ManagerName(x));
+            .Property(x => x.Name).HasConversion(x => x.Name, x => new ManagerName(x));
 
         modelBuilder.Entity<Team>()
-	        .Property(x => x.Name)
-	        .HasConversion(x => x.Name, x => new TeamName(x));
+            .Property(x => x.Name)
+            .HasConversion(x => x.Name, x => new TeamName(x));
         modelBuilder.Entity<Team>()
-	        .HasMany(x => x.Players)
-	        .WithOne()
-	        .HasForeignKey(x => x.TeamId);
+            .HasMany(x => x.Players)
+            .WithOne()
+            .HasForeignKey(x => x.TeamId);
 
         modelBuilder.Entity<Player>()
-	        .HasKey(x => x.Id);
+            .HasKey(x => x.Id);
         modelBuilder.Entity<Player>()
-	        .Property(x => x.Name)
-	        .HasConversion(x => x.Name, x => new PlayerName(x));
+            .Property(x => x.Name)
+            .HasConversion(x => x.Name, x => new PlayerName(x));
         modelBuilder.Entity<Player>()
-	        .Property(x => x.MarketValue)
-	        .HasConversion(x => x.Value, x => new MarketValue(x));
+            .Property(x => x.MarketValue)
+            .HasConversion(x => x.Value, x => new MarketValue(x));
         modelBuilder.Entity<Player>()
-	        .Property(x => x.Country)
-	        .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
+            .Property(x => x.Country)
+            .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
     }
 }
