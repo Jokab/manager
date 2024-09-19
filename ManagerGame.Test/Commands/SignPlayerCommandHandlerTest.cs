@@ -30,7 +30,7 @@ public class SignPlayerCommandHandlerTest
             && t.Players.First().Position == Position.Defender
             && t.Players.First().Country.Country == Country.Se));
     }
-    
+
     [Fact]
     public async Task CannotSignSignedPlayer()
     {
@@ -48,11 +48,11 @@ public class SignPlayerCommandHandlerTest
         Assert.Empty(team2.Players);
         var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
-        
+
         Assert.True(player.IsSigned);
 
         var signResult = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
-        
+
         Assert.True(signResult.IsFailure);
         Assert.True(signResult.Error == Error.PlayerAlreadySigned);
     }

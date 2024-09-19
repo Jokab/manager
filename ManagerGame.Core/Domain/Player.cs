@@ -47,8 +47,7 @@ public enum Country
     En,
     De,
     No,
-    Es,
-    
+    Es
 }
 
 public record CountryRec
