@@ -25,6 +25,7 @@ public class Team : Entity
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
+    public const int PlayersFromSameCountryLimit = 4;
 
     public static Team Create(TeamName name,
         Guid managerId,
@@ -36,6 +37,8 @@ public class Team : Entity
     public void SignPlayer(Player player)
     {
         if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
+        if (Players.Count(x => x.Country == player.Country) >= PlayersFromSameCountryLimit)
+            throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");
         Players.Add(player);
         player.TeamId = Id;
     }

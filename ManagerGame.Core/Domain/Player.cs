@@ -42,7 +42,8 @@ public class Player : Entity
 
 public enum Country
 {
-    Se
+    Se,
+    Dk
 }
 
 public record CountryRec
