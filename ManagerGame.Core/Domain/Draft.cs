@@ -3,13 +3,13 @@ namespace ManagerGame.Core.Domain;
 public class Draft
 {
     public List<Team> Teams { get; set; }
-    public IDraftOrder DraftOrder { get; set; }
+    private readonly IDraftOrder _draftOrder; 
 
     private Draft(List<Team> teams,
         IDraftOrder draftOrder)
     {
         Teams = teams;
-        DraftOrder = draftOrder;
+        _draftOrder = draftOrder;
     }
 
     public static Draft DoublePeakTraversalDraft(List<Team> teams)
@@ -19,16 +19,17 @@ public class Draft
 
     public Team GetNext()
     {
-        return DraftOrder.GetNext();
+        return _draftOrder.GetNext();
     }
     
-    public interface IDraftOrder
+    private interface IDraftOrder
     {
         public Team GetNext();
     }
 
-    /// Chat GPT said this was the name for this traversal but I can't really find anything online to support that :-)
-    public class DoubledPeakTraversalDraftOrder : IDraftOrder
+    /// Chat GPT said this was the name for this traversal, but I can't really find anything online to support that :-)
+    /// Moves like: A -> B -> C -> C -> B -> A -> A -> B etc
+    private class DoubledPeakTraversalDraftOrder : IDraftOrder
     {
         private readonly Team[] _teams;
         private bool _movingBackwards;
@@ -42,19 +43,6 @@ public class Draft
 
         public Team GetNext()
         {
-            if (_current == _teams.Length - 1)
-            {
-                if (_movingBackwards)
-                {
-                    return _teams[_current--];
-                }
-                else
-                {
-                    _movingBackwards = true;
-                    return _teams[_current];
-                }
-            }
-
             if (_current == 0)
             {
                 if (_movingBackwards)
@@ -65,6 +53,19 @@ public class Draft
                 else
                 {
                     return _teams[_current++];
+                }
+            }
+            
+            if (_current == _teams.Length - 1)
+            {
+                if (_movingBackwards)
+                {
+                    return _teams[_current--];
+                }
+                else
+                {
+                    _movingBackwards = true;
+                    return _teams[_current];
                 }
             }
 
