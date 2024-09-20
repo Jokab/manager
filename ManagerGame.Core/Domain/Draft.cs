@@ -3,7 +3,7 @@ namespace ManagerGame.Core.Domain;
 public class Draft
 {
     public List<Team> Teams { get; set; }
-    private readonly DraftOrder _draftOrder; 
+    private readonly DraftOrder _draftOrder;
 
     private Draft(List<Team> teams,
         DraftOrder draftOrder)
@@ -22,7 +22,7 @@ public class Draft
     {
         return _draftOrder.GetNext();
     }
-    
+
     private abstract class DraftOrder
     {
         protected readonly Team[] Teams;
@@ -34,18 +34,14 @@ public class Draft
             Current = 0;
             Teams = teams.ToArray();
         }
-        
+
         public abstract Team GetNext();
     }
 
     /// Chat GPT said this was the name for this traversal, but I can't really find anything online to support that :-)
     /// Moves like: A -> B -> C -> C -> B -> A -> A -> B etc
-    private class DoubledPeakTraversalDraftOrder : DraftOrder
+    private class DoubledPeakTraversalDraftOrder(List<Team> teams) : DraftOrder(teams)
     {
-        public DoubledPeakTraversalDraftOrder(List<Team> teams) : base(teams)
-        {
-        }
-
         public override Team GetNext()
         {
             Team next;
@@ -92,8 +88,8 @@ public class Draft
                     throw new Exception("Invalid state");
                 }
             }
+
             return next;
         }
     }
 }
-
