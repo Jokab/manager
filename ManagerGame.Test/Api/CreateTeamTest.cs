@@ -62,8 +62,6 @@ public class UnauthorizedTeamTest : IClassFixture<Fixture>
     [Fact]
     public async Task UnauthorizedIfNotLoggedIn()
     {
-        var db = TestDbFactory.Create(_fixture);
-
         var (_, manager) = await _httpClient.PostManager<ManagerDto>();
 
         _httpClient.DefaultRequestHeaders.Authorization = null;

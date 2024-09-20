@@ -1,6 +1,4 @@
 using System.Net;
-using System.Net.Http.Headers;
-using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
@@ -24,7 +22,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
 
-        var (manager, newTeam) = await SeedAndLogin();
+        var (manager, newTeam) = await Seed.SeedAndLogin(_httpClient);
 
         var player = TestData.Player();
         db.Players.Add(player);
@@ -42,20 +40,5 @@ public class SignPlayerTest : IClassFixture<Fixture>
         Assert.Equal(Position.Defender, team.Players.First().Position);
         Assert.Equal(team.Id, team.Players.First().TeamId);
         Assert.Equal(Country.Se, team.Players.First().Country.Country);
-    }
-
-    private async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin()
-    {
-        var (_, manager) = await _httpClient.PostManager<ManagerDto>();
-        var createTeamRequest = new CreateTeamRequest
-            { Name = new TeamName("Lag"), ManagerId = manager!.Id };
-        var (_, login) =
-            await _httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerId = manager.Id });
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
-
-        var (_, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
-
-        return (manager, team!);
     }
 }

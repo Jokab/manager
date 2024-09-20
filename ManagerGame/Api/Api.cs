@@ -1,3 +1,4 @@
+using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
@@ -20,6 +21,28 @@ internal static class Api
         api.MapPost("teams", CreateTeam).RequireAuthorization("user");
         api.MapGet("teams/{id:guid}", GetTeam).RequireAuthorization("user");
         api.MapPost("teams/sign", SignPlayer).RequireAuthorization("user");
+        
+        api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
+        api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
+    }
+
+    private static async Task<Ok<CreateDraftDto>> CreateDraft(
+        CreateDraftRequest request,
+        CreateDraftHandler handler)
+    {
+        await handler.Handle(request);
+
+        return TypedResults.Ok(new CreateDraftDto());
+    }
+    
+    
+    private static async Task<Ok<StartDraftDto>> StartDraft(
+        StartDraftRequest request,
+        StartDraftHandler handler)
+    {
+        await handler.Handle(request);
+
+        return TypedResults.Ok(new StartDraftDto());
     }
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(
@@ -79,8 +102,4 @@ internal static class Api
         var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(team);
     }
-}
-
-public class SignPlayerDto
-{
 }
