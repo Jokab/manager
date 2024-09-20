@@ -73,7 +73,8 @@ public enum Position
 {
     Defender,
     Midfielder,
-    Forward
+    Forward,
+    Goalkeeper
 }
 
 public record PlayerName

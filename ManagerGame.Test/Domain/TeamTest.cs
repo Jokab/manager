@@ -87,4 +87,20 @@ public class TeamTest
 
         Assert.Contains(newPlayer, team.Players);
     }
+    
+    [Fact]
+    public void CannotSignIfCannotConformToFormation()
+    {
+        var team = TestData.TeamWithValidFullSquad();
+
+        team.Players.Remove(team.Players.First(x => x.Position == Position.Midfielder));
+
+        Assert.Throws<ArgumentException>(() => team.SignPlayer(TestData.Player(position: Position.Midfielder)));
+    }
+    
+    [Fact]
+    public void CanSignIfConformsToFormation()
+    {
+        // TODO:
+    }
 }
