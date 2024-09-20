@@ -24,4 +24,11 @@ public class DraftTest
         Assert.Equal(team1, draft.GetNext());
         Assert.Equal(team2, draft.GetNext());
     }
+    
+    [Fact]
+    public void TooFewTeamsThrows()
+    {
+        var team1 = TestData.TeamWithValidFullSquad();
+        Assert.Throws<ArgumentException>(() => Draft.DoublePeakTraversalDraft([team1]));
+    }
 }

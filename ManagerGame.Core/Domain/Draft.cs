@@ -3,11 +3,12 @@ namespace ManagerGame.Core.Domain;
 public class Draft
 {
     public List<Team> Teams { get; set; }
-    private readonly IDraftOrder _draftOrder; 
+    private readonly DraftOrder _draftOrder; 
 
     private Draft(List<Team> teams,
-        IDraftOrder draftOrder)
+        DraftOrder draftOrder)
     {
+        if (teams.Count < 2) throw new ArgumentException("Too few teams to draft");
         Teams = teams;
         _draftOrder = draftOrder;
     }
@@ -22,65 +23,69 @@ public class Draft
         return _draftOrder.GetNext();
     }
     
-    private interface IDraftOrder
+    private abstract class DraftOrder
     {
-        public Team GetNext();
+        protected readonly Team[] Teams;
+        protected int Current;
+        protected int Previous;
+
+        protected DraftOrder(List<Team> teams)
+        {
+            Current = 0;
+            Teams = teams.ToArray();
+        }
+        
+        public abstract Team GetNext();
     }
 
     /// Chat GPT said this was the name for this traversal, but I can't really find anything online to support that :-)
     /// Moves like: A -> B -> C -> C -> B -> A -> A -> B etc
-    private class DoubledPeakTraversalDraftOrder : IDraftOrder
+    private class DoubledPeakTraversalDraftOrder : DraftOrder
     {
-        private readonly Team[] _teams;
-        private int _current;
-        private int _previous;
-
-        public DoubledPeakTraversalDraftOrder(List<Team> teams)
+        public DoubledPeakTraversalDraftOrder(List<Team> teams) : base(teams)
         {
-            _current = 0;
-            _teams = teams.ToArray();
         }
 
-        public Team GetNext()
+        public override Team GetNext()
         {
             Team next;
-            if (_current == 0)
+            if (Current == 0)
             {
-                if (_previous == 0)
+                if (Previous == 0)
                 {
-                    _previous = _current;
-                    next = _teams[_current++];
+                    Previous = Current;
+                    next = Teams[Current++];
                 }
                 else
                 {
-                    _previous = _current;
-                    next = _teams[_current];
+                    Previous = Current;
+                    next = Teams[Current];
                 }
             }
-            else if (_current == _teams.Length - 1)
+            else if (Current == Teams.Length - 1)
             {
-                if (_previous == _teams.Length - 1)
+                if (Previous == Teams.Length - 1)
                 {
-                    _previous = _current;
-                    next = _teams[_current--];
+                    Previous = Current;
+                    next = Teams[Current--];
                 }
                 else
                 {
-                    _previous = _current;
-                    next = _teams[_current];
+                    Previous = Current;
+                    next = Teams[Current];
                 }
             }
             else
             {
-                if (_previous == _current + 1)
+                if (Previous == Current + 1)
                 {
-                    _previous = _current;
-                    next = _teams[_current--];
+                    Previous = Current;
+                    next = Teams[Current--];
                 }
-                else if (_previous == _current - 1)
+                else if (Previous == Current - 1)
                 {
-                    _previous = _current;
-                    next = _teams[_current++];
+                    Previous = Current;
+                    next = Teams[Current++];
                 }
                 else
                 {
