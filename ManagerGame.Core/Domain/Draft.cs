@@ -43,35 +43,51 @@ public class Draft
 
         public Team GetNext()
         {
+            Team next;
             if (_current == 0)
             {
                 if (_previous == 0)
                 {
                     _previous = _current;
-                    return _teams[_current++];
+                    next = _teams[_current++];
                 }
                 else
                 {
                     _previous = _current;
-                    return _teams[_current];
+                    next = _teams[_current];
                 }
             }
-            
-            if (_current == _teams.Length - 1)
+            else if (_current == _teams.Length - 1)
             {
                 if (_previous == _teams.Length - 1)
                 {
                     _previous = _current;
-                    return _teams[_current--];
+                    next = _teams[_current--];
                 }
                 else
                 {
                     _previous = _current;
-                    return _teams[_current];
+                    next = _teams[_current];
                 }
             }
-
-            return _previous == _current + 1 ? _teams[_current--] : _teams[_current++];
+            else
+            {
+                if (_previous == _current + 1)
+                {
+                    _previous = _current;
+                    next = _teams[_current--];
+                }
+                else if (_previous == _current - 1)
+                {
+                    _previous = _current;
+                    next = _teams[_current++];
+                }
+                else
+                {
+                    throw new Exception("Invalid state");
+                }
+            }
+            return next;
         }
     }
 }
