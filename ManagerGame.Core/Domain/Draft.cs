@@ -32,8 +32,8 @@ public class Draft
     private class DoubledPeakTraversalDraftOrder : IDraftOrder
     {
         private readonly Team[] _teams;
-        private bool _movingBackwards;
         private int _current;
+        private int _previous;
 
         public DoubledPeakTraversalDraftOrder(List<Team> teams)
         {
@@ -45,31 +45,33 @@ public class Draft
         {
             if (_current == 0)
             {
-                if (_movingBackwards)
+                if (_previous == 0)
                 {
-                    _movingBackwards = false;
-                    return _teams[_current];
+                    _previous = _current;
+                    return _teams[_current++];
                 }
                 else
                 {
-                    return _teams[_current++];
+                    _previous = _current;
+                    return _teams[_current];
                 }
             }
             
             if (_current == _teams.Length - 1)
             {
-                if (_movingBackwards)
+                if (_previous == _teams.Length - 1)
                 {
+                    _previous = _current;
                     return _teams[_current--];
                 }
                 else
                 {
-                    _movingBackwards = true;
+                    _previous = _current;
                     return _teams[_current];
                 }
             }
 
-            return _movingBackwards ? _teams[_current--] : _teams[_current++];
+            return _previous == _current + 1 ? _teams[_current--] : _teams[_current++];
         }
     }
 }
