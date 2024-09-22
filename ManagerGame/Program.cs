@@ -45,6 +45,7 @@ builder.Services.AddTransient<StartDraftHandler>();
 
 builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
 builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
+builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
 

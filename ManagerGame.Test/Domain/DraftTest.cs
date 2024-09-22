@@ -11,7 +11,7 @@ public class DraftTest
         var team2 = TestData.TeamWithValidFullSquad();
         var team3 = TestData.TeamWithValidFullSquad();
         var team4 = TestData.TeamWithValidFullSquad();
-        var draft = Draft.DoublePeakTraversalDraft([team1, team2, team3, team4]);
+        var draft = Draft.DoubledPeakTraversalDraft([team1, team2, team3, team4]);
 
         Assert.Equal(team1, draft.GetNext());
         Assert.Equal(team2, draft.GetNext());
@@ -29,6 +29,6 @@ public class DraftTest
     public void TooFewTeamsThrows()
     {
         var team1 = TestData.TeamWithValidFullSquad();
-        Assert.Throws<ArgumentException>(() => Draft.DoublePeakTraversalDraft([team1]));
+        Assert.Throws<ArgumentException>(() => Draft.DoubledPeakTraversalDraft([team1]));
     }
 }

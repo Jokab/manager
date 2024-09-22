@@ -8,6 +8,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Player> Players { get; set; }
+    public DbSet<Draft> Drafts { get; set; }
+    // public DbSet<DoubledPeakTraversalDraftOrder> DoubledPeakTraversalDraftOrders { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -35,13 +37,30 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne()
             .HasForeignKey(x => x.TeamId);
 
-        modelBuilder.Entity<Player>()
-            .HasKey(x => x.Id);
+        modelBuilder.Entity<Player>().HasKey(x => x.Id);
         modelBuilder.Entity<Player>()
             .Property(x => x.Name)
             .HasConversion(x => x.Name, x => new PlayerName(x));
         modelBuilder.Entity<Player>()
             .Property(x => x.Country)
             .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
+        
+        modelBuilder.Entity<Draft>().HasKey(x => x.Id);
+        modelBuilder.Entity<Draft>().OwnsOne(typeof(DraftOrder), "DraftOrder",
+            x =>
+            {
+                x.Ignore("_teams");
+                x.Property("_current").HasColumnName("DraftOrderCurrent");
+                x.Property("_previous").HasColumnName("DraftOrderPrevious");
+            });
+        
+        modelBuilder.Entity<League>().HasKey(x => x.Id);
+        modelBuilder.Entity<League>()
+            .HasMany<Draft>(x => x.Drafts)
+            .WithOne(x => x.League).HasForeignKey(x => x.LeagueId);
+        modelBuilder.Entity<League>()
+            .HasMany<Team>(x => x.Teams)
+            .WithOne(x => x.League)
+            .HasForeignKey(x => x.LeagueId);
     }
 }

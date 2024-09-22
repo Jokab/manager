@@ -9,7 +9,7 @@ public class Team : Entity
     
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     [JsonConstructor]
-    private Team() : base(Guid.NewGuid())
+    private Team(Guid id) : base(id)
     {
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -17,23 +17,28 @@ public class Team : Entity
     private Team(Guid id,
         TeamName name,
         Guid managerId,
-        ICollection<Player> players)
+        ICollection<Player> players,
+        League league)
         : base(id)
     {
         Name = name;
         ManagerId = managerId;
         Players = players;
+        League = league;
     }
 
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
+    public League League { get; init; }
+    public Guid LeagueId { get; set; }
 
     public static Team Create(TeamName name,
         Guid managerId,
-        ICollection<Player> players)
+        ICollection<Player> players,
+        League league)
     {
-        var team = new Team(Guid.NewGuid(), name, managerId, []);
+        var team = new Team(Guid.NewGuid(), name, managerId, [], league);
         foreach (var player in players) team.SignPlayer(player);
 
         return team;
