@@ -33,9 +33,9 @@ internal static class Api
         CreateDraftRequest request,
         CreateDraftHandler handler)
     {
-        await handler.Handle(request);
+        var draft = await handler.Handle(request);
 
-        return TypedResults.Ok(new CreateDraftDto());
+        return TypedResults.Ok(new CreateDraftDto(draft.Value!));
     }
     
     
@@ -43,9 +43,9 @@ internal static class Api
         StartDraftRequest request,
         StartDraftHandler handler)
     {
-        await handler.Handle(request);
+        var draft = await handler.Handle(request);
 
-        return TypedResults.Ok(new StartDraftDto());
+        return TypedResults.Ok(new StartDraftDto {Id = draft.Value!.Id, State = draft.Value!.State});
     }
     
     private static async Task<Ok<CreateLeagueDto>> CreateLeague(

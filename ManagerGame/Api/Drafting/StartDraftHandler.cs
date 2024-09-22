@@ -3,9 +3,18 @@ using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Api.Drafting;
 
-internal class StartDraftHandler : ICommandHandler<StartDraftRequest, Draft>
+internal class StartDraftHandler(IRepository<Draft> draftRepo) : ICommandHandler<StartDraftRequest, Draft>
 {
-    public Task<Result<Draft>> Handle(StartDraftRequest command,
-        CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public async Task<Result<Draft>> Handle(StartDraftRequest command,
+        CancellationToken cancellationToken = default)
+    {
+        var draft = await draftRepo.Find(command.DraftId, cancellationToken);
+        if (draft is null) return Result<Draft>.Failure(Error.NotFound);
+
+        draft.Start();
+
+        var updatedDraft = await draftRepo.Update(draft, cancellationToken);
+        
+        return Result<Draft>.Success(updatedDraft);
+    }
 }

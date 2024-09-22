@@ -3,6 +3,7 @@ using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Api.Drafting;
 
-internal class StartDraftRequest : ICommand<Draft>
+public class StartDraftRequest : ICommand<Draft>
 {
+    public Guid DraftId { get; set; }
 }

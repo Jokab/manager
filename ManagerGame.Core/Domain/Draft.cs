@@ -4,6 +4,7 @@ public class Draft : Entity
 {
     public League League { get; set; }
     public Guid LeagueId { get; set; }
+    public State State { get; set; }
 
     private DraftOrder DraftOrder { get; }
     
@@ -19,6 +20,7 @@ public class Draft : Entity
         if (league.Teams.Count < 2) throw new ArgumentException("Too few teams to draft");
         League = league;
         DraftOrder = draftOrder;
+        State = State.Created;
     }
 
     public static Draft DoubledPeakTraversalDraft(League league)
@@ -30,4 +32,15 @@ public class Draft : Entity
     {
         return DraftOrder.GetNext();
     }
+
+    public void Start()
+    {
+        State = State.Started;
+    }
+}
+
+public enum State
+{
+    Created,
+    Started
 }

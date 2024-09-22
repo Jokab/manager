@@ -1,5 +1,9 @@
+using ManagerGame.Core.Domain;
+
 namespace ManagerGame.Api.Drafting;
 
-internal class StartDraftDto
+public class StartDraftDto
 {
+    public Guid Id { get; set; }
+    public State State { get; set; }
 }

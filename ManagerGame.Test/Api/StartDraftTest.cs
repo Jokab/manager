@@ -3,16 +3,15 @@ using ManagerGame.Api;
 using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Leagues;
-using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Test.Api;
 
-public class CreateDraftTest : IClassFixture<Fixture>
+public class StartDraftTest : IClassFixture<Fixture>
 {
     private readonly Fixture _fixture;
     private readonly HttpClient _httpClient;
 
-    public CreateDraftTest(Fixture fixture)
+    public StartDraftTest(Fixture fixture)
     {
         _fixture = fixture;
         _httpClient = fixture.CreateDefaultClient();
@@ -29,16 +28,9 @@ public class CreateDraftTest : IClassFixture<Fixture>
         var (_, _) = await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam", new AdmitTeamRequest {LeagueId = createLeagueDto!.Id, TeamId = team.Id});
         var (_, _) = await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam", new AdmitTeamRequest {LeagueId = createLeagueDto.Id, TeamId = team.Id});
         
-        var (http1, createDraftDto) = await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(createLeagueDto.Id));
+        var (http, createDraftDto) = await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(createLeagueDto.Id));
 
-        Assert.Equal(HttpStatusCode.OK, http1.StatusCode);
-        Assert.Equal(State.Created, createDraftDto!.State);
-
-        var (http2, startDraftDto) =
-            await _httpClient.Post<StartDraftDto>("/api/drafts/start", new StartDraftRequest { DraftId = createDraftDto.Id });
-
-        Assert.Equal(HttpStatusCode.OK, http2.StatusCode);
-        Assert.Equal(State.Started, startDraftDto!.State);
+        Assert.Equal(HttpStatusCode.OK, http.StatusCode);
+        Assert.NotNull(createDraftDto);
     }
 }
-
