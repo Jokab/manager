@@ -1,8 +1,8 @@
 using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Api.Leagues;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
-using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame.Api;
@@ -24,6 +24,9 @@ internal static class Api
         
         api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
         api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
+        
+        api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
+        api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
     }
 
     private static async Task<Ok<CreateDraftDto>> CreateDraft(
@@ -43,6 +46,24 @@ internal static class Api
         await handler.Handle(request);
 
         return TypedResults.Ok(new StartDraftDto());
+    }
+    
+    private static async Task<Ok<CreateLeagueDto>> CreateLeague(
+        CreateLeagueRequest request,
+        CreateLeagueHandler handler)
+    {
+        var result = await handler.Handle(request);
+
+        return TypedResults.Ok(new CreateLeagueDto(result.Value!));
+    }
+    
+    private static async Task<Ok<CreateLeagueDto>> AdmitTeam(
+        AdmitTeamRequest request,
+        AdmitTeamHandler handler)
+    {
+        var result = await handler.Handle(request);
+
+        return TypedResults.Ok(new CreateLeagueDto(result.Value!));
     }
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(

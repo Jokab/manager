@@ -10,6 +10,6 @@ public interface IRepository<T> where T : Entity
     Task<T?> Find(Guid id,
         CancellationToken cancellationToken = default);
 
-    Task Update(T entity,
+    Task<T> Update(T entity,
         CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,7 @@
 using System.Text;
 using ManagerGame.Api;
 using ManagerGame.Api.Drafting;
+using ManagerGame.Api.Leagues;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
@@ -42,10 +43,13 @@ builder.Services.AddTransient<LoginCommandHandler>();
 builder.Services.AddTransient<SignPlayerCommandHandler>();
 builder.Services.AddTransient<CreateDraftHandler>();
 builder.Services.AddTransient<StartDraftHandler>();
+builder.Services.AddTransient<CreateLeagueHandler>();
+builder.Services.AddTransient<AdmitTeamHandler>();
 
 builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
 builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
 builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
+builder.Services.AddTransient<IRepository<League>, Repository<League>>();
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
 

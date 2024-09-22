@@ -36,10 +36,11 @@ public class Repository<T> : IRepository<T> where T : Entity
         return res;
     }
 
-    public async Task Update(T entity,
+    public async Task<T> Update(T entity,
         CancellationToken cancellationToken = default)
     {
         _table.Attach(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 }
