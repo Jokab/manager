@@ -31,7 +31,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
         var (httpResponseMessage, signPlayerDto) =
             await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
-        var (_, team) = await _httpClient.Get<Team>($"/api/teams/{newTeam.Id}");
+        var (_, team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);

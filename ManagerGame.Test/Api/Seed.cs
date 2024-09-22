@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
@@ -17,7 +18,9 @@ public static class Seed
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
 
-        var (_, team) = await httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        var (createTeamResponseMessage, team) = await httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        
+        Assert.Equal(HttpStatusCode.OK, createTeamResponseMessage.StatusCode);
 
         return (manager, team!);
     }

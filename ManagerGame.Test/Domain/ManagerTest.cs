@@ -9,8 +9,8 @@ public class ManagerTest
     {
         var manager = Manager.Create(new ManagerName("Jakob"), new Email("jakob@jakobsson.com"));
 
-        manager.AddTeam(Team.Create(new TeamName("Laget"), manager.Id, []));
-        manager.AddTeam(Team.Create(new TeamName("Laget2"), manager.Id, []));
+        manager.AddTeam(TestData.TeamEmpty("Laget"));
+        manager.AddTeam(TestData.TeamEmpty("Laget2"));
 
         Assert.Contains(manager.Teams, x => x.Name.Name == "Laget");
         Assert.Contains(manager.Teams, x => x.Name.Name == "Laget2");
@@ -21,8 +21,8 @@ public class ManagerTest
     {
         var manager = Manager.Create(new ManagerName("Jakob"), new Email("jakob@jakobsson.com"));
 
-        manager.AddTeam(Team.Create(new TeamName("Laget"), manager.Id, []));
+        manager.AddTeam(TestData.TeamEmpty("Laget"));
 
-        Assert.Throws<ArgumentException>(() => manager.AddTeam(Team.Create(new TeamName("Laget"), manager.Id, [])));
+        Assert.Throws<ArgumentException>(() => manager.AddTeam(TestData.TeamEmpty("Laget")));
     }
 }

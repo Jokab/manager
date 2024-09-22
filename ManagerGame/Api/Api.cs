@@ -95,11 +95,11 @@ internal static class Api
         return TypedResults.Ok(new ManagerDto(manager!));
     }
 
-    private static async Task<Ok<Team>> GetTeam(Guid id,
+    private static async Task<Ok<TeamDto>> GetTeam(Guid id,
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
         var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
-        return TypedResults.Ok(team);
+        return TypedResults.Ok(new TeamDto(team!));
     }
 }

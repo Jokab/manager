@@ -1,22 +1,30 @@
+using System.Text.Json.Serialization;
+
 namespace ManagerGame.Core.Domain;
 
 public class League : Entity
 {
-    public League(Guid id, ICollection<Team> teams, ICollection<Draft> drafts) : base(id)
-    {
-        Teams = teams;
-        Drafts = drafts;
-    }
+    public ICollection<Team> Teams { get; init; }
+    public ICollection<Draft> Drafts { get; init; }
     
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    private League(Guid id): base(id) {}
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    [JsonConstructor]
+    public League(Guid id) : base(id)
+    {
+        Teams = [];
+        Drafts = [];
+    }
 
     public static League Empty()
     {
-        return new League(Guid.NewGuid(), [], []);
+        return new League(Guid.NewGuid());
     }
 
-    public ICollection<Team> Teams { get; init; }
-    public ICollection<Draft> Drafts { get; init; }
+    public void AddTeam(Team team)
+    {
+        // if (Teams.Any(x => x.Name == team.Name))
+        // {
+        //     throw new ArgumentException("Team with name already joined");
+        // }
+        Teams.Add(team);
+    }
 }

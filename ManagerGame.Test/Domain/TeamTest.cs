@@ -7,7 +7,7 @@ public class TeamTest
     [Fact]
     public void CanSignNewPlayer()
     {
-        var team = Team.Create(new TeamName("Lag"), Guid.NewGuid(), []);
+        var team = TestData.TeamEmpty("Laget");
         var player = TestData.Player();
         Assert.Empty(team.Players);
 
@@ -19,7 +19,7 @@ public class TeamTest
     [Fact]
     public void CannotSignDuplicatePlayer()
     {
-        var team = Team.Create(new TeamName("Lag"), Guid.NewGuid(), []);
+        var team = TestData.TeamEmpty("Laget");
         var player = TestData.Player();
         Assert.Empty(team.Players);
 
@@ -38,7 +38,8 @@ public class TeamTest
             .Select(_ => TestData.Player(country)).ToList();
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
-            players);
+            players,
+            new League(Guid.Empty));
 
         var newPlayer = TestData.Player(country);
 
@@ -56,7 +57,8 @@ public class TeamTest
             .Select(_ => TestData.Player(country)).ToList();
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
-            players);
+            players,
+            new League(Guid.Empty));
 
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);

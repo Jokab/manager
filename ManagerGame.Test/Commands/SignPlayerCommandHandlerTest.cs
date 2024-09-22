@@ -10,7 +10,7 @@ public class SignPlayerCommandHandlerTest
     public async Task PersistsPlayerInTeam()
     {
         var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = Team.Create(new TeamName("Laget"), Guid.NewGuid(), []);
+        var team = TestData.TeamEmpty("Laget");
         teamRepo.Find(team.Id).Returns(team);
 
         var playerRepo = Substitute.For<IRepository<Player>>();
@@ -35,8 +35,8 @@ public class SignPlayerCommandHandlerTest
     public async Task CannotSignSignedPlayer()
     {
         var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = Team.Create(new TeamName("Laget"), Guid.NewGuid(), []);
-        var team2 = Team.Create(new TeamName("Laget2"), Guid.NewGuid(), []);
+        var team = TestData.TeamEmpty("Laget");
+        var team2 = TestData.TeamEmpty("Laget2");
         teamRepo.Find(team.Id).Returns(team);
         teamRepo.Find(team2.Id).Returns(team2);
 

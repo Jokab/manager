@@ -10,6 +10,9 @@ public static class TestData
             position,
             new CountryRec(country));
 
+    public static Team TeamEmpty(string name) =>
+        Team.Create(new TeamName(name), Guid.NewGuid(), [], new League(Guid.NewGuid()));
+
     public static Team TeamWithValidFullSquad()
     {
         const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
@@ -45,9 +48,10 @@ public static class TestData
         // TODO: Clean this up
         players.Add(Player(country: Country.Es));
         players.Add(Player(country: Country.Es));
-        
+
         return Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
-            players);
+            players,
+            new League(Guid.Empty));
     }
 }

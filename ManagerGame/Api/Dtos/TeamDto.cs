@@ -14,6 +14,7 @@ public record TeamDto
 
     public TeamDto(Team team)
     {
+        Players = team.Players.ToList();
         Id = team.Id;
         CreatedDate = team.CreatedDate;
         UpdatedDate = team.UpdatedDate;
@@ -22,10 +23,11 @@ public record TeamDto
         ManagerId = team.ManagerId;
     }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; set;  }
 
-    public TeamName Name { get; init; }
-    public Guid ManagerId { get; init; }
+    public TeamName Name { get; set; }
+    public Guid ManagerId { get; set; }
+    public List<Player> Players { get; set; }
 
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
