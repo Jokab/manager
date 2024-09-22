@@ -23,7 +23,7 @@ public record TeamDto
         ManagerId = team.ManagerId;
     }
 
-    public Guid Id { get; set;  }
+    public Guid Id { get; set; }
 
     public TeamName Name { get; set; }
     public Guid ManagerId { get; set; }

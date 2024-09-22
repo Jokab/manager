@@ -21,10 +21,10 @@ internal static class Api
         api.MapPost("teams", CreateTeam).RequireAuthorization("user");
         api.MapGet("teams/{id:guid}", GetTeam).RequireAuthorization("user");
         api.MapPost("teams/sign", SignPlayer).RequireAuthorization("user");
-        
+
         api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
         api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
-        
+
         api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
         api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
     }
@@ -37,17 +37,17 @@ internal static class Api
 
         return TypedResults.Ok(new CreateDraftDto(draft.Value!));
     }
-    
-    
+
+
     private static async Task<Ok<StartDraftDto>> StartDraft(
         StartDraftRequest request,
         StartDraftHandler handler)
     {
         var draft = await handler.Handle(request);
 
-        return TypedResults.Ok(new StartDraftDto {Id = draft.Value!.Id, State = draft.Value!.State});
+        return TypedResults.Ok(new StartDraftDto { Id = draft.Value!.Id, State = draft.Value!.State });
     }
-    
+
     private static async Task<Ok<CreateLeagueDto>> CreateLeague(
         CreateLeagueRequest request,
         CreateLeagueHandler handler)
@@ -56,7 +56,7 @@ internal static class Api
 
         return TypedResults.Ok(new CreateLeagueDto(result.Value!));
     }
-    
+
     private static async Task<Ok<CreateLeagueDto>> AdmitTeam(
         AdmitTeamRequest request,
         AdmitTeamHandler handler)

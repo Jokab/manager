@@ -22,20 +22,16 @@ public static class HttpClientExtensions
             };
     }
 
-    private static async Task<(HttpResponseMessage, T)> Deserialize<T>(HttpResponseMessage responseMessage)
-    {
-        return (responseMessage,
+    private static async Task<(HttpResponseMessage, T)> Deserialize<T>(HttpResponseMessage responseMessage) =>
+        (responseMessage,
             (await responseMessage.Content.ReadAsStringAsync()).Deserialize<T>() ??
             throw new Exception($"Failed to deserialize {nameof(T)}"));
-    }
 
-    public static async Task<(HttpResponseMessage, T?)> PostManager<T>(this HttpClient httpClient)
-    {
-        return await Post<T>(httpClient,
+    public static async Task<(HttpResponseMessage, T?)> PostManager<T>(this HttpClient httpClient) =>
+        await Post<T>(httpClient,
             "/api/managers",
             new CreateManagerRequest
                 { Name = new ManagerName("Jakob"), Email = new Email($"jakob{Guid.NewGuid()}@jakobsson.com") });
-    }
 
     public static async Task<(HttpResponseMessage, T?)> Get<T>(this HttpClient httpClient,
         string uri)

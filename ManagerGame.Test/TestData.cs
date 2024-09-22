@@ -4,7 +4,8 @@ namespace ManagerGame.Test;
 
 public static class TestData
 {
-    public static Player Player(Country country = Country.Se, Position position = Position.Defender) =>
+    public static Player Player(Country country = Country.Se,
+        Position position = Position.Defender) =>
         new(Guid.NewGuid(),
             new PlayerName("Jakob"),
             position,
@@ -42,12 +43,13 @@ public static class TestData
                 {
                     position = Position.Forward;
                 }
+
                 return Player((Country)i, position);
             })
         ).ToList();
         // TODO: Clean this up
-        players.Add(Player(country: Country.Es));
-        players.Add(Player(country: Country.Es));
+        players.Add(Player(Country.Es));
+        players.Add(Player(Country.Es));
 
         return Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),

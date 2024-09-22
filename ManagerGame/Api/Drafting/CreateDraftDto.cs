@@ -9,6 +9,7 @@ public class CreateDraftDto
     public CreateDraftDto()
     {
     }
+
     public CreateDraftDto(Draft draft)
     {
         Id = draft.Id;

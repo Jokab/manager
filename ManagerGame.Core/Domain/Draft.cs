@@ -2,18 +2,13 @@ namespace ManagerGame.Core.Domain;
 
 public class Draft : Entity
 {
-    public League League { get; set; }
-    public Guid LeagueId { get; set; }
-    public State State { get; set; }
-
-    private DraftOrder DraftOrder { get; }
-    
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private Draft(Guid id) : base(id)
-    {}
+    {
+    }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    private Draft(Guid id, 
+    private Draft(Guid id,
         League league,
         DraftOrder draftOrder) : base(id)
     {
@@ -23,15 +18,17 @@ public class Draft : Entity
         State = State.Created;
     }
 
-    public static Draft DoubledPeakTraversalDraft(League league)
-    {
-        return new Draft(Guid.NewGuid(), league, new DraftOrder(league.Teams.ToList(), new DoubledPeakTraversalDraftOrder()));
-    }
+    public League League { get; set; }
+    public Guid LeagueId { get; set; }
+    public State State { get; set; }
 
-    public Team GetNext()
-    {
-        return DraftOrder.GetNext();
-    }
+    private DraftOrder DraftOrder { get; }
+
+    public static Draft DoubledPeakTraversalDraft(League league) => new(Guid.NewGuid(),
+        league,
+        new DraftOrder(league.Teams.ToList(), new DoubledPeakTraversalDraftOrder()));
+
+    public Team GetNext() => DraftOrder.GetNext();
 
     public void Start()
     {

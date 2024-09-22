@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Player> Players { get; set; }
+
     public DbSet<Draft> Drafts { get; set; }
     // public DbSet<DoubledPeakTraversalDraftOrder> DoubledPeakTraversalDraftOrders { get; set; }
 
@@ -44,16 +45,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Player>()
             .Property(x => x.Country)
             .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
-        
+
         modelBuilder.Entity<Draft>().HasKey(x => x.Id);
-        modelBuilder.Entity<Draft>().OwnsOne(typeof(DraftOrder), "DraftOrder",
+        modelBuilder.Entity<Draft>().OwnsOne(typeof(DraftOrder),
+            "DraftOrder",
             x =>
             {
                 x.Ignore("_teams");
                 x.Property("_current").HasColumnName("DraftOrderCurrent");
                 x.Property("_previous").HasColumnName("DraftOrderPrevious");
             });
-        
+
         modelBuilder.Entity<League>().HasKey(x => x.Id);
         modelBuilder.Entity<League>()
             .HasMany<Draft>(x => x.Drafts)

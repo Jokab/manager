@@ -14,7 +14,7 @@ internal class StartDraftHandler(IRepository<Draft> draftRepo) : ICommandHandler
         draft.Start();
 
         var updatedDraft = await draftRepo.Update(draft, cancellationToken);
-        
+
         return Result<Draft>.Success(updatedDraft);
     }
 }

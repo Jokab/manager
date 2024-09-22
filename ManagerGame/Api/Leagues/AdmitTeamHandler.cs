@@ -3,7 +3,8 @@ using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Api.Leagues;
 
-internal class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo) : ICommandHandler<AdmitTeamRequest, League>
+internal class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo)
+    : ICommandHandler<AdmitTeamRequest, League>
 {
     public async Task<Result<League>> Handle(AdmitTeamRequest command,
         CancellationToken cancellationToken = default)
@@ -12,11 +13,11 @@ internal class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> 
         if (league is null) return Result<League>.Failure(Error.NotFound);
         var team = await teamRepo.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<League>.Failure(Error.NotFound);
-        
+
         league.AddTeam(team);
-        
+
         var updatedLeague = await leagueRepo.Update(league, cancellationToken);
-        
+
         return Result<League>.Success(updatedLeague);
     }
 }

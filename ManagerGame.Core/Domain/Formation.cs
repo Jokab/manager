@@ -2,7 +2,12 @@ namespace ManagerGame.Core.Domain;
 
 public class Formation
 {
-    public readonly Dictionary<Position, int> Positions = new ();
+    public static readonly Formation[] ValidFormations =
+    [
+        new Formation(4, 4, 2)
+    ];
+
+    public readonly Dictionary<Position, int> Positions = new();
 
     public Formation(int defenders,
         int midfielders,
@@ -13,9 +18,4 @@ public class Formation
         Positions[Position.Midfielder] = midfielders;
         Positions[Position.Forward] = forwards;
     }
-
-    public static readonly Formation[] ValidFormations =
-    [
-        new Formation(4, 4, 2)
-    ];
 }

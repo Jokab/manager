@@ -19,15 +19,9 @@ public class Result<T>
     public Error Error { get; set; }
     public T? Value { get; set; }
 
-    public static Result<T> Success(T value)
-    {
-        return new Result<T>(true, Error.None, value);
-    }
+    public static Result<T> Success(T value) => new(true, Error.None, value);
 
-    public static Result<T> Failure(Error error)
-    {
-        return new Result<T>(false, error, default);
-    }
+    public static Result<T> Failure(Error error) => new(false, error, default);
 }
 
 public record Error(string Code)

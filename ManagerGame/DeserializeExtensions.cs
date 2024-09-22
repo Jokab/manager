@@ -10,8 +10,5 @@ public static class DeserializeExtensions
         IncludeFields = true
     };
 
-    public static T? Deserialize<T>(this string json)
-    {
-        return JsonSerializer.Deserialize<T>(json, DefaultSerializerSettings);
-    }
+    public static T? Deserialize<T>(this string json) => JsonSerializer.Deserialize<T>(json, DefaultSerializerSettings);
 }

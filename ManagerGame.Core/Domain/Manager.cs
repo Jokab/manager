@@ -17,10 +17,8 @@ public class Manager : Entity
     public List<Team> Teams { get; init; } = [];
 
     public static Manager Create(ManagerName name,
-        Email email)
-    {
-        return new Manager(Guid.NewGuid(), name, email);
-    }
+        Email email) =>
+        new(Guid.NewGuid(), name, email);
 
     public void AddTeam(Team team)
     {

@@ -6,7 +6,7 @@ public class Team : Entity
 {
     public const int PlayersFromSameCountryLimit = 4;
     public const int PlayerLimit = 22;
-    
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     [JsonConstructor]
     private Team(Guid id) : base(id)
@@ -52,7 +52,8 @@ public class Team : Entity
         if (Players.Count >= PlayerLimit)
             throw new ArgumentException($"Cannot have more than {PlayerLimit} players");
         if (SigningWillProhibitValidFormation(player))
-            throw new ArgumentException($"Signing {player.Position.ToString()} will make it impossible to form valid formation");
+            throw new ArgumentException(
+                $"Signing {player.Position.ToString()} will make it impossible to form valid formation");
 
         Players.Add(player);
         player.TeamId = Id;
@@ -63,12 +64,9 @@ public class Team : Entity
         foreach (var formation in Formation.ValidFormations)
         {
             var requiredForPosition = formation.Positions[player.Position] -
-                                               Players.Count(x => x.Position == player.Position);
+                                      Players.Count(x => x.Position == player.Position);
             var signingsRemaining = PlayerLimit - Players.Count;
-            if (requiredForPosition > signingsRemaining)
-            {
-                return true;
-            }
+            if (requiredForPosition > signingsRemaining) return true;
         }
 
         return false;

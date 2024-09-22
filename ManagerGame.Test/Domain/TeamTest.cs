@@ -89,7 +89,7 @@ public class TeamTest
 
         Assert.Contains(newPlayer, team.Players);
     }
-    
+
     [Fact]
     public void CannotSignIfCannotConformToFormation()
     {
@@ -99,7 +99,7 @@ public class TeamTest
 
         Assert.Throws<ArgumentException>(() => team.SignPlayer(TestData.Player(position: Position.Midfielder)));
     }
-    
+
     [Fact]
     public void CanSignIfConformsToFormation()
     {

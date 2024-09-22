@@ -33,10 +33,7 @@ public class Player : Entity
             return x.Id.Equals(y.Id) && x.Name.Equals(y.Name) && x.Position == y.Position;
         }
 
-        public int GetHashCode(Player obj)
-        {
-            return HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
-        }
+        public int GetHashCode(Player obj) => HashCode.Combine(obj.Id, obj.Name, (int)obj.Position);
     }
 }
 

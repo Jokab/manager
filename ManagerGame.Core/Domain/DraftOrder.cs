@@ -2,19 +2,19 @@ namespace ManagerGame.Core.Domain;
 
 public class DraftOrder
 {
+    private readonly IDraftStrategy _draftStrategy;
     private readonly Team[] _teams;
     private int _current;
     private int _previous;
 
-    private readonly IDraftStrategy _draftStrategy;
-    
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DraftOrder()
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
     }
 
-    public DraftOrder(List<Team> teams, IDraftStrategy draftStrategy)
+    public DraftOrder(List<Team> teams,
+        IDraftStrategy draftStrategy)
     {
         _draftStrategy = draftStrategy;
         _current = 0;
@@ -32,7 +32,9 @@ public class DraftOrder
 /// Moves like: A -> B -> C -> C -> B -> A -> A -> B etc
 public class DoubledPeakTraversalDraftOrder : IDraftStrategy
 {
-    public (Team next, int current, int previous) GetNext(int current, int previous, Team[] teams)
+    public (Team next, int current, int previous) GetNext(int current,
+        int previous,
+        Team[] teams)
     {
         Team next;
         if (current == 0)

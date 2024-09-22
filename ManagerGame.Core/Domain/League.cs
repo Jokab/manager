@@ -4,9 +4,6 @@ namespace ManagerGame.Core.Domain;
 
 public class League : Entity
 {
-    public ICollection<Team> Teams { get; init; }
-    public ICollection<Draft> Drafts { get; init; }
-    
     [JsonConstructor]
     public League(Guid id) : base(id)
     {
@@ -14,10 +11,10 @@ public class League : Entity
         Drafts = [];
     }
 
-    public static League Empty()
-    {
-        return new League(Guid.NewGuid());
-    }
+    public ICollection<Team> Teams { get; init; }
+    public ICollection<Draft> Drafts { get; init; }
+
+    public static League Empty() => new(Guid.NewGuid());
 
     public void AddTeam(Team team)
     {

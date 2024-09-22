@@ -30,11 +30,9 @@ public class Fixture : WebApplicationFactory<Program>
         return base.CreateHost(builder);
     }
 
-    public ApplicationDbContext CreateContext()
-    {
-        return new ApplicationDbContext(
+    public ApplicationDbContext CreateContext() =>
+        new(
             new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(_connStr)
                 .Options);
-    }
 }
