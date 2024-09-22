@@ -21,6 +21,7 @@ public record TeamDto
         DeletedDate = team.DeletedDate;
         Name = team.Name;
         ManagerId = team.ManagerId;
+        LeagueId = team.LeagueId;
     }
 
     public Guid Id { get; set; }
@@ -32,4 +33,5 @@ public record TeamDto
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public DateTime? DeletedDate { get; set; }
+    public Guid LeagueId { get; set; }
 }

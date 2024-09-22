@@ -57,13 +57,13 @@ internal static class Api
         return TypedResults.Ok(new CreateLeagueDto(result.Value!));
     }
 
-    private static async Task<Ok<CreateLeagueDto>> AdmitTeam(
+    private static async Task<Ok<AdmitTeamDto>> AdmitTeam(
         AdmitTeamRequest request,
         AdmitTeamHandler handler)
     {
         var result = await handler.Handle(request);
 
-        return TypedResults.Ok(new CreateLeagueDto(result.Value!));
+        return TypedResults.Ok(new AdmitTeamDto(result.Value!));
     }
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(

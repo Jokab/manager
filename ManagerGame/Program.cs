@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using ManagerGame.Api;
 using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Leagues;
@@ -52,6 +53,11 @@ builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
 builder.Services.AddTransient<IRepository<League>, Repository<League>>();
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 var app = builder.Build();
 

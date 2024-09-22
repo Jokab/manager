@@ -11,11 +11,12 @@ public static class HttpClientExtensions
         string uri,
         object data)
     {
-        return await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
-                new StringContent(
-                    JsonSerializer.Serialize(data),
-                    Encoding.UTF8,
-                    "application/json")) switch
+        var httpResponse = await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
+            new StringContent(
+                JsonSerializer.Serialize(data),
+                Encoding.UTF8,
+                "application/json"));
+        return httpResponse switch
             {
                 { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
                 { } response => (response, default)

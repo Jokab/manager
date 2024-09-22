@@ -1,23 +1,19 @@
 using System.Text.Json.Serialization;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Leagues;
+namespace ManagerGame.Api;
 
-public class CreateLeagueDto
+public class AdmitTeamDto
 {
     [JsonConstructor]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public CreateLeagueDto()
-    {
-    }
+    public AdmitTeamDto(){}
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-    public CreateLeagueDto(League league)
+        
+    public AdmitTeamDto(League league)
     {
-        Id = league.Id;
-        Teams = league.Teams.ToList();
+        League = league;
     }
 
-    public Guid Id { get; set; }
-    public List<Team> Teams { get; set; }
+    public League League { get; set; }
 }
