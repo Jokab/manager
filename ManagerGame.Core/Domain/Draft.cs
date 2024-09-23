@@ -29,7 +29,8 @@ public class Draft : Entity
 
     public void Start()
     {
-        if (Teams.Count < 2) throw new ArgumentException("Too few teams to draft");
+        const int minimumTeamCount = 2;
+        if (Teams.Count < minimumTeamCount) throw new ArgumentException($"Too few teams to draft, needs at least {minimumTeamCount}");
         State = State.Started;
     }
     
@@ -43,5 +44,6 @@ public class Draft : Entity
 public enum State
 {
     Created,
-    Started
+    Started,
+    Finished
 }
