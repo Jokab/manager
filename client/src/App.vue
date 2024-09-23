@@ -19,13 +19,19 @@ function send() {
   message.value = "";
 }
 
+let retries = 0;
 async function start() {
     try {
         await connection.start();
         console.log("SignalR Connected.");
     } catch (err) {
         console.log(err);
-        setTimeout(start, 5000);
+        if (retries < 3) {
+          setTimeout(start, 5000);
+          retries += 1;
+        } else {
+          console.err("Timeout")
+        }
     }
 };
 
