@@ -55,14 +55,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 x.Property("_current").HasColumnName("DraftOrderCurrent");
                 x.Property("_previous").HasColumnName("DraftOrderPrevious");
             });
+        modelBuilder.Entity<Draft>().Ignore(x => x.Teams);
+        modelBuilder.Entity<Draft>().Property(x => x.State)
+            .HasConversion<string>(x => x.ToString(), x => Enum.Parse<State>(x));
 
         modelBuilder.Entity<League>().HasKey(x => x.Id);
         modelBuilder.Entity<League>()
             .HasMany<Draft>(x => x.Drafts)
-            .WithOne(x => x.League).HasForeignKey(x => x.LeagueId);
+            .WithOne().HasForeignKey(x => x.LeagueId)
+            .IsRequired();
         modelBuilder.Entity<League>()
             .HasMany<Team>(x => x.Teams)
-            .WithOne(x => x.League)
-            .HasForeignKey(x => x.LeagueId);
+            .WithOne()
+            .HasForeignKey(x => x.LeagueId)
+            .IsRequired(false);
     }
 }

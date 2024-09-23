@@ -16,12 +16,17 @@ public class League : Entity
 
     public static League Empty() => new(Guid.NewGuid());
 
-    public void AddTeam(Team team)
+    public void AdmitTeam(Team team)
     {
         // if (Teams.Any(x => x.Name == team.Name))
         // {
         //     throw new ArgumentException("Team with name already joined");
         // }
         Teams.Add(team);
+    }
+
+    public void CreateDraft()
+    {
+        Drafts.Add(Draft.DoubledPeakTraversalDraft(this));
     }
 }

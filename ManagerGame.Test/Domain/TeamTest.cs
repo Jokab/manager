@@ -39,7 +39,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            new League(Guid.Empty));
+            Guid.NewGuid());
 
         var newPlayer = TestData.Player(country);
 
@@ -58,7 +58,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            new League(Guid.Empty));
+            Guid.NewGuid());
 
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);

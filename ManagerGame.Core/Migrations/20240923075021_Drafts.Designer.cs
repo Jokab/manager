@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ManagerGame.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240922192710_Drafts")]
+    [Migration("20240923075021_Drafts")]
     partial class Drafts
     {
         /// <inheritdoc />
@@ -43,6 +43,11 @@ namespace ManagerGame.Core.Migrations
                     b.Property<Guid>("LeagueId")
                         .HasColumnType("uuid")
                         .HasColumnName("league_id");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -209,7 +214,7 @@ namespace ManagerGame.Core.Migrations
 
             modelBuilder.Entity("ManagerGame.Core.Domain.Draft", b =>
                 {
-                    b.HasOne("ManagerGame.Core.Domain.League", "League")
+                    b.HasOne("ManagerGame.Core.Domain.League", null)
                         .WithMany("Drafts")
                         .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -241,8 +246,6 @@ namespace ManagerGame.Core.Migrations
 
                     b.Navigation("DraftOrder")
                         .IsRequired();
-
-                    b.Navigation("League");
                 });
 
             modelBuilder.Entity("ManagerGame.Core.Domain.Player", b =>
@@ -255,7 +258,7 @@ namespace ManagerGame.Core.Migrations
 
             modelBuilder.Entity("ManagerGame.Core.Domain.Team", b =>
                 {
-                    b.HasOne("ManagerGame.Core.Domain.League", "League")
+                    b.HasOne("ManagerGame.Core.Domain.League", null)
                         .WithMany("Teams")
                         .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -268,8 +271,6 @@ namespace ManagerGame.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_teams_managers_manager_id");
-
-                    b.Navigation("League");
                 });
 
             modelBuilder.Entity("ManagerGame.Core.Domain.League", b =>

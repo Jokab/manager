@@ -38,6 +38,7 @@ namespace ManagerGame.Core.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     league_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    state = table.Column<string>(type: "text", nullable: false),
                     DraftOrderCurrent = table.Column<int>(type: "integer", nullable: false),
                     DraftOrderPrevious = table.Column<int>(type: "integer", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

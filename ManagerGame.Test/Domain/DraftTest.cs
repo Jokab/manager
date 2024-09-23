@@ -12,10 +12,10 @@ public class DraftTest
         var team2 = TestData.TeamWithValidFullSquad();
         var team3 = TestData.TeamWithValidFullSquad();
         var team4 = TestData.TeamWithValidFullSquad();
-        league.AddTeam(team1);
-        league.AddTeam(team2);
-        league.AddTeam(team3);
-        league.AddTeam(team4);
+        league.AdmitTeam(team1);
+        league.AdmitTeam(team2);
+        league.AdmitTeam(team3);
+        league.AdmitTeam(team4);
         var draft = Draft.DoubledPeakTraversalDraft(league);
 
         Assert.Equal(team1, draft.GetNext());
@@ -29,11 +29,15 @@ public class DraftTest
         Assert.Equal(team1, draft.GetNext());
         Assert.Equal(team2, draft.GetNext());
     }
-    //
-    // [Fact]
-    // public void TooFewTeamsThrows()
-    // {
-    //     var team1 = TestData.TeamWithValidFullSquad();
-    //     Assert.Throws<ArgumentException>(() => Draft.DoubledPeakTraversalDraft([team1]));
-    // }
+
+    [Fact]
+    public void TooFewTeamsThrows()
+    {
+        var team1 = TestData.TeamWithValidFullSquad();
+        var league = new League(Guid.NewGuid());
+        league.AdmitTeam(team1);
+        var draft = Draft.DoubledPeakTraversalDraft(league);
+        
+        Assert.Throws<ArgumentException>(() => draft.Start());
+    }
 }

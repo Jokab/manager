@@ -33,5 +33,5 @@ public record TeamDto
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public DateTime? DeletedDate { get; set; }
-    public Guid LeagueId { get; set; }
+    public Guid? LeagueId { get; set; }
 }

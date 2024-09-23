@@ -18,27 +18,26 @@ public class Team : Entity
         TeamName name,
         Guid managerId,
         ICollection<Player> players,
-        League league)
+        Guid? leagueId)
         : base(id)
     {
         Name = name;
         ManagerId = managerId;
         Players = players;
-        League = league;
+        LeagueId = leagueId;
     }
 
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
-    public League League { get; init; }
-    public Guid LeagueId { get; set; }
+    public Guid? LeagueId { get; private init; }
 
     public static Team Create(TeamName name,
         Guid managerId,
         ICollection<Player> players,
-        League league)
+        Guid? leagueId)
     {
-        var team = new Team(Guid.NewGuid(), name, managerId, [], league);
+        var team = new Team(Guid.NewGuid(), name, managerId, [], leagueId);
         foreach (var player in players) team.SignPlayer(player);
 
         return team;

@@ -14,7 +14,7 @@ internal class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> 
         var team = await teamRepo.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<League>.Failure(Error.NotFound);
 
-        league.AddTeam(team);
+        league.AdmitTeam(team);
 
         var updatedLeague = await leagueRepo.Update(league, cancellationToken);
 
