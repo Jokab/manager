@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
 import * as signalR from "@microsoft/signalr";
-import {ref} from "vue";
+import { ref } from "vue";
 
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5001/chatHub")
-    //.configureLogging()//signalR.LogLevel.Information)
-    .build();
+  .withUrl("http://localhost:5001/chatHub")
+  //.configureLogging()//signalR.LogLevel.Information)
+  .build();
 
 const message = ref<string>();
 const chat = ref<string>("");
@@ -21,22 +20,22 @@ function send() {
 
 let retries = 0;
 async function start() {
-    try {
-        await connection.start();
-        console.log("SignalR Connected.");
-    } catch (err) {
-        console.log(err);
-        if (retries < 3) {
-          setTimeout(start, 5000);
-          retries += 1;
-        } else {
-          console.err("Timeout")
-        }
+  try {
+    await connection.start();
+    console.log("SignalR Connected.");
+  } catch (err) {
+    console.log(err);
+    if (retries < 3) {
+      setTimeout(start, 5000);
+      retries += 1;
+    } else {
+      console.error("Timeout")
     }
+  }
 };
 
 connection.onclose(async () => {
-    await start();
+  await start();
 });
 
 start();
@@ -44,13 +43,13 @@ start();
 
 <template>
   <div style="display: flex; flex-direction: column; width: 20rem">
-  <textarea style="height: 20rem"v-model="chat"></textarea>
-  <div>
-    <label for="text">Meddelande: </label>
-    <input @keyup.enter="send" v-model="message" id="text" type="text"/>
-    <button @click="send">Hej</button>
+    <textarea style="height: 20rem" v-model="chat"></textarea>
+    <div>
+      <label for="text">Meddelande: </label>
+      <input @keyup.enter="send" v-model="message" id="text" type="text" />
+      <button @click="send">Hej</button>
+    </div>
   </div>
-</div>
 </template>
 
 <style scoped>
@@ -60,9 +59,11 @@ start();
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }

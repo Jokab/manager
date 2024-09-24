@@ -10,12 +10,16 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
+    "@typescript-eslint/parser": "^8.7.0",
     "vue": "^3.4.37"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.2",
+    "eslint": "^9.11.1",
+    "eslint-plugin-vue": "^9.28.0",
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
+    "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.0.29"
   }
 }
