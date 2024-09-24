@@ -1,24 +1,32 @@
-import pluginVue from 'eslint-plugin-vue';
-import typesciptParser from '@typescript-eslint/parser'
-import vueParser from 'vue-eslint-parser';
+import jsLint from "@eslint/js"
+import tsLint from "typescript-eslint"
+import vueLint from "eslint-plugin-vue"
+import vueLint2 from "vue-eslint-parser"
+
 
 export default [
-    // add more generic rulesets here, such as:
-    // js.configs.recommended,
-    ...pluginVue.configs['flat/recommended'],
+    jsLint.configs.recommended,
+    ...tsLint.configs.recommended,
+    ...vueLint.configs["flat/essential"],
     {
-        rules: {
-            // override/add rules settings here, such as:
-            // 'vue/no-unused-vars': 'error'
-        },
-    },
-    {
+        files: ["**/*.{js,mjs,cjs,ts,mts,jsx,tsx}"],
         languageOptions: {
-            parser: vueParser,
+            // common parser options, enable TypeScript and JSX
+            parser: tsLint.parser,
             parserOptions: {
-                parser: typesciptParser,
-                sourceType: 'module',
-            },
-        },
+                sourceType: "module"
+            }
+        }
     },
-]   
+    {
+        files: ["*.vue", "**/*.vue"],
+        languageOptions: {
+            parser: vueLint2,
+            parserOptions: {
+                // <script lang="ts" /> to enable TypeScript in Vue SFC
+                parser: tsLint.parser,
+                sourceType: "module"
+            }
+        }
+    }
+]; 
