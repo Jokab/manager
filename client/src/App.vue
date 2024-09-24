@@ -43,11 +43,21 @@ start();
 
 <template>
   <div style="display: flex; flex-direction: column; width: 20rem">
-    <textarea style="height: 20rem" v-model="chat"></textarea>
+    <textarea
+      v-model="chat"
+      style="height: 20rem"
+    />
     <div>
       <label for="text">Meddelande: </label>
-      <input @keyup.enter="send" v-model="message" id="text" type="text" />
-      <button @click="send">Hej</button>
+      <input
+        id="text"
+        v-model="message"
+        type="text"
+        @keyup.enter="send"
+      >
+      <button @click="send">
+        Hej
+      </button>
     </div>
   </div>
 </template>

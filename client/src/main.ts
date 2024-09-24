@@ -1,5 +1,16 @@
 import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import { routes } from 'vue-router/auto-routes'
+import CreateManager from './CreateManager.vue'
 
-createApp(App).mount('#app')
+import '@unocss/reset/tailwind.css'
+import './styles/main.css'
+import 'uno.css'
+
+const app = createApp(CreateManager)
+const router = createRouter({
+  routes,
+  history: createWebHistory(import.meta.env.BASE_URL),
+})
+app.use(router)
+app.mount('#app')
