@@ -5,18 +5,19 @@ import { ref } from 'vue'
 const managerName = ref<string>()
 const managerEmail = ref<string>()
 
-const response = ref<string>()
+const managerId = ref<string>()
 
 async function createManager() {
   const res = await apiCreateManager({
     name: managerName.value!,
     email: managerEmail.value!,
   })
-  response.value = res.id
+  managerId.value = res.id
 }
 </script>
 
 <template>
+  Skapa manager!
   <div
     style="display: grid; grid: auto-flow / 1fr 1fr;
       justify-items: right; grid-gap: 10px"
@@ -37,5 +38,7 @@ async function createManager() {
   <button @click="createManager">
     Skicka
   </button>
-  <div>{{ response }}</div>
+  <div v-if="managerId">
+    Skapat manager-ID! {{ managerId }}
+  </div>
 </template>
