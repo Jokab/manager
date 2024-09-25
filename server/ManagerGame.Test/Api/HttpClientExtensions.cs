@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using ManagerGame.Api;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
@@ -32,7 +33,7 @@ public static class HttpClientExtensions
         await Post<T>(httpClient,
             "/api/managers",
             new CreateManagerRequest
-                { Name = new ManagerName("Jakob"), Email = new Email($"jakob{Guid.NewGuid()}@jakobsson.com") });
+                { Name = "Jakob", Email = $"jakob{Guid.NewGuid()}@jakobsson.com" });
 
     public static async Task<(HttpResponseMessage, T?)> Get<T>(this HttpClient httpClient,
         string uri)

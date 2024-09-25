@@ -103,7 +103,7 @@ internal static class Api
         CreateManagerCommandHandler handler,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(request.ToCommand(), cancellationToken);
         if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }

@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import { useFetch } from '@vueuse/core';
-import { ref } from 'vue';
-const managerName = ref<string>();
-const managerEmail = ref<string>();
+import { createManager as apiCreateManager } from '@/api'
+import { ref } from 'vue'
 
-const response = ref<string>();
+const managerName = ref<string>()
+const managerEmail = ref<string>()
 
-console.log(import.meta.env.VITE_API_URL);
+const response = ref<string>()
+
 async function createManager() {
-  const { data } = await useFetch(import.meta.env.VITE_API_URL + "/api/managers").post({
-    name: {
-      name: managerName.value
-    },
-    email: {
-      emailAddress: managerEmail.value
-    }
-  }).json();
-  response.value = data.value ;
+  const res = await apiCreateManager({
+    name: managerName.value!,
+    email: managerEmail.value!,
+  })
+  response.value = res.id
 }
 </script>
 
@@ -25,13 +21,13 @@ async function createManager() {
     style="display: grid; grid: auto-flow / 1fr 1fr;
       justify-items: right; grid-gap: 10px"
   >
-    <label for="managerName">Namn </label>
+    <label for="managerName">Namn</label>
     <input
       id="managerName"
       v-model="managerName"
       type="text"
     >
-    <label for="managerEmail">Mejl </label>
+    <label for="managerEmail">Mejl</label>
     <input
       id="managerEmail"
       v-model="managerEmail"
