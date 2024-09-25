@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CreateManagerForm: typeof import('./src/components/CreateManagerForm.vue')['default']
     CreateTeamForm: typeof import('./src/components/CreateTeamForm.vue')['default']
+    Login: typeof import('./src/components/Login.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

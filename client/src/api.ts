@@ -1,10 +1,15 @@
 // 1. Login (POST /api/login)
 export interface LoginRequest {
-  email: string
+  managerEmail: string
   password: string
 }
 
-export async function login(requestBody: LoginRequest) {
+export interface LoginDto {
+  manager: ManagerDto
+  token: string
+}
+
+export async function login(requestBody: LoginRequest): Promise<LoginDto> {
   return await fetchWithAuth('/login', 'POST', null, requestBody)
 }
 
@@ -29,7 +34,7 @@ export async function createManager(requestBody: CreateManagerRequest): Promise<
 }
 
 // 3. GetManager (GET /api/managers/{id}) - Requires JWT token
-export async function getManager(id: string, token: string) {
+export async function getManager(id: string, token: string): Promise<ManagerDto> {
   return await fetchWithAuth(`/managers/${id}`, 'GET', token)
 }
 

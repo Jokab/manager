@@ -1,18 +1,19 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ManagerGame.Core.Commands;
 
 public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration configuration)
-    : ICommandHandler<LoginRequest, LoginResponse>
+    : ICommandHandler<LoginCommand, LoginResponse>
 {
-    public async Task<Result<LoginResponse>> Handle(LoginRequest request,
+    public async Task<Result<LoginResponse>> Handle(LoginCommand command,
         CancellationToken cancellationToken)
     {
-        var manager = await dbContext.Managers.FindAsync([request.ManagerId], cancellationToken);
+        var manager = await dbContext.Managers.FirstOrDefaultAsync(x => x.Email == command.ManagerEmail, cancellationToken);
         if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
 
         var token = GenerateToken(configuration);

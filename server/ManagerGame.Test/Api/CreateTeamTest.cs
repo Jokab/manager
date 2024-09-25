@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
@@ -22,29 +23,21 @@ public class CreateTeamTest : IClassFixture<Fixture>
     public async Task CreateTeam()
     {
         var db = TestDbFactory.Create(_fixture);
-
-        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
-        var createTeamRequest = new CreateTeamRequest
-            { Name = new TeamName("Lag"), ManagerId = manager!.Id };
-
-        var (_, login) =
-            await _httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerId = manager.Id });
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
+        var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
+        var createTeamRequest = new CreateTeamRequest { Name = new TeamName("Lag2"), ManagerId = manager.Id };
 
         var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
 
         Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
 
         Assert.Equal(manager.Id, team!.ManagerId);
-        Assert.Equal("Lag", team.Name.Name);
+        Assert.Equal("Lag2", team.Name.Name);
 
         Assert.Single(db.Teams);
         var createdManagerInDb = db.Managers.Include(m => m.Teams).First(x => x.Id == manager.Id);
         var createdTeamInDb = createdManagerInDb.Teams.First(x => x.Id == team.Id);
         Assert.Equal(manager.Id, createdTeamInDb.ManagerId);
-        Assert.Equal("Lag", createdTeamInDb.Name.Name);
+        Assert.Equal("Lag2", createdTeamInDb.Name.Name);
     }
 }
 

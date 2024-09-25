@@ -3,6 +3,7 @@ using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Leagues;
 using ManagerGame.Core;
 using ManagerGame.Core.Commands;
+using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ManagerGame.Api;
@@ -75,12 +76,16 @@ internal static class Api
         return TypedResults.Ok(new SignPlayerDto());
     }
 
+
+
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
         LoginRequest request,
         LoginCommandHandler commandHandler,
         CancellationToken cancellationToken = default)
     {
-        var result = await commandHandler.Handle(request, cancellationToken);
+        if (string.IsNullOrEmpty(request.ManagerEmail)) return TypedResults.Problem("Empty email");
+
+        var result = await commandHandler.Handle(new LoginCommand {ManagerEmail = new Email(request.ManagerEmail)}, cancellationToken);
         if (result.IsSuccess)
             return TypedResults.Ok(new LoginResponseDto
                 { Manager = new ManagerDto(result.Value!.Manager), Token = result.Value.Token });
