@@ -16,7 +16,7 @@ var configuration = builder.Configuration;
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; sadsda
+    options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -39,8 +39,8 @@ builder.Services.AddSignalR();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); 
-  
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddTransient<CreateTeamCommandHandler>();
 builder.Services.AddTransient<CreateManagerCommandHandler>();
 builder.Services.AddTransient<LoginCommandHandler>();
@@ -79,7 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-    
+
 // app.UseHttpsRedirection();
 
 app.MapApi();
