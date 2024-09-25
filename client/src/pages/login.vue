@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { getManager as apiGetManager, login as apiLogin } from '@/api'
+import { useManagerStore } from '@/store'
 
+const store = useManagerStore()
 const email = ref<string>()
-const managerId = ref<string>()
+const managerId = ref<string>(store.manager?.id || '')
 
 async function login() {
   const response = await apiLogin({
     managerEmail: 'jakob@jakob.com',
     password: 'jakob',
   })
+  store.token = response.token
   const response2 = await apiGetManager(response.manager.id, response.token)
   managerId.value = response2.id
+  store.manager = response2
 }
 </script>
 
