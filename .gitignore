@@ -1,23 +1,4 @@
-.DS_Store
-.vite-ssg-dist
-.vite-ssg-temp
-*.local
-dist
-dist-ssr
 node_modules
-.idea/
-*.log
-
-
-
 [Bb]in/
 [Oo]bj/
-[Ll]og/
-
-
-# ReSharper is a .NET coding add-in
-_ReSharper*/
-*.[Rr]e[Ss]harper
 *.DotSettings.user
-
-
