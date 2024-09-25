@@ -39,8 +39,8 @@ builder.Services.AddSignalR();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(); rereara
+  
 builder.Services.AddTransient<CreateTeamCommandHandler>();
 builder.Services.AddTransient<CreateManagerCommandHandler>();
 builder.Services.AddTransient<LoginCommandHandler>();
