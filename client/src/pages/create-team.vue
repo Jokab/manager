@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { createTeam as apiCreateTeam } from '@/api'
+import { useManagerStore } from '@/store'
 import { ref } from 'vue'
 
+const store = useManagerStore()
 const teamName = ref<string>()
 
 const response = ref<string>()
@@ -9,7 +11,8 @@ const response = ref<string>()
 async function createTeam() {
   const res = await apiCreateTeam({
     name: teamName.value!,
-  })
+    managerId: store.manager!.id,
+  }, store.token!)
   response.value = res.id
 }
 </script>

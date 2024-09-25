@@ -97,7 +97,9 @@ internal static class Api
         CreateTeamCommandHandler handler,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(new CreateTeamCommand
+                { Name = new TeamName(request.Name!), ManagerId = request.ManagerId!.Value },
+            cancellationToken);
 
         if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
