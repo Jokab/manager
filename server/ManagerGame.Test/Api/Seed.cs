@@ -23,7 +23,7 @@ public static class Seed
     {
         var (_, manager) = await httpClient.PostManager<ManagerDto>();
         var createTeamRequest = new CreateTeamRequest
-            { Name = new TeamName("Lag"), ManagerId = manager!.Id };
+            { Name = "Lag", ManagerId = manager!.Id };
         var (_, login) =
             await httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerEmail = manager.Email.EmailAddress });
 
