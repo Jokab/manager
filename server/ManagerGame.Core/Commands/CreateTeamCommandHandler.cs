@@ -5,7 +5,7 @@ namespace ManagerGame.Core.Commands;
 public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateTeamCommand, Team>
 {
     public async Task<Result<Team>> Handle(CreateTeamCommand command,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var manager = await dbContext.Managers.FindAsync([command.ManagerId], cancellationToken);
         if (manager == null) return Result<Team>.Failure(Error.NotFound);

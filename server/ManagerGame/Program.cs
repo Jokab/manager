@@ -83,6 +83,20 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 
 app.MapApi();
+
+if (args.Contains("seed"))
+{
+    using var scope = app.Services.CreateScope();
+    var createManagerCommandHandler = scope.ServiceProvider.GetService<CreateManagerCommandHandler>();
+    var manager = createManagerCommandHandler!.Handle(new CreateManagerCommand
+        { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
+    Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
+
+    var createTeamCommandHandler = scope.ServiceProvider.GetService<CreateTeamCommandHandler>();
+    var team = await createTeamCommandHandler!.Handle(new CreateTeamCommand
+        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id});
+}
+
 app.Run();
 
 // Make the implicit Program class public so test projects can access it

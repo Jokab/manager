@@ -11,7 +11,7 @@ public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration 
     : ICommandHandler<LoginCommand, LoginResponse>
 {
     public async Task<Result<LoginResponse>> Handle(LoginCommand command,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var manager = await dbContext.Managers.FirstOrDefaultAsync(x => x.Email == command.ManagerEmail, cancellationToken);
         if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
