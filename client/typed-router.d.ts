@@ -22,5 +22,6 @@ declare module 'vue-router/auto-routes' {
     '/create-manager': RouteRecordInfo<'/create-manager', '/create-manager', Record<never, never>, Record<never, never>>,
     '/create-team': RouteRecordInfo<'/create-team', '/create-team', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/managers/[id]': RouteRecordInfo<'/managers/[id]', '/managers/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
   }
 }
