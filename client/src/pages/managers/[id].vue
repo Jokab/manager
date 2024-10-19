@@ -16,4 +16,14 @@ onMounted(async () => {
 
 <template>
   {{ managerId }}
+  <RouterLink
+    to="/drafts"
+  >
+    draft
+  </RouterLink>
+  <RouterLink
+    to="/leagues"
+  >
+    skapa liga
+  </RouterLink>
 </template>
