@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Player> Players { get; set; }
 
     public DbSet<Draft> Drafts { get; set; }
+    public DbSet<League> Leagues { get; set; }
     // public DbSet<DoubledPeakTraversalDraftOrder> DoubledPeakTraversalDraftOrders { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -52,9 +53,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             x =>
             {
                 x.Ignore("_teams");
-                x.Property("_current").HasColumnName("DraftOrderCurrent");
-                x.Property("_previous").HasColumnName("DraftOrderPrevious");
+                x.Property("_current").HasColumnName("draftOrderCurrent");
+                x.Property("_previous").HasColumnName("draftOrderPrevious");
             });
+        // Required by the domain but not part of the data model
         modelBuilder.Entity<Draft>().Ignore(x => x.Teams);
         modelBuilder.Entity<Draft>().Property(x => x.State)
             .HasConversion<string>(x => x.ToString(), x => Enum.Parse<State>(x));

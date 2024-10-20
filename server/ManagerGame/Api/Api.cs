@@ -6,6 +6,7 @@ using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Api;
 
@@ -28,6 +29,7 @@ internal static class Api
         api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
         api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
 
+        api.MapGet("leagues/{id:guid}", GetLeague).RequireAuthorization("user");
         api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
         api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
 
@@ -141,6 +143,44 @@ internal static class Api
         var draft = await dbContext.Drafts.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new DraftDto(draft!));
     }
+
+    private static async Task<Ok<LeagueDto>> GetLeague(Guid id,
+        ApplicationDbContext dbContext,
+        CancellationToken cancellationToken = default)
+    {
+        var league = await dbContext.Leagues.Include(x => x.Drafts).Include(x => x.Teams)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return TypedResults.Ok(new LeagueDto(league!));
+    }
+}
+
+internal class LeagueDto
+{
+    [JsonConstructor]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public LeagueDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+    public LeagueDto(League league)
+    {
+        Teams = league.Teams.Select(x => new TeamDto(x)).ToList();
+        Drafts = league.Drafts.Select(x => new DraftDto(x)).ToList();
+        Id = league.Id;
+        CreatedDate = league.CreatedDate;
+        UpdatedDate = league.CreatedDate;
+        DeletedDate = league.DeletedDate;
+    }
+
+    public Guid Id { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
+    public DateTime? DeletedDate { get; set; }
+
+    public List<TeamDto> Teams { get; }
+    public List<DraftDto> Drafts { get; }
 }
 
 internal class DraftDto

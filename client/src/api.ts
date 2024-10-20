@@ -38,6 +38,21 @@ export interface DraftDto {
   state: string
 }
 
+export interface LeagueDto {
+  id: string
+  createdDate: string
+  updatedDate: string
+  deletedDate?: string | null
+  teams: TeamDto[]
+  drafts: DraftDto[]
+}
+
+export interface TeamDto {
+  id: string
+  name: string
+  managerId: string
+}
+
 export async function createManager(requestBody: CreateManagerRequest): Promise<ManagerDto> {
   return await fetchWithAuth('/managers', 'POST', null, requestBody)
 }
@@ -58,7 +73,7 @@ export async function createTeam(requestBody: CreateTeamRequest, token: string) 
 }
 
 // 5. GetTeam (GET /api/teams/{id}) - Requires JWT token
-export async function getTeam(id: string, token: string) {
+export async function getTeam(id: string, token: string): Promise<TeamDto> {
   return await fetchWithAuth(`/teams/${id}`, 'GET', token)
 }
 
@@ -99,6 +114,10 @@ export interface CreateLeagueRequest {}
 
 export async function createLeague(requestBody: CreateLeagueRequest, token: string) {
   return await fetchWithAuth('/leagues', 'POST', token, requestBody)
+}
+
+export async function getLeague(id: string, token: string): Promise<LeagueDto> {
+  return await fetchWithAuth(`/leagues/${id}`, 'GET', token)
 }
 
 // 10. AdmitTeam (POST /api/leagues/admitTeam) - Requires JWT token
