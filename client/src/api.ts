@@ -29,6 +29,15 @@ export interface ManagerDto {
   // teams: Team[] // Assuming Team is another export interface defined elsewhere
 }
 
+export interface DraftDto {
+  id: string
+  createdDate: string
+  updatedDate: string
+  deletedDate?: string | null
+  leagueId: string
+  state: string
+}
+
 export async function createManager(requestBody: CreateManagerRequest): Promise<ManagerDto> {
   return await fetchWithAuth('/managers', 'POST', null, requestBody)
 }
@@ -61,6 +70,10 @@ export interface SignPlayerRequest {
 
 export async function signPlayer(requestBody: SignPlayerRequest, token: string) {
   return await fetchWithAuth('/teams/sign', 'POST', token, requestBody)
+}
+
+export async function getDraft(id: string, token: string): Promise<DraftDto> {
+  return await fetchWithAuth(`/drafts/${id}`, 'GET', token)
 }
 
 // 7. CreateDraft (POST /api/drafts) - Requires JWT token
