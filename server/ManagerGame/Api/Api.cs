@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Leagues;
@@ -23,11 +24,13 @@ internal static class Api
         api.MapGet("teams/{id:guid}", GetTeam).RequireAuthorization("user");
         api.MapPost("teams/sign", SignPlayer).RequireAuthorization("user");
 
+        api.MapGet("drafts/{id:guid}", GetDraft).RequireAuthorization("user");
         api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
         api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
 
         api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
         api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
+
     }
 
     private static async Task<Ok<CreateDraftDto>> CreateDraft(
@@ -130,4 +133,43 @@ internal static class Api
         var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new TeamDto(team!));
     }
+
+    private static async Task<Ok<DraftDto>> GetDraft(Guid id,
+        ApplicationDbContext dbContext,
+        CancellationToken cancellationToken = default)
+    {
+        var draft = await dbContext.Drafts.FindAsync([id, cancellationToken], cancellationToken);
+        return TypedResults.Ok(new DraftDto(draft!));
+    }
+}
+
+internal class DraftDto
+{
+    [JsonConstructor]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public DraftDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+    public DraftDto(Draft draft)
+    {
+        Teams = draft.Teams;
+        Id = draft.Id;
+        LeagueId = draft.LeagueId;
+        State = draft.State;
+        CreatedDate = draft.CreatedDate;
+        UpdatedDate = draft.CreatedDate;
+        DeletedDate = draft.DeletedDate;
+    }
+
+    public Guid Id { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
+    public DateTime? DeletedDate { get; set; }
+
+    public Guid LeagueId { get; set; }
+    public ICollection<Team> Teams { get; }
+    public State State { get; private set; }
 }
