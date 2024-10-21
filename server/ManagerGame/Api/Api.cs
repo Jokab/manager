@@ -6,6 +6,7 @@ using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Api;
@@ -33,7 +34,8 @@ internal static class Api
         api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
         api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
 
-    }
+        api.MapGet("players", GetPlayers);
+        }
 
     private static async Task<Ok<CreateDraftDto>> CreateDraft(
         CreateDraftRequest request,
@@ -74,14 +76,21 @@ internal static class Api
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(
         SignPlayerRequest request,
-        SignPlayerCommandHandler handler)
+        SignPlayerCommandHandler handler,
+        IHubContext<TestHub> hubContext)
     {
         await handler.Handle(request);
+        await hubContext.Clients.All.SendCoreAsync("signedPlayer", [request.TeamId, request.PlayerId]);
 
         return TypedResults.Ok(new SignPlayerDto());
     }
 
+    private static async Task<Ok<List<PlayerDto>>> GetPlayers(ApplicationDbContext dbContext, CancellationToken cancellationToken = default)
+    {
+        var players = await dbContext.Players.ToListAsync(cancellationToken);
 
+        return TypedResults.Ok(players.Select(x => new PlayerDto(x)).ToList());
+    }
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
         LoginRequest request,
@@ -152,6 +161,42 @@ internal static class Api
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return TypedResults.Ok(new LeagueDto(league!));
     }
+}
+
+internal record PlayerDto
+{
+    public PlayerDto(Player player)
+    {
+        Id = player.Id;
+        CreatedDate = player.CreatedDate;
+        UpdatedDate = player.CreatedDate;
+        DeletedDate = player.DeletedDate;
+        Country = player.Country.Country.ToString();
+        Name = player.Name.Name;
+        TeamId = player.TeamId;
+        Position = player.Position.ToString();
+        IsSigned = player.IsSigned;
+    }
+
+    public DateTime? DeletedDate { get; set; }
+
+    public DateTime UpdatedDate { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+
+    public Guid Id { get; set; }
+    public Guid? TeamId { get; set; }
+    public string Name { get; init; }
+    public string Position { get; init; }
+    public string Country { get; init; }
+    public bool IsSigned { get; set; }
+
+    [JsonConstructor]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public PlayerDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }
 
 internal class LeagueDto

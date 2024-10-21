@@ -19,14 +19,14 @@ public record TeamDto
         CreatedDate = team.CreatedDate;
         UpdatedDate = team.UpdatedDate;
         DeletedDate = team.DeletedDate;
-        Name = team.Name;
+        Name = team.Name.Name;
         ManagerId = team.ManagerId;
         LeagueId = team.LeagueId;
     }
 
     public Guid Id { get; set; }
 
-    public TeamName Name { get; set; }
+    public string Name { get; set; }
     public Guid ManagerId { get; set; }
     public List<Player> Players { get; set; }
 

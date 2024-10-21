@@ -47,6 +47,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .Property(x => x.Country)
             .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
 
+        modelBuilder.Entity<Draft>().Navigation<League>(x => x.League).AutoInclude();
         modelBuilder.Entity<Draft>().HasKey(x => x.Id);
         modelBuilder.Entity<Draft>().OwnsOne(typeof(DraftOrder),
             "DraftOrder",
@@ -62,9 +63,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasConversion<string>(x => x.ToString(), x => Enum.Parse<State>(x));
 
         modelBuilder.Entity<League>().HasKey(x => x.Id);
+        modelBuilder.Entity<League>().Navigation(x => x.Teams).AutoInclude();
         modelBuilder.Entity<League>()
             .HasMany<Draft>(x => x.Drafts)
-            .WithOne().HasForeignKey(x => x.LeagueId)
+            .WithOne(x => x.League).HasForeignKey(x => x.LeagueId)
             .IsRequired();
         modelBuilder.Entity<League>()
             .HasMany<Team>(x => x.Teams)

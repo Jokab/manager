@@ -4,9 +4,8 @@ namespace ManagerGame;
 
 public class TestHub : Hub
 {
-    public async Task SendMessage(string user, string message)
+    public async Task SignedPlayer(Guid teamId, Guid playerId)
     {
-        Console.WriteLine("send");
-        await Clients.All.SendAsync("messageReceived", user, message);
+        await Clients.All.SendAsync("signedPlayer", teamId, playerId);
     }
 }

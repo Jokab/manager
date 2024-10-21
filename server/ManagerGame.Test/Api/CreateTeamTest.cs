@@ -31,7 +31,7 @@ public class CreateTeamTest : IClassFixture<Fixture>
         Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
 
         Assert.Equal(manager.Id, team!.ManagerId);
-        Assert.Equal("Lag2", team.Name.Name);
+        Assert.Equal("Lag2", team.Name);
 
         Assert.Single(db.Teams);
         var createdManagerInDb = db.Managers.Include(m => m.Teams).First(x => x.Id == manager.Id);

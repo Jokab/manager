@@ -8,6 +8,7 @@ using ManagerGame.Core;
 using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 using ManagerGame.Infra;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,17 +88,86 @@ app.MapApi();
 if (args.Contains("seed"))
 {
     using var scope = app.Services.CreateScope();
-    var createManagerCommandHandler = scope.ServiceProvider.GetService<CreateManagerCommandHandler>();
+    var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+
+    ResetDb(db);
+    await SeedDb(scope, db);
+}
+
+app.Run();
+return;
+
+void ResetDb(ApplicationDbContext? applicationDbContext)
+{
+    var tableNames = applicationDbContext!.Model.GetEntityTypes()
+        .Select(t => t.GetTableName())
+        .Distinct()
+        .ToList();
+
+    foreach (var tableName in tableNames)
+    {
+#pragma warning disable EF1002
+        applicationDbContext.Database.ExecuteSqlRaw($"TRUNCATE {tableName} CASCADE;");
+#pragma warning restore EF1002
+    }
+}
+
+async Task SeedDb(IServiceScope serviceScope,
+    ApplicationDbContext? db)
+{
+    var createManagerCommandHandler = serviceScope.ServiceProvider.GetService<CreateManagerCommandHandler>();
     var manager = createManagerCommandHandler!.Handle(new CreateManagerCommand
         { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
     Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
 
-    var createTeamCommandHandler = scope.ServiceProvider.GetService<CreateTeamCommandHandler>();
+    var createTeamCommandHandler = serviceScope.ServiceProvider.GetService<CreateTeamCommandHandler>();
     var team = await createTeamCommandHandler!.Handle(new CreateTeamCommand
         { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id});
-}
 
-app.Run();
+
+    const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
+    var goalkeepersRemaining = 1;
+    var minDefendersRemaining = 4;
+    var minMidfieldersRemaining = 4;
+
+    static Player Player(Country country = Country.Se,
+        Position position = Position.Defender) =>
+        new(Guid.NewGuid(),
+            new PlayerName("Jakob"),
+            position,
+            new CountryRec(country));
+
+    var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
+        Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>
+        {
+            Position position;
+            if (goalkeepersRemaining > 0)
+            {
+                goalkeepersRemaining--;
+                position = Position.Goalkeeper;
+            }
+            else if (minDefendersRemaining > 0)
+            {
+                minDefendersRemaining--;
+                position = Position.Defender;
+            }
+            else if (minMidfieldersRemaining > 0)
+            {
+                minMidfieldersRemaining--;
+                position = Position.Midfielder;
+            }
+            else
+            {
+                position = Position.Forward;
+            }
+
+            return Player((Country)i, position);
+        })
+    ).ToList();
+
+    db!.Players.AddRange(players);
+    await db.SaveChangesAsync();
+}
 
 // Make the implicit Program class public so test projects can access it
 namespace ManagerGame
