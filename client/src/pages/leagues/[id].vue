@@ -3,6 +3,7 @@ import type { DraftDto, TeamDto } from '@/api'
 import { admitTeam as apiAdmitTeam, createDraft as apiCreateDraft, getLeague, getTeam } from '@/api'
 import { useManagerStore } from '@/store'
 
+const router = useRouter()
 const store = useManagerStore()
 const { params } = useRoute('/leagues/[id]')
 
@@ -10,17 +11,15 @@ const teams = ref<TeamDto[]>()
 const drafts = ref<DraftDto[]>()
 const teamIdToAdd = ref<string>()
 
-onMounted(async () => {
-  const response = await getLeague(params.id, store.token!)
-  teams.value = response.teams
-  drafts.value = response.drafts
-})
+const response = await getLeague(params.id, store.token!)
+teams.value = response.teams
+drafts.value = response.drafts
 
 async function createDraft() {
   const response = await apiCreateDraft({
     leagueId: params.id,
   }, store.token!)
-  console.log(response)
+  router.push({ name: '/drafts/[id]', params: { id: response.id } })
 }
 
 async function admitTeam() {
@@ -43,11 +42,13 @@ async function admitTeam() {
     drafts
     <ul>
       <li v-for="draft in drafts" :key="draft.id">
-        {{ draft.id }}
+        <RouterLink :to="{ name: '/drafts/[id]', params: { id: draft.id } }">
+          Draft {{ draft.id.split("-")[0] }}
+        </RouterLink>
       </li>
     </ul>
     <button @click="createDraft">
-      Skapa draft
+      Ny draft
     </button>
     <form>
       <label>

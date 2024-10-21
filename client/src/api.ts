@@ -38,6 +38,11 @@ export interface DraftDto {
   state: string
 }
 
+export interface StartDraftDto {
+  id: string
+  state: string
+}
+
 export interface LeagueDto {
   id: string
   createdDate: string
@@ -83,7 +88,7 @@ export interface SignPlayerRequest {
   playerId: string
 }
 
-export async function signPlayer(requestBody: SignPlayerRequest, token: string) {
+export async function signPlayer(requestBody: SignPlayerRequest, token: string): Promise<void> {
   return await fetchWithAuth('/teams/sign', 'POST', token, requestBody)
 }
 
@@ -96,7 +101,7 @@ export interface CreateDraftRequest {
   leagueId: string
 }
 
-export async function createDraft(requestBody: CreateDraftRequest, token: string) {
+export async function createDraft(requestBody: CreateDraftRequest, token: string): Promise<DraftDto> {
   return await fetchWithAuth('/drafts', 'POST', token, requestBody)
 }
 
@@ -105,7 +110,7 @@ export interface StartDraftRequest {
   draftId: string
 }
 
-export async function startDraft(requestBody: StartDraftRequest, token: string) {
+export async function startDraft(requestBody: StartDraftRequest, token: string): Promise<StartDraftDto> {
   return await fetchWithAuth('/drafts/start', 'POST', token, requestBody)
 }
 
@@ -128,6 +133,22 @@ export interface AdmitTeamRequest {
 
 export async function admitTeam(requestBody: AdmitTeamRequest, token: string) {
   return await fetchWithAuth('/leagues/admitTeam', 'POST', token, requestBody)
+}
+
+export interface PlayerDto {
+  id: string
+  createdDate: string
+  updatedDate: string
+  deletedDate: string | null
+  country: string
+  name: string
+  teamId: string
+  position: string
+  isSigned: boolean
+}
+
+export async function getPlayers(): Promise<PlayerDto[]> {
+  return await fetchWithAuth('/players', 'GET')
 }
 
 // Helper function to handle fetch requests

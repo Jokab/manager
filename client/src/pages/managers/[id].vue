@@ -7,11 +7,9 @@ const store = useManagerStore()
 
 const managerId = ref<string>()
 
-onMounted(async () => {
-  const response2 = await apiGetManager(params.id, store.token!)
-  managerId.value = response2.id
-  store.manager = response2
-})
+const response2 = await apiGetManager(params.id, store.token!)
+managerId.value = response2.id
+store.manager = response2
 </script>
 
 <template>
