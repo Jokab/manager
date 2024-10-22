@@ -28,9 +28,7 @@ public class League : Entity
     public void CreateDraft()
     {
         if (Drafts.Any(x => x.State != DraftState.Finished))
-        {
             throw new InvalidOperationException("Cannot create new draft while there unfinished drafts");
-        }
         Drafts.Add(Draft.DoubledPeakTraversalDraft(this));
     }
 }

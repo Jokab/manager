@@ -35,7 +35,7 @@ internal static class Api
         api.MapPost("leagues/admitTeam", AdmitTeam).RequireAuthorization("user");
 
         api.MapGet("players", GetPlayers);
-        }
+    }
 
     private static async Task<Ok<CreateDraftDto>> CreateDraft(
         CreateDraftRequest request,
@@ -85,7 +85,8 @@ internal static class Api
         return TypedResults.Ok(new SignPlayerDto());
     }
 
-    private static async Task<Ok<List<PlayerDto>>> GetPlayers(ApplicationDbContext dbContext, CancellationToken cancellationToken = default)
+    private static async Task<Ok<List<PlayerDto>>> GetPlayers(ApplicationDbContext dbContext,
+        CancellationToken cancellationToken = default)
     {
         var players = await dbContext.Players.ToListAsync(cancellationToken);
 
@@ -99,7 +100,8 @@ internal static class Api
     {
         if (string.IsNullOrEmpty(request.ManagerEmail)) return TypedResults.Problem("Empty email");
 
-        var result = await commandHandler.Handle(new LoginCommand {ManagerEmail = new Email(request.ManagerEmail)}, cancellationToken);
+        var result = await commandHandler.Handle(new LoginCommand { ManagerEmail = new Email(request.ManagerEmail) },
+            cancellationToken);
         if (result.IsSuccess)
             return TypedResults.Ok(new LoginResponseDto
                 { Manager = new ManagerDto(result.Value!.Manager), Token = result.Value.Token });
@@ -178,6 +180,13 @@ internal record PlayerDto
         IsSigned = player.IsSigned;
     }
 
+    [JsonConstructor]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public PlayerDto()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
     public DateTime? DeletedDate { get; set; }
 
     public DateTime UpdatedDate { get; set; }
@@ -190,13 +199,6 @@ internal record PlayerDto
     public string Position { get; init; }
     public string Country { get; init; }
     public bool IsSigned { get; set; }
-
-    [JsonConstructor]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public PlayerDto()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }
 
 internal class LeagueDto

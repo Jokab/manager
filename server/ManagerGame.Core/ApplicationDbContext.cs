@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Player> Players { get; set; }
 
     public DbSet<Draft> Drafts { get; set; }
+
     public DbSet<League> Leagues { get; set; }
     // public DbSet<DoubledPeakTraversalDraftOrder> DoubledPeakTraversalDraftOrders { get; set; }
 

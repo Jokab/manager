@@ -12,7 +12,14 @@ public class Draft : Entity
         State = DraftState.Created;
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    private Draft(Guid id) : base(id)
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
     public Guid LeagueId { get; private init; }
+
     // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local used by EF core
     public League League { get; private init; }
     public DraftState State { get; private set; }
@@ -33,20 +40,12 @@ public class Draft : Entity
 
     public void Start()
     {
-        if (State is DraftState.Started)
-        {
-            throw new InvalidOperationException("Draft is already started");
-        }
+        if (State is DraftState.Started) throw new InvalidOperationException("Draft is already started");
         const int minimumTeamCount = 2;
-        if (Teams.Count < minimumTeamCount) throw new ArgumentException($"Too few teams to draft, needs at least {minimumTeamCount}");
+        if (Teams.Count < minimumTeamCount)
+            throw new ArgumentException($"Too few teams to draft, needs at least {minimumTeamCount}");
         State = DraftState.Started;
     }
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    private Draft(Guid id) : base(id)
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }
 
 public enum DraftState

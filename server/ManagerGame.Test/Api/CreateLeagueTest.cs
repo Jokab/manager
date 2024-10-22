@@ -33,5 +33,3 @@ public class CreateLeagueTest : IClassFixture<Fixture>
         Assert.Equal(createLeagueDto.Id, team1!.League!.Id);
     }
 }
-
-

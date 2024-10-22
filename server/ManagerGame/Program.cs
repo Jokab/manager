@@ -122,7 +122,7 @@ async Task SeedDb(IServiceScope serviceScope,
 
     var createTeamCommandHandler = serviceScope.ServiceProvider.GetService<CreateTeamCommandHandler>();
     var team = await createTeamCommandHandler!.Handle(new CreateTeamCommand
-        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id});
+        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id });
 
 
     const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
@@ -131,11 +131,13 @@ async Task SeedDb(IServiceScope serviceScope,
     var minMidfieldersRemaining = 4;
 
     static Player Player(Country country = Country.Se,
-        Position position = Position.Defender) =>
-        new(Guid.NewGuid(),
+        Position position = Position.Defender)
+    {
+        return new Player(Guid.NewGuid(),
             new PlayerName("Jakob"),
             position,
             new CountryRec(country));
+    }
 
     var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
         Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>

@@ -1,9 +1,6 @@
 using System.Net;
-using System.Net.Http.Headers;
-using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
-using ManagerGame.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Api;

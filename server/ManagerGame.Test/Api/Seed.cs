@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Commands;
-using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Test.Api;
 
@@ -12,7 +11,8 @@ public static class Seed
     public static async Task<(ManagerDto manager, string token)> SeedManagerAndLogin(HttpClient httpClient)
     {
         var (_, manager) = await httpClient.PostManager<ManagerDto>();
-        var (_, login) = await httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerEmail = manager!.Email.EmailAddress });
+        var (_, login) = await httpClient.Post<LoginResponseDto>("/api/login",
+            new LoginRequest { ManagerEmail = manager!.Email.EmailAddress });
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
 
@@ -25,7 +25,8 @@ public static class Seed
         var createTeamRequest = new CreateTeamRequest
             { Name = "Lag", ManagerId = manager!.Id };
         var (_, login) =
-            await httpClient.Post<LoginResponseDto>("/api/login", new LoginRequest { ManagerEmail = manager.Email.EmailAddress });
+            await httpClient.Post<LoginResponseDto>("/api/login",
+                new LoginRequest { ManagerEmail = manager.Email.EmailAddress });
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
 

@@ -8,8 +8,5 @@ public record CreateManagerRequest
     public string? Name { get; init; }
     public string? Email { get; init; }
 
-    public CreateManagerCommand ToCommand()
-    {
-        return new CreateManagerCommand { Email = new Email(Email!), Name = new ManagerName(Name!) };
-    }
+    public CreateManagerCommand ToCommand() => new() { Email = new Email(Email!), Name = new ManagerName(Name!) };
 }

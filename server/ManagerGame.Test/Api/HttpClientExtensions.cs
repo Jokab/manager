@@ -1,8 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using ManagerGame.Api;
-using ManagerGame.Core.Commands;
-using ManagerGame.Core.Domain;
 
 namespace ManagerGame.Test.Api;
 
@@ -18,10 +16,10 @@ public static class HttpClientExtensions
                 Encoding.UTF8,
                 "application/json"));
         return httpResponse switch
-            {
-                { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
-                { } response => (response, default)
-            };
+        {
+            { IsSuccessStatusCode: true } response => await Deserialize<T>(response),
+            { } response => (response, default)
+        };
     }
 
     private static async Task<(HttpResponseMessage, T)> Deserialize<T>(HttpResponseMessage responseMessage) =>

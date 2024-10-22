@@ -31,7 +31,7 @@ public class Team : Entity
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
     public Guid? LeagueId { get; private init; }
-    public League? League { get; private init; }
+    public League? League { get; }
 
     public static Team Create(TeamName name,
         Guid managerId,
