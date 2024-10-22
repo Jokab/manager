@@ -1,6 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
-using ManagerGame.Core.Commands;
+using ManagerGame.Core.Teams;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Api;

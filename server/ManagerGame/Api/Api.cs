@@ -1,10 +1,10 @@
-using System.Text.Json.Serialization;
-using ManagerGame.Api.Drafting;
 using ManagerGame.Api.Dtos;
-using ManagerGame.Api.Leagues;
 using ManagerGame.Core;
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
+using ManagerGame.Core.Drafting;
+using ManagerGame.Core.Leagues;
+using ManagerGame.Core.Managers;
+using ManagerGame.Core.Teams;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -163,100 +163,4 @@ internal static class Api
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return TypedResults.Ok(new LeagueDto(league!));
     }
-}
-
-internal record PlayerDto
-{
-    public PlayerDto(Player player)
-    {
-        Id = player.Id;
-        CreatedDate = player.CreatedDate;
-        UpdatedDate = player.CreatedDate;
-        DeletedDate = player.DeletedDate;
-        Country = player.Country.Country.ToString();
-        Name = player.Name.Name;
-        TeamId = player.TeamId;
-        Position = player.Position.ToString();
-        IsSigned = player.IsSigned;
-    }
-
-    [JsonConstructor]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public PlayerDto()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-    public DateTime? DeletedDate { get; set; }
-
-    public DateTime UpdatedDate { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-
-    public Guid Id { get; set; }
-    public Guid? TeamId { get; set; }
-    public string Name { get; init; }
-    public string Position { get; init; }
-    public string Country { get; init; }
-    public bool IsSigned { get; set; }
-}
-
-internal class LeagueDto
-{
-    [JsonConstructor]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public LeagueDto()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-    public LeagueDto(League league)
-    {
-        Teams = league.Teams.Select(x => new TeamDto(x)).ToList();
-        Drafts = league.Drafts.Select(x => new DraftDto(x)).ToList();
-        Id = league.Id;
-        CreatedDate = league.CreatedDate;
-        UpdatedDate = league.CreatedDate;
-        DeletedDate = league.DeletedDate;
-    }
-
-    public Guid Id { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-    public DateTime UpdatedDate { get; set; }
-    public DateTime? DeletedDate { get; set; }
-
-    public List<TeamDto> Teams { get; }
-    public List<DraftDto> Drafts { get; }
-}
-
-internal class DraftDto
-{
-    [JsonConstructor]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public DraftDto()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-    public DraftDto(Draft draft)
-    {
-        Teams = draft.Teams;
-        Id = draft.Id;
-        LeagueId = draft.LeagueId;
-        State = draft.State;
-        CreatedDate = draft.CreatedDate;
-        UpdatedDate = draft.CreatedDate;
-        DeletedDate = draft.DeletedDate;
-    }
-
-    public Guid Id { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-    public DateTime UpdatedDate { get; set; }
-    public DateTime? DeletedDate { get; set; }
-
-    public Guid LeagueId { get; set; }
-    public ICollection<Team> Teams { get; }
-    public DraftState State { get; private set; }
 }

@@ -1,6 +1,5 @@
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Drafting;
+namespace ManagerGame.Core.Drafting;
 
 public record CreateDraftRequest(Guid LeagueId) : ICommand<Draft>;

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Drafting;
+namespace ManagerGame.Api.Dtos;
 
 public class CreateDraftDto
 {

@@ -1,9 +1,8 @@
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Leagues;
+namespace ManagerGame.Core.Leagues;
 
-internal class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo)
+public class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo)
     : ICommandHandler<AdmitTeamRequest, League>
 {
     public async Task<Result<League>> Handle(AdmitTeamRequest command,

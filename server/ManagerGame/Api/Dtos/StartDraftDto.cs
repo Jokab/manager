@@ -1,6 +1,6 @@
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Drafting;
+namespace ManagerGame.Api.Dtos;
 
 public class StartDraftDto
 {

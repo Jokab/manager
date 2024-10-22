@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ManagerGame.Core.Commands;
+namespace ManagerGame.Core.Managers;
 
 public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration configuration)
     : ICommandHandler<LoginCommand, LoginResponse>

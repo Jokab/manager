@@ -31,7 +31,7 @@ public class DraftTest
     }
 
     [Fact]
-    public void TooFewTeamsThrows()
+    public void StartWithTooFewTeamsThrows()
     {
         var team1 = TestData.TeamWithValidFullSquad();
         var league = League.Empty();

@@ -1,7 +1,7 @@
 using System.Net;
 using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
-using ManagerGame.Api.Leagues;
+using ManagerGame.Core.Leagues;
 
 namespace ManagerGame.Test.Api;
 

@@ -1,6 +1,6 @@
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Core.Commands;
+namespace ManagerGame.Core;
 
 public interface IRepository<T> where T : Entity
 {

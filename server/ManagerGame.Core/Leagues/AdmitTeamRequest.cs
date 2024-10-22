@@ -1,7 +1,6 @@
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Leagues;
+namespace ManagerGame.Core.Leagues;
 
 public class AdmitTeamRequest : ICommand<League>
 {

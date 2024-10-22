@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api;
+namespace ManagerGame.Api.Dtos;
 
-public class AdmitTeamDto
+public record AdmitTeamDto
 {
     [JsonConstructor]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

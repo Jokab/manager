@@ -1,4 +1,4 @@
-namespace ManagerGame.Core.Commands;
+namespace ManagerGame.Core;
 
 public class Result<T>
 {

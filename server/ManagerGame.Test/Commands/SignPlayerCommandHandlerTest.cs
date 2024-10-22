@@ -1,5 +1,6 @@
-using ManagerGame.Core.Commands;
+using ManagerGame.Core;
 using ManagerGame.Core.Domain;
+using ManagerGame.Core.Teams;
 using NSubstitute;
 
 namespace ManagerGame.Test.Commands;

@@ -39,7 +39,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            Guid.NewGuid());
+            League.Empty());
 
         var newPlayer = TestData.Player(country);
 
@@ -58,7 +58,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            Guid.NewGuid());
+            League.Empty());
 
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);
@@ -81,7 +81,7 @@ public class TeamTest
     {
         var team = TestData.TeamWithValidFullSquad();
         for (var i = 0; i < initialPlayersCountBelowLimit; i++)
-            // Remove from full squad so we can add them in test 
+            // Remove from full squad so we can add them in test
             team.Players.Remove(team.Players.First(x => x.Country.Country == Country.Se));
         var newPlayer = TestData.Player();
 

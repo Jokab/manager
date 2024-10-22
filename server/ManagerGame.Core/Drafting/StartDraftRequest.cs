@@ -1,7 +1,6 @@
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Drafting;
+namespace ManagerGame.Core.Drafting;
 
 public class StartDraftRequest : ICommand<Draft>
 {

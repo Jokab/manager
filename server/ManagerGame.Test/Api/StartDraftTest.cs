@@ -1,6 +1,7 @@
 using System.Net;
-using ManagerGame.Api.Drafting;
-using ManagerGame.Api.Leagues;
+using ManagerGame.Api.Dtos;
+using ManagerGame.Core.Drafting;
+using ManagerGame.Core.Leagues;
 
 namespace ManagerGame.Test.Api;
 

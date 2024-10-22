@@ -1,9 +1,8 @@
-using ManagerGame.Core.Commands;
 using ManagerGame.Core.Domain;
 
-namespace ManagerGame.Api.Drafting;
+namespace ManagerGame.Core.Drafting;
 
-internal class CreateDraftHandler(IRepository<Draft> repo, IRepository<League> leagueRepo)
+public class CreateDraftHandler(IRepository<Draft> repo, IRepository<League> leagueRepo)
     : ICommandHandler<CreateDraftRequest, Draft>
 {
     public async Task<Result<Draft>> Handle(CreateDraftRequest command,
