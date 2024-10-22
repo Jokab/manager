@@ -152,6 +152,8 @@ export async function getPlayers(): Promise<PlayerDto[]> {
   return await fetchWithAuth('/players', 'GET')
 }
 
+const errorHandler = useErrorHandler()
+
 // Helper function to handle fetch requests
 async function fetchWithAuth(url: string, method: string, token: string | null = null, body: any = null) {
   const headers: HeadersInit = {
@@ -168,11 +170,36 @@ async function fetchWithAuth(url: string, method: string, token: string | null =
     body: body ? JSON.stringify(body) : null,
   }
 
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api${url}`, options)
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api${url}`, options)
 
-  if (!response.ok) {
-    throw new Error(`Failed to ${method} ${url}`)
+    // Check if the response is OK (status code 2xx)
+    if (!response.ok) {
+      // Handle different error statuses
+      const status = response.status
+      switch (status) {
+        case 500:
+          errorHandler.setError('Server error: Please try again later.')
+          break
+        case 404:
+          errorHandler.setError('Resource not found.')
+          break
+        default:
+          errorHandler.setError('An unexpected error occurred.')
+      }
+      throw new Error(`HTTP error! Status: ${status}`)
+    }
+
+    return await response.json()
   }
-
-  return await response.json()
+  catch (error: any) {
+    // Handle network errors (when the server is down or unreachable)
+    if (error.message === 'Failed to fetch') {
+      errorHandler.setError('Network error: Unable to reach the server')
+    }
+    else {
+      errorHandler.setError(`Fetch error: ${error.message}`)
+    }
+    throw error // Propagate the error for additional handling if needed
+  }
 }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { useManagerStore } from './store'
 
 const store = useManagerStore()
@@ -17,6 +16,7 @@ watch(() => store.token, (newValue) => {
 </script>
 
 <template>
+  <ErrorBanner />
   <div v-if="store.token && store.manager" style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column;">
     <div>
       inloggad som <RouterLink :to="{ name: '/managers/[id]', params: { id: store.manager.id } }">
@@ -27,14 +27,18 @@ watch(() => store.token, (newValue) => {
       logga ut
     </button>
   </div>
-  <Suspense>
-    <router-view v-slot="{ Component }">
-      <component :is="Component" />
-    </router-view>
-    <template #fallback>
-      <div>
-        laddar...!
-      </div>
+  <RouterView v-slot="{ Component }">
+    <template v-if="Component">
+      <Transition mode="out-in">
+        <KeepAlive>
+          <Suspense>
+            <component :is="Component" />
+            <template #fallback>
+              Laddar...
+            </template>
+          </Suspense>
+        </KeepAlive>
+      </Transition>
     </template>
-  </Suspense>
+  </RouterView>
 </template>

@@ -77,9 +77,9 @@ start()
   <button @click="loadPlayers">
     Ladda om spelare
   </button>
-  <div style="display: flex; flex-direction: column; width: 20rem">
+  <div style="display: flex; flex-direction: column; width: 20rem; text-align: left">
     <div v-for="p in players" :key="p.id" style="text-decoration: underline; cursor:pointer;" @click="signPlayer(p.id, props.league.teams[0].id)">
-      {{ p.name }} {{ p.position }} {{ p.country }} {{ (p.isSigned ? `signad av ${p.teamId}` : "friii") }}
+      {{ p.name }} {{ p.position }} {{ p.country }} {{ (p.isSigned ? `signad av ${league.teams.find(x => x.id === p.teamId)?.name}` : "friii") }}
     </div>
   </div>
 </template>

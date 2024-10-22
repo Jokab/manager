@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ManagerDto } from '@/api'
-import { getManager as apiGetManager, login as apiLogin, getTeam } from '@/api'
+import { getManager as apiGetManager } from '@/api'
 import { useManagerStore } from '@/store'
 import { storeToRefs } from 'pinia'
 
@@ -9,14 +8,8 @@ const store = useManagerStore()
 
 const { manager } = storeToRefs(store)
 
-const response2 = await apiGetManager(params.id, store.token!)
-manager.value = response2
-
-// watch(() => store.manager, async (val: ManagerDto | undefined) => {
-//   if (val) {
-//     await getTeams()
-//   }
-// })
+const response = await apiGetManager(params.id, store.token!)
+manager.value = response
 </script>
 
 <template>

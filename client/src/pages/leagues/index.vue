@@ -12,8 +12,10 @@ async function createLeague() {
 </script>
 
 <template>
-  ligor
-  <button @click="createLeague">
-    skapa liga
-  </button>
+  <div>
+    ligor
+    <button @click="createLeague">
+      skapa liga
+    </button>
+  </div>
 </template>

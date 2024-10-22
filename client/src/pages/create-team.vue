@@ -18,20 +18,22 @@ async function createTeam() {
 </script>
 
 <template>
-  Skapa lag!
-  <div
-    style="display: grid; grid: auto-flow / 1fr 1fr;
+  <div>
+    <div
+      style="display: grid; grid: auto-flow / 1fr 1fr;
       justify-items: right; grid-gap: 10px"
-  >
-    <label for="teamName">Namn</label>
-    <input
-      id="teamName"
-      v-model="teamName"
-      type="text"
     >
+      <div>Skapa lag!</div>
+      <label for="teamName">Namn</label>
+      <input
+        id="teamName"
+        v-model="teamName"
+        type="text"
+      >
+    </div>
+    <button @click="createTeam">
+      Skicka
+    </button>
+    <div>{{ response }}</div>
   </div>
-  <button @click="createTeam">
-    Skicka
-  </button>
-  <div>{{ response }}</div>
 </template>

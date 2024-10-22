@@ -17,28 +17,30 @@ async function createManager() {
 </script>
 
 <template>
-  Skapa manager!
-  <div
-    style="display: grid; grid: auto-flow / 1fr 1fr;
+  <div>
+    Skapa manager!
+    <div
+      style="display: grid; grid: auto-flow / 1fr 1fr;
       justify-items: right; grid-gap: 10px"
-  >
-    <label for="managerName">Namn</label>
-    <input
-      id="managerName"
-      v-model="managerName"
-      type="text"
     >
-    <label for="managerEmail">Mejl</label>
-    <input
-      id="managerEmail"
-      v-model="managerEmail"
-      type="email"
-    >
-  </div>
-  <button @click="createManager">
-    Skicka
-  </button>
-  <div v-if="managerId">
-    Skapat manager-ID! {{ managerId }}
+      <label for="managerName">Namn</label>
+      <input
+        id="managerName"
+        v-model="managerName"
+        type="text"
+      >
+      <label for="managerEmail">Mejl</label>
+      <input
+        id="managerEmail"
+        v-model="managerEmail"
+        type="email"
+      >
+    </div>
+    <button @click="createManager">
+      Skicka
+    </button>
+    <div v-if="managerId">
+      Skapat manager-ID! {{ managerId }}
+    </div>
   </div>
 </template>

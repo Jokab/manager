@@ -22,24 +22,26 @@ async function login() {
 </script>
 
 <template>
-  Logga in!
   <div>
-    <form>
-      <label>
-        Email
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          required
-        >
-      </label>
-      <button @click.prevent="login">
-        Logga in
-      </button>
-    </form>
-  </div>
-  <div v-if="manager?.id">
-    Inloggad som: {{ manager?.id }}
+    Logga in!
+    <div>
+      <form>
+        <label>
+          Email
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            required
+          >
+        </label>
+        <button @click.prevent="login">
+          Logga in
+        </button>
+      </form>
+    </div>
+    <div v-if="manager?.id">
+      Inloggad som: {{ manager?.id }}
+    </div>
   </div>
 </template>
