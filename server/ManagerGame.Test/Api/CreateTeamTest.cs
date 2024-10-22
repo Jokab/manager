@@ -1,5 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Api.Requests;
 using ManagerGame.Core.Teams;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,4 +1,5 @@
 using ManagerGame.Api.Dtos;
+using ManagerGame.Api.Requests;
 using ManagerGame.Core;
 using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
