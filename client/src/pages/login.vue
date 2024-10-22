@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { getManager as apiGetManager, login as apiLogin } from '@/api'
+import { login as apiLogin } from '@/api'
 import { useManagerStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 
 const store = useManagerStore()
+
+const { manager } = storeToRefs(store)
 const email = ref<string>()
-const managerId = ref<string>(store.manager?.id || '')
 
 async function login() {
   const response = await apiLogin({
@@ -14,9 +16,6 @@ async function login() {
     password: '',
   })
   store.token = response.token
-  // const response2 = await apiGetManager(response.manager.id, response.token)
-  // managerId.value = response2.id
-  // store.manager = response2
 
   router.push({ name: '/managers/[id]', params: { id: response.manager.id } })
 }
@@ -40,7 +39,7 @@ async function login() {
       </button>
     </form>
   </div>
-  <div v-if="managerId">
-    Inloggad som: {{ managerId }}
+  <div v-if="manager?.id">
+    Inloggad som: {{ manager?.id }}
   </div>
 </template>

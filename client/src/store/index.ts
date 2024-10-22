@@ -5,7 +5,16 @@ export const useManagerStore = defineStore('manager', () => {
   const token = ref<string>()
   const manager = ref<ManagerDto>()
 
-  return { token, manager }
+  function $reset() {
+    token.value = undefined
+    manager.value = undefined
+  }
+
+  function logout() {
+    token.value = undefined
+    manager.value = undefined
+  }
+  return { token, manager, $reset, logout }
 }, {
   persist: true,
 })
