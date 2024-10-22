@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ManagerGame.Core.Domain;
+namespace ManagerGame.Domain;
 
 public class Team : Entity
 {

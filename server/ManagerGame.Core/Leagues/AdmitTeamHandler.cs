@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Leagues;
 
 public class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo)

@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Teams;
 
 public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo)

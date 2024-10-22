@@ -1,6 +1,5 @@
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
-using ManagerGame.Core.Domain;
 using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;

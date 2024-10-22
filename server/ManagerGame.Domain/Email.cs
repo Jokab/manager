@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ManagerGame.Core.Domain;
+namespace ManagerGame.Domain;
 
 public record Email
 {

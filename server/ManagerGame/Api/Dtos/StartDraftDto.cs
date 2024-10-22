@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Api.Dtos;
 
 public class StartDraftDto

@@ -1,4 +1,3 @@
-using ManagerGame.Core.Domain;
 using ManagerGame.Core.Managers;
 
 namespace ManagerGame.Api;

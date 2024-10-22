@@ -1,8 +1,8 @@
-namespace ManagerGame.Core.Domain;
+namespace ManagerGame.Domain;
 
-public record ManagerName
+public record TeamName
 {
-    public ManagerName(string name)
+    public TeamName(string name)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         Name = name;

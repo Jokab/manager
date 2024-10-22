@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Teams;
 
 public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateTeamCommand, Team>

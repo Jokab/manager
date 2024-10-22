@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Drafting;
 
 public class StartDraftHandler(IRepository<Draft> draftRepo) : ICommandHandler<StartDraftRequest, Draft>

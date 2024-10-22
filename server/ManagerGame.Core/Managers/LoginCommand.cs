@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Managers;
 
 public class LoginCommand : ICommand<LoginResponse>

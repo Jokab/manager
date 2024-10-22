@@ -1,4 +1,4 @@
-namespace ManagerGame.Core.Domain;
+namespace ManagerGame.Domain;
 
 public abstract class Entity(Guid id)
 {

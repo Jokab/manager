@@ -1,6 +1,5 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
-using ManagerGame.Core.Domain;
 using ManagerGame.Core.Teams;
 
 namespace ManagerGame.Test.Api;

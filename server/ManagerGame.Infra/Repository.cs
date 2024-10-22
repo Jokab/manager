@@ -1,5 +1,5 @@
 using ManagerGame.Core;
-using ManagerGame.Core.Domain;
+using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Infra;

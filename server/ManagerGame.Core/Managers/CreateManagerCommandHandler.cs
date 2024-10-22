@@ -1,4 +1,3 @@
-using ManagerGame.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Core.Managers;

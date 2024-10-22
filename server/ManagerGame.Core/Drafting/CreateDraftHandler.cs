@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Drafting;
 
 public class CreateDraftHandler(IRepository<Draft> repo, IRepository<League> leagueRepo)

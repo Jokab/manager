@@ -1,5 +1,4 @@
 using ManagerGame.Core;
-using ManagerGame.Core.Domain;
 using ManagerGame.Core.Teams;
 using NSubstitute;
 

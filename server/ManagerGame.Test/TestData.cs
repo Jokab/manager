@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Test;
 
 public static class TestData
@@ -7,9 +5,9 @@ public static class TestData
     public static Player Player(Country country = Country.Se,
         Position position = Position.Defender) =>
         new(Guid.NewGuid(),
-            new PlayerName("Jakob"),
-            position,
-            new CountryRec(country));
+            (PlayerName)new PlayerName("Jakob"),
+            (Position)position,
+            (CountryRec)new CountryRec(country));
 
     public static Team TeamEmpty(string name) =>
         Team.Create(new TeamName(name), Guid.NewGuid(), [], League.Empty());

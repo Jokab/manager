@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core;
 
 public interface IRepository<T> where T : Entity

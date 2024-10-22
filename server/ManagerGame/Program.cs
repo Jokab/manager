@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using ManagerGame;
 using ManagerGame.Api;
 using ManagerGame.Core;
-using ManagerGame.Core.Domain;
 using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;

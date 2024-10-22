@@ -1,5 +1,3 @@
-using ManagerGame.Core.Domain;
-
 namespace ManagerGame.Core.Leagues;
 
 public class CreateLeagueHandler(IRepository<League> repo) : ICommandHandler<CreateLeagueRequest, League>
