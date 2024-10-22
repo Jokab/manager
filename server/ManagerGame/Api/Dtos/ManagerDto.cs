@@ -18,8 +18,9 @@ public record ManagerDto
         CreatedDate = manager.CreatedDate;
         UpdatedDate = manager.CreatedDate;
         DeletedDate = manager.DeletedDate;
-        Name = manager.Name;
+        Name = manager.Name.Name;
         Email = manager.Email;
+        Teams = manager.Teams.Select(x => new TeamDto(x)).ToList();
     }
 
     public Guid Id { get; set; }
@@ -28,7 +29,7 @@ public record ManagerDto
     public DateTime UpdatedDate { get; set; }
     public DateTime? DeletedDate { get; set; }
 
-    public ManagerName Name { get; set; }
+    public string Name { get; set; }
     public Email Email { get; set; }
-    public List<Team> Teams { get; init; } = [];
+    public List<TeamDto> Teams { get; init; }
 }

@@ -20,6 +20,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Manager>().Navigation(x => x.Teams).AutoInclude();
         modelBuilder.Entity<Manager>()
             .HasMany(x => x.Teams)
             .WithOne()

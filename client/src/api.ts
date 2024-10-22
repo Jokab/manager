@@ -26,7 +26,7 @@ export interface ManagerDto {
   deletedDate?: string | null // Nullable DateTime can be either string or null
   name: string // Assuming ManagerName is a string-like object
   email: string // Assuming Email is a string-like object
-  // teams: Team[] // Assuming Team is another export interface defined elsewhere
+  teams: TeamDto[] // Assuming Team is another export interface defined elsewhere
 }
 
 export interface DraftDto {

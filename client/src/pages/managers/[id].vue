@@ -1,27 +1,44 @@
 <script setup lang="ts">
-import { getManager as apiGetManager, login as apiLogin } from '@/api'
+import type { ManagerDto } from '@/api'
+import { getManager as apiGetManager, login as apiLogin, getTeam } from '@/api'
 import { useManagerStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
 const { params } = useRoute('/managers/[id]')
 const store = useManagerStore()
 
-const managerId = ref<string>()
+const { manager } = storeToRefs(store)
 
 const response2 = await apiGetManager(params.id, store.token!)
-managerId.value = response2.id
-store.manager = response2
+manager.value = response2
+
+// watch(() => store.manager, async (val: ManagerDto | undefined) => {
+//   if (val) {
+//     await getTeams()
+//   }
+// })
 </script>
 
 <template>
-  {{ managerId }}
-  <RouterLink
-    to="/drafts"
-  >
-    draft
-  </RouterLink>
-  <RouterLink
-    to="/leagues"
-  >
-    skapa liga
-  </RouterLink>
+  <div style="display: flex; flex-direction: column; justify-content: space-around;">
+    {{ manager?.id }}
+    <RouterLink
+      to="/drafts"
+    >
+      draft
+    </RouterLink>
+    <RouterLink
+      to="/leagues"
+    >
+      skapa liga
+    </RouterLink>
+    <div>
+      <div>lag</div>
+      <ul v-if="manager">
+        <li v-for="team in manager.teams" :key="team.id">
+          - {{ team.name }}
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
