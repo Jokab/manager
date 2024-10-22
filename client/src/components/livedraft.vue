@@ -14,27 +14,14 @@ const connection = new signalR.HubConnectionBuilder()
 const store = useManagerStore()
 const players = ref<PlayerDto[]>()
 
-// const message = ref<string>()
-// const chat = ref<string>('')
-
-// connection.on('messageReceived', () => {
-//   chat.value = `${chat.value}\n${user}: ${message}`
-// })
-
 connection.on('signedPlayer', async (teamId: string, playerId: string) => {
-  console.log('hub signed')
   const player = players.value!.find(x => x.id === playerId)!
   player.isSigned = true
   player.teamId = teamId
 })
-// function send() {
-//   connection.send('SendMessage', 'Jakob', message.value)
-//   message.value = ''
-// }
 
 async function loadPlayers() {
   const res = await apiGetPlayers()
-
   players.value = res
 }
 
@@ -65,7 +52,7 @@ connection.onclose(async () => {
 async function signPlayer(playerId: string, teamId: string) {
   await apiSignPlayer({ playerId, teamId } as SignPlayerRequest, store.token!)
 
-  connection.send('signedPlayer', playerId)
+  //   connection.send('signedPlayer', playerId)
 
   players.value!.find(x => x.id === playerId)!.isSigned = true
 }
@@ -77,14 +64,30 @@ start()
   <button @click="loadPlayers">
     Ladda om spelare
   </button>
-  <div style="display: flex; flex-direction: column; width: 20rem; text-align: left">
-    <div v-for="p in players" :key="p.id" style="text-decoration: underline; cursor:pointer;" @click="signPlayer(p.id, props.league.teams[0].id)">
-      {{ p.name }} {{ p.position }} {{ p.country }} {{ (p.isSigned ? `signad av ${league.teams.find(x => x.id === p.teamId)?.name}` : "friii") }}
-    </div>
+  <div class="grid">
+    <template v-for="p in players" :key="p.id">
+      <div>{{ p.name }}</div>
+      <div>{{ p.position }}</div>
+      <div>{{ p.country }}</div>
+      <div>{{ (p.isSigned ? `signad av ${league.teams.find(x => x.id === p.teamId)?.name}` : "friii") }}</div>
+      <button @click="signPlayer(p.id, props.league.teams[0].id)">
+        Signa
+      </button>
+    </template>
   </div>
 </template>
 
 <style scoped>
+.grid {
+  background-color: #2f2f2f;
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: auto;
+  width: 60rem;
+  text-align: left;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

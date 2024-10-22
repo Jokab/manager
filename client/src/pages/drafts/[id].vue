@@ -20,7 +20,7 @@ async function startDraft() {
 </script>
 
 <template>
-  <div style="display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column; width: 50rem">
     <div>hej draft! id är: {{ draft?.id }} med status {{ draft?.state }}</div>
     <div>
       medverkande lag:
