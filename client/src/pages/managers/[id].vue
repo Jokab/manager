@@ -27,6 +27,11 @@ manager.value = response2
     >
       skapa liga
     </RouterLink>
+    <RouterLink
+      :to="{ name: '/create-team' }"
+    >
+      skapa lag
+    </RouterLink>
     <div>
       <div>lag</div>
       <ul v-if="manager">
