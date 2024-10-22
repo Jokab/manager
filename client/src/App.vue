@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useManagerStore } from './store'
 
 const store = useManagerStore()
@@ -16,8 +17,12 @@ watch(() => store.token, (newValue) => {
 </script>
 
 <template>
-  <div v-if="store.token" style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column;">
-    <div>inloggad som {{ store.manager?.email }}</div>
+  <div v-if="store.token && store.manager" style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column;">
+    <div>
+      inloggad som <RouterLink :to="{ name: '/managers/[id]', params: { id: store.manager.id } }">
+        {{ store.manager?.email }}
+      </RouterLink>
+    </div>
     <button @click="logout">
       logga ut
     </button>

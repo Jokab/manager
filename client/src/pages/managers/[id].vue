@@ -23,11 +23,6 @@ manager.value = response2
   <div style="display: flex; flex-direction: column; justify-content: space-around;">
     {{ manager?.id }}
     <RouterLink
-      to="/drafts"
-    >
-      draft
-    </RouterLink>
-    <RouterLink
       to="/leagues"
     >
       skapa liga
