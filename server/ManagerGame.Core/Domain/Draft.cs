@@ -9,32 +9,37 @@ public class Draft : Entity
         LeagueId = league.Id;
         League = league;
         DraftOrder = draftOrder;
-        State = State.Created;
+        State = DraftState.Created;
     }
 
-    public Guid LeagueId { get; set; }
-    public League League { get; set; }
-    public ICollection<Team> Teams => League.Teams;
-    public State State { get; private set; }
-
+    public Guid LeagueId { get; private init; }
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local used by EF core
+    public League League { get; private init; }
+    public DraftState State { get; private set; }
     private DraftOrder DraftOrder { get; }
+    public ICollection<Team> Teams => League.Teams;
 
-    public static Draft DoubledPeakTraversalDraft(League league) => new(
-        Guid.NewGuid(),
-        league,
-        new DraftOrder(league.Teams.ToList(), new DoubledPeakTraversalDraftOrder()));
+    public static Draft DoubledPeakTraversalDraft(League league)
+    {
+        if (league.Teams.Count == 0) throw new ArgumentException("No teams in league", nameof(league));
+
+        return new Draft(
+            Guid.NewGuid(),
+            league,
+            new DraftOrder(league.Teams.ToList(), new DoubledPeakTraversalDraftOrder()));
+    }
 
     public Team GetNext() => DraftOrder.GetNext();
 
     public void Start()
     {
-        if (State is State.Started)
+        if (State is DraftState.Started)
         {
             throw new InvalidOperationException("Draft is already started");
         }
         const int minimumTeamCount = 2;
         if (Teams.Count < minimumTeamCount) throw new ArgumentException($"Too few teams to draft, needs at least {minimumTeamCount}");
-        State = State.Started;
+        State = DraftState.Started;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -44,7 +49,7 @@ public class Draft : Entity
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }
 
-public enum State
+public enum DraftState
 {
     Created,
     Started,

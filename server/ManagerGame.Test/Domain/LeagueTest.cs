@@ -7,7 +7,7 @@ public class LeagueTest
     [Fact]
     public void CanCreateDraft()
     {
-        var sut = new League(Guid.NewGuid());
+        var sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
@@ -18,21 +18,21 @@ public class LeagueTest
     [Fact]
     public void CanStartDraft()
     {
-        var sut = new League(Guid.NewGuid());
+        var sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
         sut.Drafts.First().Start();
 
-        Assert.Equal(State.Started, sut.Drafts.First().State);
+        Assert.Equal(DraftState.Started, sut.Drafts.First().State);
     }
 
 
     [Fact]
     public void CannotStartAlreadyStartedDraft()
     {
-        var sut = new League(Guid.NewGuid());
+        var sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
@@ -45,12 +45,12 @@ public class LeagueTest
     [Fact]
     public void CannotCreateDraftWithCreatedDraft()
     {
-        var sut = new League(Guid.NewGuid());
+        var sut = League.Empty();
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
 
-        Assert.Equal(State.Created, sut.Drafts.Single().State);
+        Assert.Equal(DraftState.Created, sut.Drafts.Single().State);
 
         Assert.Throws<InvalidOperationException>(() => sut.CreateDraft());
     }
@@ -58,13 +58,13 @@ public class LeagueTest
     [Fact]
     public void CannotCreateDraftWithStartedDraft()
     {
-        var sut = new League(Guid.NewGuid());
+        var sut = League.Empty();
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
         sut.Drafts.First().Start();
 
-        Assert.Equal(State.Started, sut.Drafts.Single().State);
+        Assert.Equal(DraftState.Started, sut.Drafts.Single().State);
 
         Assert.Throws<InvalidOperationException>(() => sut.CreateDraft());
     }

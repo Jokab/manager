@@ -17,5 +17,5 @@ public class CreateDraftDto
     }
 
     public Guid Id { get; set; }
-    public State State { get; set; }
+    public DraftState State { get; set; }
 }

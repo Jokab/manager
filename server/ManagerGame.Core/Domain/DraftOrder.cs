@@ -7,12 +7,6 @@ public class DraftOrder
     private int _current;
     private int _previous;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public DraftOrder()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    {
-    }
-
     public DraftOrder(List<Team> teams,
         IDraftStrategy draftStrategy)
     {
@@ -26,6 +20,10 @@ public class DraftOrder
         (var next, _current, _previous) = _draftStrategy.GetNext(_current, _previous, _teams);
         return next;
     }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public DraftOrder() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }
 
 /// ChatGPT said this was the name for this traversal, but I can't really find anything online to support that :-)

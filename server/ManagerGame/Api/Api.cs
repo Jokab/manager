@@ -256,5 +256,5 @@ internal class DraftDto
 
     public Guid LeagueId { get; set; }
     public ICollection<Team> Teams { get; }
-    public State State { get; private set; }
+    public DraftState State { get; private set; }
 }

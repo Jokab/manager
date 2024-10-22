@@ -5,7 +5,7 @@ namespace ManagerGame.Core.Domain;
 public class League : Entity
 {
     [JsonConstructor]
-    public League(Guid id) : base(id)
+    private League(Guid id) : base(id)
     {
         Teams = [];
         Drafts = [];
@@ -27,7 +27,7 @@ public class League : Entity
 
     public void CreateDraft()
     {
-        if (Drafts.Any(x => x.State != State.Finished))
+        if (Drafts.Any(x => x.State != DraftState.Finished))
         {
             throw new InvalidOperationException("Cannot create new draft while there unfinished drafts");
         }

@@ -34,13 +34,13 @@ public class CreateDraftTest : IClassFixture<Fixture>
             await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(createLeagueDto.Id));
 
         Assert.Equal(HttpStatusCode.OK, http1.StatusCode);
-        Assert.Equal(State.Created, createDraftDto!.State);
+        Assert.Equal(DraftState.Created, createDraftDto!.State);
 
         var (http2, startDraftDto) =
             await _httpClient.Post<StartDraftDto>("/api/drafts/start",
                 new StartDraftRequest { DraftId = createDraftDto.Id });
 
         Assert.Equal(HttpStatusCode.OK, http2.StatusCode);
-        Assert.Equal(State.Started, startDraftDto!.State);
+        Assert.Equal(DraftState.Started, startDraftDto!.State);
     }
 }

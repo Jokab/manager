@@ -8,7 +8,7 @@ internal class CreateLeagueHandler(IRepository<League> repo) : ICommandHandler<C
     public async Task<Result<League>> Handle(CreateLeagueRequest command,
         CancellationToken cancellationToken = default)
     {
-        var league = new League(Guid.NewGuid());
+        var league = League.Empty();
         await repo.Add(league, cancellationToken);
 
         return Result<League>.Success(league);
