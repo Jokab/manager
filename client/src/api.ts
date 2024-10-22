@@ -56,6 +56,7 @@ export interface TeamDto {
   id: string
   name: string
   managerId: string
+  league: LeagueDto | undefined
 }
 
 export async function createManager(requestBody: CreateManagerRequest): Promise<ManagerDto> {

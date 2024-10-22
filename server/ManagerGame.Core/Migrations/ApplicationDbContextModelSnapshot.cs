@@ -218,7 +218,7 @@ namespace ManagerGame.Infra.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_drafts_leagues_league_id");
 
-                    b.OwnsOne("ManagerGame.Core.Domain.DraftOrder", "DraftOrder", b1 =>
+                    b.OwnsOne("ManagerGame.Core.Domain.Draft.DraftOrder#ManagerGame.Core.Domain.DraftOrder", "DraftOrder", b1 =>
                         {
                             b1.Property<Guid>("DraftId")
                                 .HasColumnType("uuid")
@@ -234,7 +234,7 @@ namespace ManagerGame.Infra.Migrations
 
                             b1.HasKey("DraftId");
 
-                            b1.ToTable("drafts");
+                            b1.ToTable("drafts", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("DraftId")

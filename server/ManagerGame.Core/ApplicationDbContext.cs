@@ -39,6 +39,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(x => x.Players)
             .WithOne()
             .HasForeignKey(x => x.TeamId);
+        modelBuilder.Entity<Team>().Navigation(x => x.League).AutoInclude();
 
         modelBuilder.Entity<Player>().HasKey(x => x.Id);
         modelBuilder.Entity<Player>()
@@ -71,7 +72,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .IsRequired();
         modelBuilder.Entity<League>()
             .HasMany<Team>(x => x.Teams)
-            .WithOne()
+            .WithOne(x => x.League)
             .HasForeignKey(x => x.LeagueId)
             .IsRequired(false);
     }

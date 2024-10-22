@@ -35,9 +35,9 @@ manager.value = response2
     <div>
       <div>lag</div>
       <ul v-if="manager">
-        <li v-for="team in manager.teams" :key="team.id">
+        <RouterLink v-for="team in manager.teams" :key="team.id" :to="{ name: '/teams/[id]', params: { id: team.id } }">
           - {{ team.name }}
-        </li>
+        </RouterLink>
       </ul>
     </div>
   </div>
