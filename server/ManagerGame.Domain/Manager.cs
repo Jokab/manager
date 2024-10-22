@@ -7,7 +7,6 @@ public class Manager : Entity
         Email email)
         : base(id)
     {
-        Id = id;
         Name = name;
         Email = email;
     }
