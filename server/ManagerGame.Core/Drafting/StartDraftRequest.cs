@@ -1,6 +1,6 @@
 namespace ManagerGame.Core.Drafting;
 
-public class StartDraftRequest : ICommand<Draft>
+public class StartDraftRequest
 {
     public Guid DraftId { get; set; }
 }

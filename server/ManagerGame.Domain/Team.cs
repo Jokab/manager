@@ -30,8 +30,8 @@ public class Team : Entity
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
     public ICollection<Player> Players { get; init; } = [];
-    public Guid? LeagueId { get; private init; }
-    public League? League { get; private init;  }
+    public Guid? LeagueId { get; }
+    public League? League { get; private init; }
 
     public static Team Create(TeamName name,
         Guid managerId,

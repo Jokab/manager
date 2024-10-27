@@ -1,11 +1,27 @@
 namespace ManagerGame.Core.Teams;
 
 public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo)
-    : ICommandHandler<SignPlayerRequest, Team>
+
 {
+    public void Apa(int a)
+    {
+    }
+
+    public void Apa(object a)
+    {
+    }
+
+    public void Apa(string a)
+    {
+    }
+
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
         CancellationToken cancellationToken = default)
     {
+        Hej apa = Apa;
+        apa(1);
+
+
         var team = await teamRepo.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<Team>.Failure(Error.NotFound);
 
@@ -19,4 +35,6 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
 
         return Result<Team>.Success(team);
     }
+
+    private delegate void Hej(int i);
 }

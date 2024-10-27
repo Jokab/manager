@@ -1,6 +1,6 @@
 namespace ManagerGame.Core.Drafting;
 
-public class StartDraftHandler(IRepository<Draft> draftRepo) : ICommandHandler<StartDraftRequest, Draft>
+public class StartDraftHandler(IRepository<Draft> draftRepo)
 {
     public async Task<Result<Draft>> Handle(StartDraftRequest command,
         CancellationToken cancellationToken = default)

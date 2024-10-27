@@ -1,5 +1,4 @@
 using System.Net;
-using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Core.Leagues;
 

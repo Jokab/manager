@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Requests;
-using ManagerGame.Core.Teams;
 
 namespace ManagerGame.Test.Api;
 

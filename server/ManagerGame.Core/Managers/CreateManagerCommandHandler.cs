@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ManagerGame.Core.Managers;
 
 public class CreateManagerCommandHandler(ApplicationDbContext dbContext)
-    : ICommandHandler<CreateManagerCommand, Manager>
+
 {
     public async Task<Result<Manager>> Handle(CreateManagerCommand command,
         CancellationToken cancellationToken = default)

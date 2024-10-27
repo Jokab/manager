@@ -1,6 +1,6 @@
 namespace ManagerGame.Core.Managers;
 
-public class LoginCommand : ICommand<LoginResponse>
+public class LoginCommand
 {
     public Email? ManagerEmail { get; init; }
 }

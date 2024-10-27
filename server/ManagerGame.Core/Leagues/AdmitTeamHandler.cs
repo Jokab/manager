@@ -1,7 +1,7 @@
 namespace ManagerGame.Core.Leagues;
 
 public class AdmitTeamHandler(IRepository<Team> teamRepo, IRepository<League> leagueRepo)
-    : ICommandHandler<AdmitTeamRequest, League>
+
 {
     public async Task<Result<League>> Handle(AdmitTeamRequest command,
         CancellationToken cancellationToken = default)

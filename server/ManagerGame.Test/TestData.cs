@@ -5,8 +5,8 @@ public static class TestData
     public static Player Player(Country country = Country.Se,
         Position position = Position.Defender) =>
         new(Guid.NewGuid(),
-            (PlayerName)new PlayerName("Jakob"),
-            (Position)position,
+            new PlayerName("Jakob"),
+            position,
             (CountryRec)new CountryRec(country));
 
     public static Team TeamEmpty(string name) =>

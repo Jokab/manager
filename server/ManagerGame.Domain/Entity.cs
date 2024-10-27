@@ -2,7 +2,10 @@ namespace ManagerGame.Domain;
 
 public abstract class Entity
 {
-    protected Entity(Guid id) => Id = id;
+    protected Entity(Guid id)
+    {
+        Id = id;
+    }
 
     public Guid Id { get; private init; }
     public DateTime CreatedDate { get; set; }
