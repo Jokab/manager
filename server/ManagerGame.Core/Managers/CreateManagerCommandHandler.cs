@@ -7,7 +7,6 @@ public class CreateManagerCommandHandler(IRepository<Manager> managerRepo)
         CancellationToken cancellationToken = default)
     {
         var managers = await managerRepo.GetAll(cancellationToken);
-
         if (managers.Any(x => x.Email == command.Email)) return Result<Manager>.Failure(Error.NotFound);
 
         var manager = Manager.Create(command.Name, command.Email);

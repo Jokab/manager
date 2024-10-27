@@ -15,17 +15,21 @@ public class DraftTest
         league.AdmitTeam(team3);
         league.AdmitTeam(team4);
         var draft = Draft.DoubledPeakTraversalDraft(league);
+        draft.Start();
 
-        Assert.Equal(team1, draft.GetNext());
-        Assert.Equal(team2, draft.GetNext());
-        Assert.Equal(team3, draft.GetNext());
-        Assert.Equal(team4, draft.GetNext());
-        Assert.Equal(team4, draft.GetNext());
-        Assert.Equal(team3, draft.GetNext());
-        Assert.Equal(team2, draft.GetNext());
-        Assert.Equal(team1, draft.GetNext());
-        Assert.Equal(team1, draft.GetNext());
-        Assert.Equal(team2, draft.GetNext());
+        Assert.Equal(team1, GetNext(draft));
+        Assert.Equal(team2, GetNext(draft));
+        Assert.Equal(team3, GetNext(draft));
+        Assert.Equal(team4, GetNext(draft));
+        Assert.Equal(team4, GetNext(draft));
+        Assert.Equal(team3, GetNext(draft));
+        Assert.Equal(team2, GetNext(draft));
+        Assert.Equal(team1, GetNext(draft));
+        Assert.Equal(team1, GetNext(draft));
+        Assert.Equal(team2, GetNext(draft));
+        return;
+
+        Team GetNext(Draft d) => d.GetNext().Match(team => team, _ => null!);
     }
 
     [Fact]
@@ -37,5 +41,20 @@ public class DraftTest
         var draft = Draft.DoubledPeakTraversalDraft(league);
 
         Assert.Throws<ArgumentException>(() => draft.Start());
+    }
+
+    [Fact]
+    public void GetNext_WhenDraftNotStarted_DoesNothing()
+    {
+        var team1 = TestData.TeamWithValidFullSquad();
+        var league = League.Empty();
+        league.AdmitTeam(team1);
+        var draft = Draft.DoubledPeakTraversalDraft(league);
+
+        var next = draft.GetNext().Match(
+            team => team,
+            _ => null!);
+
+        Assert.Null(next);
     }
 }
