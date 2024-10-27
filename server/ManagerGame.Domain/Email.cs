@@ -12,5 +12,14 @@ public record Email
         EmailAddress = emailAddress;
     }
 
-    public string EmailAddress { get; private set; }
+    public string EmailAddress { get; }
+
+    public virtual bool Equals(Email? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return string.Equals(EmailAddress, other.EmailAddress, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override int GetHashCode() => EmailAddress.GetHashCode();
 }
