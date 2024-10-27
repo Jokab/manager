@@ -1,6 +1,7 @@
 namespace ManagerGame.Core.Managers;
 
-public class CreateManagerCommandHandler(IRepository<Manager> managerRepo) : ICommandHandler<CreateManagerCommand, Manager>
+public class CreateManagerCommandHandler(IRepository<Manager> managerRepo)
+    : ICommandHandler<CreateManagerCommand, Manager>
 {
     public async Task<Result<Manager>> Handle(CreateManagerCommand command,
         CancellationToken cancellationToken = default)

@@ -1,6 +1,7 @@
 namespace ManagerGame.Core.Teams;
 
-public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo) : ICommandHandler<SignPlayerRequest, Team>
+public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo)
+    : ICommandHandler<SignPlayerRequest, Team>
 {
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
         CancellationToken cancellationToken = default)

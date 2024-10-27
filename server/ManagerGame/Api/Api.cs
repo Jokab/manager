@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Requests;
 using ManagerGame.Core;

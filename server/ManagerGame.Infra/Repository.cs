@@ -37,7 +37,7 @@ public class Repository<T> : IRepository<T> where T : Entity
     }
 
     public async Task<IReadOnlyCollection<T>> GetAll(CancellationToken cancellationToken = default) =>
-        new ReadOnlyCollection<T>(await _table.ToListAsync(cancellationToken: cancellationToken));
+        new ReadOnlyCollection<T>(await _table.ToListAsync(cancellationToken));
 
     public async Task<T> Update(T entity,
         CancellationToken cancellationToken = default)

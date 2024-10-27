@@ -6,7 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ManagerGame.Core.Managers;
 
-public class LoginCommandHandler(IRepository<Manager> managerRepo, IConfiguration configuration) : ICommandHandler<LoginCommand, LoginResponse>
+public class LoginCommandHandler(IRepository<Manager> managerRepo, IConfiguration configuration)
+    : ICommandHandler<LoginCommand, LoginResponse>
 {
     public async Task<Result<LoginResponse>> Handle(LoginCommand command,
         CancellationToken cancellationToken = default)
