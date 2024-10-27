@@ -1,9 +1,8 @@
 using System.Collections.ObjectModel;
 using ManagerGame.Core;
-using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManagerGame.Infra;
+namespace ManagerGame;
 
 public class Repository<T> : IRepository<T> where T : Entity
 {
