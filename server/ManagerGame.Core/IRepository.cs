@@ -8,6 +8,8 @@ public interface IRepository<T> where T : Entity
     Task<T?> Find(Guid id,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyCollection<T>> GetAll(CancellationToken cancellationToken = default);
+
     Task<T> Update(T entity,
         CancellationToken cancellationToken = default);
 }

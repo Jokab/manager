@@ -1,21 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace ManagerGame.Core.Managers;
 
-public class CreateManagerCommandHandler(ApplicationDbContext dbContext)
-
+public class CreateManagerCommandHandler(IRepository<Manager> managerRepo) : ICommandHandler<CreateManagerCommand, Manager>
 {
     public async Task<Result<Manager>> Handle(CreateManagerCommand command,
         CancellationToken cancellationToken = default)
     {
-        var exists = await dbContext.Managers.AnyAsync(x => x.Email == command.Email, cancellationToken);
-        if (exists) return Result<Manager>.Failure(Error.NotFound);
+        var managers = await managerRepo.GetAll(cancellationToken);
+
+        if (managers.Any(x => x.Email == command.Email)) return Result<Manager>.Failure(Error.NotFound);
 
         var manager = Manager.Create(command.Name, command.Email);
 
-        var createdManager = dbContext.Managers.Add(manager);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var createdManager = await managerRepo.Add(manager, cancellationToken);
 
-        return Result<Manager>.Success(createdManager.Entity);
+        return Result<Manager>.Success(createdManager);
     }
 }

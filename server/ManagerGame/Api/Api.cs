@@ -40,7 +40,7 @@ internal static class Api
 
     private static async Task<Ok<CreateDraftDto>> CreateDraft(
         CreateDraftRequest request,
-        CreateDraftHandler handler)
+        ICommandHandler<CreateDraftRequest, Draft> handler)
     {
         var draft = await handler.Handle(request);
 
@@ -50,7 +50,7 @@ internal static class Api
 
     private static async Task<Ok<StartDraftDto>> StartDraft(
         StartDraftRequest request,
-        StartDraftHandler handler)
+        ICommandHandler<StartDraftRequest, Draft> handler)
     {
         var draft = await handler.Handle(request);
 
@@ -59,7 +59,7 @@ internal static class Api
 
     private static async Task<Ok<CreateLeagueDto>> CreateLeague(
         CreateLeagueRequest request,
-        CreateLeagueHandler handler)
+        ICommandHandler<CreateLeagueRequest, League> handler)
     {
         var result = await handler.Handle(request);
 
@@ -68,7 +68,7 @@ internal static class Api
 
     private static async Task<Ok<AdmitTeamDto>> AdmitTeam(
         AdmitTeamRequest request,
-        AdmitTeamHandler handler)
+        ICommandHandler<AdmitTeamRequest, League> handler)
     {
         var result = await handler.Handle(request);
 
@@ -77,7 +77,7 @@ internal static class Api
 
     private static async Task<Ok<SignPlayerDto>> SignPlayer(
         SignPlayerRequest request,
-        SignPlayerCommandHandler handler,
+        ICommandHandler<SignPlayerRequest, Team> handler,
         IHubContext<TestHub> hubContext)
     {
         await handler.Handle(request);
@@ -96,12 +96,12 @@ internal static class Api
 
     private static async Task<Results<Ok<LoginResponseDto>, ProblemHttpResult>> Login(
         LoginRequest request,
-        LoginCommandHandler commandHandler,
+        ICommandHandler<LoginCommand, LoginResponse> commandHandler1,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(request.ManagerEmail)) return TypedResults.Problem("Empty email");
 
-        var result = await commandHandler.Handle(new LoginCommand { ManagerEmail = new Email(request.ManagerEmail) },
+        var result = await commandHandler1.Handle(new LoginCommand { ManagerEmail = new Email(request.ManagerEmail) },
             cancellationToken);
         if (result.IsSuccess)
             return TypedResults.Ok(new LoginResponseDto
@@ -111,7 +111,7 @@ internal static class Api
 
     private static async Task<Results<Ok<TeamDto>, ProblemHttpResult, UnauthorizedHttpResult>> CreateTeam(
         CreateTeamRequest request,
-        ICommandHandler<CreateTeamCommand, Team> handler,
+        ICommandHandler<CreateTeamCommand, Team> handler, // gör alla andra såna här okså
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(new CreateTeamCommand
@@ -124,7 +124,7 @@ internal static class Api
 
     private static async Task<Results<Ok<ManagerDto>, ProblemHttpResult>> CreateManager(
         CreateManagerRequest request,
-        CreateManagerCommandHandler handler,
+        ICommandHandler<CreateManagerCommand, Manager> handler,
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(request.ToCommand(), cancellationToken);

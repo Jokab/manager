@@ -1,6 +1,6 @@
 namespace ManagerGame.Core.Leagues;
 
-public class CreateLeagueHandler(IRepository<League> repo)
+public class CreateLeagueHandler(IRepository<League> repo) : ICommandHandler<CreateLeagueRequest, League>
 {
     public async Task<Result<League>> Handle(CreateLeagueRequest command,
         CancellationToken cancellationToken = default)

@@ -1,10 +1,12 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ManagerGame.Core;
-using ManagerGame.Core.Teams;
 
 namespace ManagerGame;
 
-public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult> where TCommand : class where TResult : class
+public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult>
+    where TCommand : class
+    where TResult : class
 {
     private readonly ICommandHandler<TCommand, TResult> _innerHandler;
     private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
@@ -15,7 +17,8 @@ public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TRe
         _logger = logger;
     }
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, ReferenceHandler = ReferenceHandler.Preserve };
 
     public async Task<Result<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default)
     {

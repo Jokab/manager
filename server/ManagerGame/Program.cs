@@ -44,26 +44,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
-builder.Services.AddScoped<ICommandHandler<CreateTeamCommand, Team>>(provider =>
-{
-    var dbContext = provider.GetRequiredService<ApplicationDbContext>();
-    var handler = new CreateTeamCommandHandler(dbContext);
-    var logger = provider.GetRequiredService<ILogger<LoggingDecorator<CreateTeamCommand, Team>>>();
-
-    return new LoggingDecorator<CreateTeamCommand, Team>(handler, logger);
-});
-builder.Services.AddTransient<CreateManagerCommandHandler>();
-builder.Services.AddTransient<LoginCommandHandler>();
-builder.Services.AddTransient<SignPlayerCommandHandler>();
-builder.Services.AddTransient<CreateDraftHandler>();
-builder.Services.AddTransient<StartDraftHandler>();
-builder.Services.AddTransient<CreateLeagueHandler>();
-builder.Services.AddTransient<AdmitTeamHandler>();
-
-builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
-builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
-builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
-builder.Services.AddTransient<IRepository<League>, Repository<League>>();
+RegisterCommandHandlers();
+RegisterRepositories();
 
 builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
 
@@ -83,14 +65,13 @@ app.UseAuthorization();
 
 app.MapHub<TestHub>("/chatHub");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.MapApi();
 
@@ -105,6 +86,51 @@ if (args.Contains("seed"))
 
 app.Run();
 return;
+
+void RegisterRepositories()
+{
+    builder.Services.AddTransient<IRepository<Manager>, Repository<Manager>>();
+    builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
+    builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
+    builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
+    builder.Services.AddTransient<IRepository<League>, Repository<League>>();
+}
+
+void RegisterCommandHandlers()
+{
+    AddHandlerWithLogging(sp => new CreateTeamCommandHandler(
+        sp.GetService<IRepository<Manager>>()!,
+        sp.GetService<IRepository<Team>>()!));
+    AddHandlerWithLogging(sp => new CreateManagerCommandHandler(
+        sp.GetService<IRepository<Manager>>()!));
+    AddHandlerWithLogging(sp => new LoginCommandHandler(
+        sp.GetService<IRepository<Manager>>()!,
+        sp.GetService<IConfiguration>()!));
+    AddHandlerWithLogging(sp => new SignPlayerCommandHandler(
+        sp.GetService<IRepository<Player>>()!,
+        sp.GetService<IRepository<Team>>()!));
+    AddHandlerWithLogging(sp => new CreateDraftHandler(
+        sp.GetService<IRepository<Draft>>()!,
+        sp.GetService<IRepository<League>>()!));
+    AddHandlerWithLogging(sp => new StartDraftHandler
+        (sp.GetService<IRepository<Draft>>()!));
+    AddHandlerWithLogging(sp => new CreateLeagueHandler(
+        sp.GetService<IRepository<League>>()!));
+    AddHandlerWithLogging(sp => new AdmitTeamHandler(
+        sp.GetService<IRepository<Team>>()!,
+        sp.GetService<IRepository<League>>()!));
+}
+
+void AddHandlerWithLogging<TCommand, TResult>(Func<IServiceProvider, ICommandHandler<TCommand, TResult>> handler)
+    where TCommand : class
+    where TResult : class
+{
+    builder.Services.AddScoped<ICommandHandler<TCommand, TResult>>(provider =>
+    {
+        var logger = provider.GetRequiredService<ILogger<LoggingDecorator<TCommand, TResult>>>();
+        return new LoggingDecorator<TCommand, TResult>(handler(provider), logger);
+    });
+}
 
 void ResetDb(ApplicationDbContext? applicationDbContext)
 {

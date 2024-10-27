@@ -1,7 +1,6 @@
 namespace ManagerGame.Core.Drafting;
 
-public class CreateDraftHandler(IRepository<Draft> repo, IRepository<League> leagueRepo)
-
+public class CreateDraftHandler(IRepository<Draft> draftRepo, IRepository<League> leagueRepo) : ICommandHandler<CreateDraftRequest, Draft>
 {
     public async Task<Result<Draft>> Handle(CreateDraftRequest command,
         CancellationToken cancellationToken = default)
@@ -11,7 +10,7 @@ public class CreateDraftHandler(IRepository<Draft> repo, IRepository<League> lea
 
         var draft = Draft.DoubledPeakTraversalDraft(league);
 
-        var newDraft = await repo.Add(draft, cancellationToken);
+        var newDraft = await draftRepo.Add(draft, cancellationToken);
 
         return Result<Draft>.Success(newDraft);
     }

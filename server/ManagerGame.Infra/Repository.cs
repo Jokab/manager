@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using ManagerGame.Core;
 using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,9 @@ public class Repository<T> : IRepository<T> where T : Entity
         var res = await _table.FindAsync([id], cancellationToken);
         return res;
     }
+
+    public async Task<IReadOnlyCollection<T>> GetAll(CancellationToken cancellationToken = default) =>
+        new ReadOnlyCollection<T>(await _table.ToListAsync(cancellationToken: cancellationToken));
 
     public async Task<T> Update(T entity,
         CancellationToken cancellationToken = default)
