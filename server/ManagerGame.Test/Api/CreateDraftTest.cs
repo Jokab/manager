@@ -19,15 +19,15 @@ public class CreateDraftTest : IClassFixture<Fixture>
     [Fact]
     public async Task Test()
     {
-        var db = TestDbFactory.Create(_fixture);
+        TestDbFactory.Create(_fixture);
 
-        var (manager, team) = await Seed.SeedAndLogin(_httpClient);
-        var (httpResponseMessage, createLeagueDto) =
+        var (_, team) = await Seed.SeedAndLogin(_httpClient);
+        var (_, createLeagueDto) =
             await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
 
-        var (_, _) = await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
+        await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
             new AdmitTeamRequest { LeagueId = createLeagueDto!.Id, TeamId = team.Id });
-        var (_, _) = await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
+        await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
             new AdmitTeamRequest { LeagueId = createLeagueDto.Id, TeamId = team.Id });
 
         var (http1, createDraftDto) =

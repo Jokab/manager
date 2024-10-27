@@ -121,7 +121,7 @@ async Task SeedDb(IServiceScope serviceScope,
     Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
 
     var createTeamCommandHandler = serviceScope.ServiceProvider.GetService<CreateTeamCommandHandler>();
-    var team = await createTeamCommandHandler!.Handle(new CreateTeamCommand
+    await createTeamCommandHandler!.Handle(new CreateTeamCommand
         { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id });
 
 
