@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Requests;
 using ManagerGame.Core;
@@ -110,7 +111,7 @@ internal static class Api
 
     private static async Task<Results<Ok<TeamDto>, ProblemHttpResult, UnauthorizedHttpResult>> CreateTeam(
         CreateTeamRequest request,
-        CreateTeamCommandHandler handler,
+        ICommandHandler<CreateTeamCommand, Team> handler,
         CancellationToken cancellationToken = default)
     {
         var result = await handler.Handle(new CreateTeamCommand

@@ -42,7 +42,16 @@ builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<CreateTeamCommandHandler>();
+builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
+
+builder.Services.AddScoped<ICommandHandler<CreateTeamCommand, Team>>(provider =>
+{
+    var dbContext = provider.GetRequiredService<ApplicationDbContext>();
+    var handler = new CreateTeamCommandHandler(dbContext);
+    var logger = provider.GetRequiredService<ILogger<LoggingDecorator<CreateTeamCommand, Team>>>();
+
+    return new LoggingDecorator<CreateTeamCommand, Team>(handler, logger);
+});
 builder.Services.AddTransient<CreateManagerCommandHandler>();
 builder.Services.AddTransient<LoginCommandHandler>();
 builder.Services.AddTransient<SignPlayerCommandHandler>();

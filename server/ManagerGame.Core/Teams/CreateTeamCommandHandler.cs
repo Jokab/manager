@@ -1,6 +1,6 @@
 namespace ManagerGame.Core.Teams;
 
-public class CreateTeamCommandHandler(ApplicationDbContext dbContext)
+public class CreateTeamCommandHandler(ApplicationDbContext dbContext) : ICommandHandler<CreateTeamCommand, Team>
 {
     public async Task<Result<Team>> Handle(CreateTeamCommand command,
         CancellationToken cancellationToken = default)
@@ -16,4 +16,9 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext)
 
         return Result<Team>.Success(createdTeam.Entity);
     }
+}
+
+public interface ICommandHandler<in TCommand, TResult>
+{
+    public Task<Result<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default);
 }
