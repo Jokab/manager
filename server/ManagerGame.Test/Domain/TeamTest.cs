@@ -89,6 +89,17 @@ public class TeamTest
     }
 
     [Fact]
+    public void CannotSignSignedPlayer()
+    {
+        var team = TestData.TeamEmpty("Team");
+
+        var signedPlayer = TestData.Player(position: Position.Midfielder);
+        signedPlayer.TeamId = Guid.NewGuid();
+
+        Assert.Throws<ArgumentException>(() => team.SignPlayer(signedPlayer));
+    }
+
+    [Fact]
     public void CannotSignIfCannotConformToFormation()
     {
         var team = TestData.TeamWithValidFullSquad();

@@ -46,6 +46,7 @@ public class Team : Entity
 
     public void SignPlayer(Player player)
     {
+        if (player.IsSigned) throw new ArgumentException("Player is already signed");
         if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
         if (Players.Count(x => x.Country == player.Country) >= PlayersFromSameCountryLimit)
             throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");

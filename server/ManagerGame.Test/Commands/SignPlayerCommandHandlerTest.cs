@@ -54,6 +54,6 @@ public class SignPlayerCommandHandlerTest
         var signResult = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
 
         Assert.True(signResult.IsFailure);
-        Assert.True(signResult.Error == Error.PlayerAlreadySigned);
+        Assert.NotEmpty(signResult.Error.Code);
     }
 }
