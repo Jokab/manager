@@ -11,18 +11,18 @@ public class LoginCommandHandler(IRepository<Manager> managerRepo, IConfiguratio
     public async Task<Result<LoginResponse>> Handle(LoginCommand command,
         CancellationToken cancellationToken = default)
     {
-        var managers = await managerRepo.GetAll(cancellationToken);
-        var manager = managers.FirstOrDefault(x => x.Email == command.ManagerEmail);
+        IReadOnlyCollection<Manager> managers = await managerRepo.GetAll(cancellationToken);
+        Manager? manager = managers.FirstOrDefault(x => x.Email == command.ManagerEmail);
         if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
 
-        var token = GenerateToken(configuration);
+        string token = GenerateToken(configuration);
 
         return Result<LoginResponse>.Success(new LoginResponse(manager, token));
     }
 
     private static string GenerateToken(IConfiguration configuration)
     {
-        var jwtSecret = configuration["JWT:Secret"];
+        string? jwtSecret = configuration["JWT:Secret"];
         ArgumentException.ThrowIfNullOrEmpty(jwtSecret, "Could not extract JWT secret from config");
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -34,7 +34,7 @@ public class LoginCommandHandler(IRepository<Manager> managerRepo, IConfiguratio
                 new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
                     SecurityAlgorithms.HmacSha256Signature)
         };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+        SecurityToken? token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
 }

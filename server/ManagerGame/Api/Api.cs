@@ -16,7 +16,7 @@ internal static class Api
 {
     public static void MapApi(this IEndpointRouteBuilder builder)
     {
-        var api = builder.MapGroup("api");
+        RouteGroupBuilder api = builder.MapGroup("api");
 
         api.MapPost("login", Login);
 
@@ -42,7 +42,7 @@ internal static class Api
         CreateDraftRequest request,
         ICommandHandler<CreateDraftRequest, Draft> handler)
     {
-        var draft = await handler.Handle(request);
+        Result<Draft> draft = await handler.Handle(request);
 
         return TypedResults.Ok(new CreateDraftDto(draft.Value!));
     }
@@ -52,7 +52,7 @@ internal static class Api
         StartDraftRequest request,
         ICommandHandler<StartDraftRequest, Draft> handler)
     {
-        var draft = await handler.Handle(request);
+        Result<Draft> draft = await handler.Handle(request);
 
         return TypedResults.Ok(new StartDraftDto { Id = draft.Value!.Id, State = draft.Value!.State });
     }
@@ -61,7 +61,7 @@ internal static class Api
         CreateLeagueRequest request,
         ICommandHandler<CreateLeagueRequest, League> handler)
     {
-        var result = await handler.Handle(request);
+        Result<League> result = await handler.Handle(request);
 
         return TypedResults.Ok(new CreateLeagueDto(result.Value!));
     }
@@ -70,7 +70,7 @@ internal static class Api
         AdmitTeamRequest request,
         ICommandHandler<AdmitTeamRequest, League> handler)
     {
-        var result = await handler.Handle(request);
+        Result<League> result = await handler.Handle(request);
 
         return TypedResults.Ok(new AdmitTeamDto(result.Value!));
     }
@@ -89,7 +89,7 @@ internal static class Api
     private static async Task<Ok<List<PlayerDto>>> GetPlayers(ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var players = await dbContext.Players.ToListAsync(cancellationToken);
+        List<Player> players = await dbContext.Players.ToListAsync(cancellationToken);
 
         return TypedResults.Ok(players.Select(x => new PlayerDto(x)).ToList());
     }
@@ -101,7 +101,8 @@ internal static class Api
     {
         if (string.IsNullOrEmpty(request.ManagerEmail)) return TypedResults.Problem("Empty email");
 
-        var result = await commandHandler1.Handle(new LoginCommand { ManagerEmail = new Email(request.ManagerEmail) },
+        Result<LoginResponse> result = await commandHandler1.Handle(new LoginCommand
+                { ManagerEmail = new Email(request.ManagerEmail) },
             cancellationToken);
         if (result.IsSuccess)
             return TypedResults.Ok(new LoginResponseDto
@@ -114,7 +115,7 @@ internal static class Api
         ICommandHandler<CreateTeamCommand, Team> handler, // gör alla andra såna här okså
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.Handle(new CreateTeamCommand
+        Result<Team> result = await handler.Handle(new CreateTeamCommand
                 { Name = new TeamName(request.Name!), ManagerId = request.ManagerId!.Value },
             cancellationToken);
 
@@ -127,7 +128,7 @@ internal static class Api
         ICommandHandler<CreateManagerCommand, Manager> handler,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.Handle(request.ToCommand(), cancellationToken);
+        Result<Manager> result = await handler.Handle(request.ToCommand(), cancellationToken);
         if (result.IsSuccess) return TypedResults.Ok(new ManagerDto(result.Value!));
         return TypedResults.Problem(result.Error.Code);
     }
@@ -136,7 +137,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var manager = await dbContext.Managers.FindAsync([id, cancellationToken], cancellationToken);
+        Manager? manager = await dbContext.Managers.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new ManagerDto(manager!));
     }
 
@@ -144,7 +145,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
+        Team? team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new TeamDto(team!));
     }
 
@@ -152,7 +153,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var draft = await dbContext.Drafts.FindAsync([id, cancellationToken], cancellationToken);
+        Draft? draft = await dbContext.Drafts.FindAsync([id, cancellationToken], cancellationToken);
         return TypedResults.Ok(new DraftDto(draft!));
     }
 
@@ -160,7 +161,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var league = await dbContext.Leagues.Include(x => x.Drafts).Include(x => x.Teams)
+        League? league = await dbContext.Leagues.Include(x => x.Drafts).Include(x => x.Teams)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return TypedResults.Ok(new LeagueDto(league!));
     }

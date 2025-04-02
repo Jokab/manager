@@ -1,5 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Core;
 
 namespace ManagerGame.Test.Api;
 
@@ -17,9 +18,9 @@ public class CreateManagerTest : IClassFixture<Fixture>
     [Fact]
     public async Task Test()
     {
-        var db = TestDbFactory.Create(_fixture);
+        ApplicationDbContext db = TestDbFactory.Create(_fixture);
 
-        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
+        (HttpResponseMessage? createManagerResponse, ManagerDto? manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
         Assert.NotNull(manager);

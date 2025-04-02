@@ -5,7 +5,7 @@ public class LeagueTest
     [Fact]
     public void CanCreateDraft()
     {
-        var sut = League.Empty();
+        League sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
         sut.CreateDraft();
@@ -16,7 +16,7 @@ public class LeagueTest
     [Fact]
     public void CanStartDraft()
     {
-        var sut = League.Empty();
+        League sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
@@ -30,7 +30,7 @@ public class LeagueTest
     [Fact]
     public void CannotStartAlreadyStartedDraft()
     {
-        var sut = League.Empty();
+        League sut = League.Empty();
 
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
@@ -43,7 +43,7 @@ public class LeagueTest
     [Fact]
     public void CannotCreateDraftWithCreatedDraft()
     {
-        var sut = League.Empty();
+        League sut = League.Empty();
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
         sut.CreateDraft();
@@ -56,7 +56,7 @@ public class LeagueTest
     [Fact]
     public void CannotCreateDraftWithStartedDraft()
     {
-        var sut = League.Empty();
+        League sut = League.Empty();
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
         sut.CreateDraft();

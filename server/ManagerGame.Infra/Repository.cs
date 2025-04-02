@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using ManagerGame.Core;
 using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ManagerGame.Infra;
 
@@ -21,7 +22,7 @@ public class Repository<T> : IRepository<T> where T : Entity
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
-        var e = _table.Add(entity);
+        EntityEntry<T> e = _table.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return e.Entity;
@@ -32,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : Entity
     {
         if (id == Guid.Empty) throw new ArgumentException("ID was empty");
 
-        var res = await _table.FindAsync([id], cancellationToken);
+        T? res = await _table.FindAsync([id], cancellationToken);
         return res;
     }
 

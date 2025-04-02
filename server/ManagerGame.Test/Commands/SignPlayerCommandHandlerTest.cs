@@ -10,11 +10,11 @@ public class SignPlayerCommandHandlerTest
     public async Task PersistsPlayerInTeam()
     {
         var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = TestData.TeamEmpty("Laget");
+        Team team = TestData.TeamEmpty("Laget");
         teamRepo.Find(team.Id).Returns(team);
 
         var playerRepo = Substitute.For<IRepository<Player>>();
-        var player = TestData.Player();
+        Player player = TestData.Player();
         playerRepo.Find(player.Id).Returns(player);
 
         Assert.Empty(team.Players);
@@ -35,13 +35,13 @@ public class SignPlayerCommandHandlerTest
     public async Task CannotSignSignedPlayer()
     {
         var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = TestData.TeamEmpty("Laget");
-        var team2 = TestData.TeamEmpty("Laget2");
+        Team team = TestData.TeamEmpty("Laget");
+        Team team2 = TestData.TeamEmpty("Laget2");
         teamRepo.Find(team.Id).Returns(team);
         teamRepo.Find(team2.Id).Returns(team2);
 
         var playerRepo = Substitute.For<IRepository<Player>>();
-        var player = TestData.Player();
+        Player player = TestData.Player();
         playerRepo.Find(player.Id).Returns(player);
 
         Assert.Empty(team.Players);
@@ -51,7 +51,7 @@ public class SignPlayerCommandHandlerTest
 
         Assert.True(player.IsSigned);
 
-        var signResult = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
+        Result<Team> signResult = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
 
         Assert.True(signResult.IsFailure);
         Assert.True(signResult.Error == Error.PlayerAlreadySigned);

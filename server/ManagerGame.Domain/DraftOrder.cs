@@ -23,7 +23,7 @@ public class DraftOrder
 
     public Team GetNext()
     {
-        (var next, _current, _previous) = _draftStrategy.GetNext(_current, _previous, _teams);
+        (Team? next, _current, _previous) = _draftStrategy.GetNext(_current, _previous, _teams);
         return next;
     }
 }

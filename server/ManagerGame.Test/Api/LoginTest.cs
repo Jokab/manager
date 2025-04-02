@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using ManagerGame.Api;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -25,12 +26,12 @@ public class LoginTest : IClassFixture<Fixture>
     [Fact]
     public async Task GeneratesJwtTokenForManager()
     {
-        var db = TestDbFactory.Create(_fixture);
+        ApplicationDbContext db = TestDbFactory.Create(_fixture);
 
-        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
+        (HttpResponseMessage? createManagerResponse, ManagerDto? manager) = await _httpClient.PostManager<ManagerDto>();
         var request = new LoginRequest { ManagerEmail = manager!.Email.EmailAddress };
 
-        var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
+        (HttpResponseMessage? loginResponse, LoginResponseDto? login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
 
         db.ChangeTracker.Clear();
 
@@ -51,7 +52,7 @@ public class LoginTest : IClassFixture<Fixture>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!))
         };
 
-        tokenHandler.ValidateToken(authToken, validationParameters, out var validatedToken);
+        tokenHandler.ValidateToken(authToken, validationParameters, out SecurityToken? validatedToken);
 
         return validatedToken;
     }

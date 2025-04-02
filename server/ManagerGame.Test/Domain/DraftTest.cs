@@ -5,11 +5,11 @@ public class DraftTest
     [Fact]
     public void DoublePeakDraftOrderIsCorrect()
     {
-        var league = League.Empty();
-        var team1 = TestData.TeamWithValidFullSquad();
-        var team2 = TestData.TeamWithValidFullSquad();
-        var team3 = TestData.TeamWithValidFullSquad();
-        var team4 = TestData.TeamWithValidFullSquad();
+        League league = League.Empty();
+        Team team1 = TestData.TeamWithValidFullSquad();
+        Team team2 = TestData.TeamWithValidFullSquad();
+        Team team3 = TestData.TeamWithValidFullSquad();
+        Team team4 = TestData.TeamWithValidFullSquad();
         league.AdmitTeam(team1);
         league.AdmitTeam(team2);
         league.AdmitTeam(team3);
@@ -31,8 +31,8 @@ public class DraftTest
     [Fact]
     public void StartWithTooFewTeamsThrows()
     {
-        var team1 = TestData.TeamWithValidFullSquad();
-        var league = League.Empty();
+        Team team1 = TestData.TeamWithValidFullSquad();
+        League league = League.Empty();
         league.AdmitTeam(team1);
         var draft = Draft.DoubledPeakTraversalDraft(league);
 

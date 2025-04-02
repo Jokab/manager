@@ -11,14 +11,14 @@ using ManagerGame.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+ConfigurationManager configuration = builder.Configuration;
 
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = false,
         ValidateAudience = false,
@@ -54,7 +54,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -77,7 +77,7 @@ app.MapApi();
 
 if (args.Contains("seed"))
 {
-    using var scope = app.Services.CreateScope();
+    using IServiceScope scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
     ResetDb(db);
@@ -134,12 +134,12 @@ void AddHandlerWithLogging<TCommand, TResult>(Func<IServiceProvider, ICommandHan
 
 void ResetDb(ApplicationDbContext? applicationDbContext)
 {
-    var tableNames = applicationDbContext!.Model.GetEntityTypes()
+    List<string?> tableNames = applicationDbContext!.Model.GetEntityTypes()
         .Select(t => t.GetTableName())
         .Distinct()
         .ToList();
 
-    foreach (var tableName in tableNames)
+    foreach (string? tableName in tableNames)
     {
 #pragma warning disable EF1002
         applicationDbContext.Database.ExecuteSqlRaw($"TRUNCATE {tableName} CASCADE;");
@@ -151,12 +151,12 @@ async Task SeedDb(IServiceScope serviceScope,
     ApplicationDbContext? db)
 {
     var createManagerCommandHandler = serviceScope.ServiceProvider.GetService<CreateManagerCommandHandler>();
-    var manager = createManagerCommandHandler!.Handle(new CreateManagerCommand
+    Task<Result<Manager>> manager = createManagerCommandHandler!.Handle(new CreateManagerCommand()
         { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
     Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
 
     var createTeamCommandHandler = serviceScope.ServiceProvider.GetService<CreateTeamCommandHandler>();
-    await createTeamCommandHandler!.Handle(new CreateTeamCommand
+    await createTeamCommandHandler!.Handle(new CreateTeamCommand()
         { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id });
 
 
@@ -174,7 +174,7 @@ async Task SeedDb(IServiceScope serviceScope,
             new CountryRec(country));
     }
 
-    var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
+    List<Player> players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
         Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>
         {
             Position position;

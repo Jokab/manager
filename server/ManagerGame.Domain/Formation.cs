@@ -4,7 +4,7 @@ public class Formation
 {
     public static readonly Formation[] ValidFormations =
     [
-        new Formation(4, 4, 2)
+        new(4, 4, 2)
     ];
 
     public readonly Dictionary<Position, int> Positions = new();

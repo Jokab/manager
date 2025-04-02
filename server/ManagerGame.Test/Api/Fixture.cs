@@ -21,7 +21,7 @@ public class Fixture : WebApplicationFactory<Program>
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 _connStr = $"Host=localhost;Database={Guid.NewGuid()};User Id=postgres;Password=1234";
 
-            var context = CreateContext();
+            ApplicationDbContext context = CreateContext();
             context.Database.EnsureCreated();
 
             services.AddSingleton(context);

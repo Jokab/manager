@@ -1,5 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Core;
 using ManagerGame.Core.Teams;
 
 namespace ManagerGame.Test.Api;
@@ -19,18 +20,18 @@ public class SignPlayerTest : IClassFixture<Fixture>
     [Fact]
     public async Task SignFirstPlayer()
     {
-        var db = TestDbFactory.Create(_fixture);
+        ApplicationDbContext db = TestDbFactory.Create(_fixture);
 
-        var (_, newTeam) = await Seed.SeedAndLogin(_httpClient);
+        (_, TeamDto? newTeam) = await Seed.SeedAndLogin(_httpClient);
 
-        var player = TestData.Player();
+        Player player = TestData.Player();
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        var (httpResponseMessage, _) =
+        (HttpResponseMessage? httpResponseMessage, _) =
             await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
-        var (_, team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
+        (_, TeamDto? team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);

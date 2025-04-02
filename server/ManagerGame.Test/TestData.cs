@@ -18,7 +18,7 @@ public static class TestData
         var goalkeepersRemaining = 1;
         var minDefendersRemaining = 4;
         var minMidfieldersRemaining = 4;
-        var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
+        List<Player> players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
             Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>
             {
                 Position position;

@@ -39,7 +39,7 @@ public class Team : Entity
         League? league)
     {
         var team = new Team(Guid.NewGuid(), name, managerId, [], league);
-        foreach (var player in players) team.SignPlayer(player);
+        foreach (Player? player in players) team.SignPlayer(player);
 
         return team;
     }
@@ -61,11 +61,11 @@ public class Team : Entity
 
     private bool SigningWillProhibitValidFormation(Player player)
     {
-        foreach (var formation in Formation.ValidFormations)
+        foreach (Formation? formation in Formation.ValidFormations)
         {
-            var requiredForPosition = formation.Positions[player.Position] -
+            int requiredForPosition = formation.Positions[player.Position] -
                                       Players.Count(x => x.Position == player.Position);
-            var signingsRemaining = PlayerLimit - Players.Count;
+            int signingsRemaining = PlayerLimit - Players.Count;
             if (requiredForPosition > signingsRemaining) return true;
         }
 
