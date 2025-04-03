@@ -15,13 +15,15 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
         try
         {
             team.SignPlayer(player);
+            // Update the player first since its TeamId was changed
+            await playerRepo.Update(player, cancellationToken);
+            // Then update the team with the new player
+            await teamRepo.Update(team, cancellationToken);
         }
         catch (Exception e)
         {
             return Result<Team>.Failure(e.Message);
         }
-
-        await teamRepo.Update(team, cancellationToken);
 
         return Result<Team>.Success(team);
     }

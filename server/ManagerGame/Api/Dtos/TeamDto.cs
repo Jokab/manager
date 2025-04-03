@@ -13,7 +13,7 @@ public record TeamDto
 
     public TeamDto(Team team)
     {
-        Players = team.Players.ToList();
+        Players = [.. team.Players.Select(x => x.Player)];
         Id = team.Id;
         CreatedDate = team.CreatedDate;
         UpdatedDate = team.UpdatedDate;

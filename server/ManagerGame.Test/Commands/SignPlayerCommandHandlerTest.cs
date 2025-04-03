@@ -24,11 +24,11 @@ public class SignPlayerCommandHandlerTest
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
         await teamRepo.Received().Update(Arg.Is<Team>(t =>
-            t.Players.First().Id == player.Id
+            t.Players.First().Player.Id == player.Id
             && t.Players.First().TeamId == team.Id
-            && t.Players.First().Name.Name == "Jakob"
-            && t.Players.First().Position == Position.Defender
-            && t.Players.First().Country.Country == Country.Se));
+            && t.Players.First().Player.Name.Name == "Jakob"
+            && t.Players.First().Player.Position == Position.Defender
+            && t.Players.First().Player.Country.Country == Country.Se));
     }
 
     [Fact]

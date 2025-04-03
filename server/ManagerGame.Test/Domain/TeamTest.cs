@@ -11,7 +11,7 @@ public class TeamTest
 
         team.SignPlayer(player);
 
-        Assert.Contains(player, team.Players);
+        Assert.Contains(player, team.Players.Select(x => x.Player));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class TeamTest
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);
 
-        Assert.Contains(newPlayer, team.Players);
+        Assert.Contains(newPlayer, team.Players.Select(x => x.Player));
     }
 
     [Fact]
@@ -80,12 +80,12 @@ public class TeamTest
         var team = TestData.TeamWithValidFullSquad();
         for (var i = 0; i < initialPlayersCountBelowLimit; i++)
             // Remove from full squad so we can add them in test
-            team.Players.Remove(team.Players.First(x => x.Country.Country == Country.Se));
+            team.Players.Remove(team.Players.First(x => x.Player.Country.Country == Country.Se));
         var newPlayer = TestData.Player();
 
         team.SignPlayer(newPlayer);
 
-        Assert.Contains(newPlayer, team.Players);
+        Assert.Contains(newPlayer, team.Players.Select(x => x.Player));
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class TeamTest
     {
         var team = TestData.TeamWithValidFullSquad();
 
-        team.Players.Remove(team.Players.First(x => x.Position == Position.Midfielder));
+        team.Players.Remove(team.Players.First(x => x.Player.Position == Position.Midfielder));
 
         Assert.Throws<ArgumentException>(() => team.SignPlayer(TestData.Player(position: Position.Midfielder)));
     }

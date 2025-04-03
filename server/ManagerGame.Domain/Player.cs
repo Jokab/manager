@@ -1,3 +1,4 @@
+
 namespace ManagerGame.Domain;
 
 public class Player : Entity

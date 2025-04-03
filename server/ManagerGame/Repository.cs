@@ -41,7 +41,7 @@ public class Repository<T> : IRepository<T> where T : Entity
     public async Task<T> Update(T entity,
         CancellationToken cancellationToken = default)
     {
-        _table.Attach(entity);
+        _dbContext.Entry(entity).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync(cancellationToken);
         return entity;
     }
