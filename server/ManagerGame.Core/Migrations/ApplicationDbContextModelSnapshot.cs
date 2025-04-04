@@ -22,7 +22,7 @@ namespace ManagerGame.Infra.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Draft", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Draft", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace ManagerGame.Infra.Migrations
                     b.ToTable("drafts", (string)null);
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.League", b =>
+            modelBuilder.Entity("ManagerGame.Domain.League", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,7 +84,7 @@ namespace ManagerGame.Infra.Migrations
                     b.ToTable("leagues", (string)null);
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Manager", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Manager", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +119,7 @@ namespace ManagerGame.Infra.Migrations
                     b.ToTable("managers", (string)null);
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Player", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Player", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,13 +159,10 @@ namespace ManagerGame.Infra.Migrations
                     b.HasKey("Id")
                         .HasName("pk_players");
 
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("ix_players_team_id");
-
                     b.ToTable("players", (string)null);
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Team", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Team", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,16 +206,56 @@ namespace ManagerGame.Infra.Migrations
                     b.ToTable("teams", (string)null);
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Draft", b =>
+            modelBuilder.Entity("ManagerGame.Domain.TeamPlayer", b =>
                 {
-                    b.HasOne("ManagerGame.Core.Domain.League", "League")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_date");
+
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_id");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("team_id");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_team_player");
+
+                    b.HasIndex("PlayerId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_team_player_player_id");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("ix_team_player_team_id");
+
+                    b.ToTable("team_player", (string)null);
+                });
+
+            modelBuilder.Entity("ManagerGame.Domain.Draft", b =>
+                {
+                    b.HasOne("ManagerGame.Domain.League", "League")
                         .WithMany("Drafts")
                         .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_drafts_leagues_league_id");
 
-                    b.OwnsOne("ManagerGame.Core.Domain.Draft.DraftOrder#ManagerGame.Core.Domain.DraftOrder", "DraftOrder", b1 =>
+                    b.OwnsOne("ManagerGame.Domain.DraftOrder", "DraftOrder", b1 =>
                         {
                             b1.Property<Guid>("DraftId")
                                 .HasColumnType("uuid")
@@ -234,7 +271,7 @@ namespace ManagerGame.Infra.Migrations
 
                             b1.HasKey("DraftId");
 
-                            b1.ToTable("drafts", (string)null);
+                            b1.ToTable("drafts");
 
                             b1.WithOwner()
                                 .HasForeignKey("DraftId")
@@ -247,42 +284,57 @@ namespace ManagerGame.Infra.Migrations
                     b.Navigation("League");
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Player", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Team", b =>
                 {
-                    b.HasOne("ManagerGame.Core.Domain.Team", null)
-                        .WithMany("Players")
-                        .HasForeignKey("TeamId")
-                        .HasConstraintName("fk_players_teams_team_id");
-                });
-
-            modelBuilder.Entity("ManagerGame.Core.Domain.Team", b =>
-                {
-                    b.HasOne("ManagerGame.Core.Domain.League", null)
+                    b.HasOne("ManagerGame.Domain.League", "League")
                         .WithMany("Teams")
                         .HasForeignKey("LeagueId")
                         .HasConstraintName("fk_teams_leagues_league_id");
 
-                    b.HasOne("ManagerGame.Core.Domain.Manager", null)
+                    b.HasOne("ManagerGame.Domain.Manager", null)
                         .WithMany("Teams")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_teams_managers_manager_id");
+
+                    b.Navigation("League");
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.League", b =>
+            modelBuilder.Entity("ManagerGame.Domain.TeamPlayer", b =>
+                {
+                    b.HasOne("ManagerGame.Domain.Player", "Player")
+                        .WithOne()
+                        .HasForeignKey("ManagerGame.Domain.TeamPlayer", "PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_team_player_players_player_id");
+
+                    b.HasOne("ManagerGame.Domain.Team", "Team")
+                        .WithMany("Players")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_team_player_teams_team_id");
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("ManagerGame.Domain.League", b =>
                 {
                     b.Navigation("Drafts");
 
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Manager", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Manager", b =>
                 {
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("ManagerGame.Core.Domain.Team", b =>
+            modelBuilder.Entity("ManagerGame.Domain.Team", b =>
                 {
                     b.Navigation("Players");
                 });

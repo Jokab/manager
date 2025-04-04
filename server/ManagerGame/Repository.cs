@@ -1,10 +1,9 @@
 using System.Collections.ObjectModel;
 using ManagerGame.Core;
-using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace ManagerGame.Infra;
+namespace ManagerGame;
 
 public class Repository<T> : IRepository<T> where T : Entity
 {
@@ -38,12 +37,12 @@ public class Repository<T> : IRepository<T> where T : Entity
     }
 
     public async Task<IReadOnlyCollection<T>> GetAll(CancellationToken cancellationToken = default) =>
-        new ReadOnlyCollection<T>(await _table.ToListAsync(cancellationToken: cancellationToken));
+        new ReadOnlyCollection<T>(await _table.ToListAsync(cancellationToken));
 
     public async Task<T> Update(T entity,
         CancellationToken cancellationToken = default)
     {
-        _table.Attach(entity);
+        _dbContext.Entry(entity).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync(cancellationToken);
         return entity;
     }

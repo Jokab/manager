@@ -9,18 +9,21 @@ public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TRe
     where TResult : class
 {
     private readonly ICommandHandler<TCommand, TResult> _innerHandler;
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, ReferenceHandler = ReferenceHandler.Preserve };
+
     private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
 
-    public LoggingDecorator(ICommandHandler<TCommand, TResult> innerHandler, ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    public LoggingDecorator(ICommandHandler<TCommand, TResult> innerHandler,
+        ILogger<LoggingDecorator<TCommand, TResult>> logger)
     {
         _innerHandler = innerHandler;
         _logger = logger;
     }
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-        { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, ReferenceHandler = ReferenceHandler.Preserve };
-
-    public async Task<Result<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<TResult>> Handle(TCommand command,
+        CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
             "Executing {method} with command {result}",

@@ -12,7 +12,9 @@ public class EmailTest
     [InlineData("jakob@jakob.SE", "jakob@JAKOB1.SE", false)]
     [InlineData("hej@hej.com", "hej@hej.com", true)]
     [InlineData("hej@hej.co.uk", "hej@hej.co.uk", true)]
-    public void TestEquality(string first, string second, bool shouldEqual)
+    public void TestEquality(string first,
+        string second,
+        bool shouldEqual)
     {
         Assert.Equal(shouldEqual, new Email(first) == new Email(second));
     }

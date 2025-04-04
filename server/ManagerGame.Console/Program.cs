@@ -1,13 +1,10 @@
-﻿// using ManagerGame;
-// using ManagerGame.Core;
-// using ManagerGame.Core.Commands;
-// using ManagerGame.Core.Domain;
-// using Microsoft.EntityFrameworkCore;
+﻿﻿using ManagerGame.Core;
+using ManagerGame.Core.Managers;
+using ManagerGame.Domain;
+using Microsoft.EntityFrameworkCore;
 
-static void Main(string[] args)
-{
-    Console.WriteLine("Hello, World!");
-}
+var a = 0;
+
 // var dbContext = ConnectDb();
 
 // var exit = false;
@@ -47,18 +44,7 @@ static void Main(string[] args)
 //             break;
 //     }
 
-//     // Console.WriteLine("Manager med ID " + manager.Id + " skapad");
-//     // Console.WriteLine("Namn från db " + dbContext.Managers.First(x => x.Id == manager.Id).Name.Name);
-//     //
-//     // var team = await CreateTeam(manager, dbContext);
-//     // if (!team.IsSuccess)
-//     // {
-//     //     Console.WriteLine("Failed to create team");
-//     // }
-//     //
-//     // Console.WriteLine("Managers lag" + dbContext.Managers.Include(manager => manager.Teams).First(x => x.Id == manager.Id).Teams.First().Name.Name);
-//     //
-//     //
+// return;
 
 // }
 
@@ -69,7 +55,7 @@ static void Main(string[] args)
 //     {
 //         throw new Exception("Managern finns inte");
 //     }
-//     var loginHandler = new LoginCommandHandler(applicationDbContext);
+//     var loginHandler = new LoginCommandHandler(applicationDbContext.Managers, configuration);
 
 //     var request = new LoginRequest {ManagerId = managerWithName.Id};
 //     var loginResult = await loginHandler.Handle(request, CancellationToken.None);

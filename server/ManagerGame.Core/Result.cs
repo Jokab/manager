@@ -22,11 +22,11 @@ public class Result<T>
     public static Result<T> Success(T value) => new(true, Error.None, value);
 
     public static Result<T> Failure(Error error) => new(false, error, default);
+    public static Result<T> Failure(string error) => new(false, new Error(error), default);
 }
 
 public record Error(string Code)
 {
     public static readonly Error None = new(string.Empty);
     public static readonly Error NotFound = new("Not Found");
-    public static readonly Error PlayerAlreadySigned = new("Player already signed");
 }

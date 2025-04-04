@@ -1,3 +1,6 @@
+using OneOf;
+using OneOf.Types;
+
 namespace ManagerGame.Domain;
 
 public class Draft : Entity
@@ -36,7 +39,15 @@ public class Draft : Entity
             new DraftOrder(league.Teams.ToList(), new DoubledPeakTraversalDraftOrder()));
     }
 
-    public Team GetNext() => DraftOrder.GetNext();
+    public OneOf<Team, None> GetNext()
+    {
+        if (State is DraftState.Created)
+        {
+            return new None();
+        }
+
+        return DraftOrder.GetNext();
+    }
 
     public void Start()
     {
@@ -53,4 +64,9 @@ public enum DraftState
     Created,
     Started,
     Finished
+}
+
+public class StartedDraft
+{
+
 }

@@ -1,3 +1,4 @@
+
 namespace ManagerGame.Domain;
 
 public class Player : Entity
@@ -23,6 +24,7 @@ public class Player : Entity
 
     private sealed class IdNamePositionEqualityComparer : IEqualityComparer<Player>
     {
+        // ReSharper disable once CyclomaticComplexity it's fine
         public bool Equals(Player? x,
             Player? y)
         {

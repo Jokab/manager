@@ -1,6 +1,7 @@
 namespace ManagerGame.Core.Teams;
 
-public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo) : ICommandHandler<SignPlayerRequest, Team>
+public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo)
+    : ICommandHandler<SignPlayerRequest, Team>
 {
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
         CancellationToken cancellationToken = default)
@@ -10,11 +11,19 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
 
         Player? player = await playerRepo.Find(command.PlayerId, cancellationToken);
         if (player is null) return Result<Team>.Failure(Error.NotFound);
-        if (player.IsSigned) return Result<Team>.Failure(Error.PlayerAlreadySigned);
 
-        team.SignPlayer(player);
-
-        await teamRepo.Update(team, cancellationToken);
+        try
+        {
+            team.SignPlayer(player);
+            // Update the player first since its TeamId was changed
+            await playerRepo.Update(player, cancellationToken);
+            // Then update the team with the new player
+            await teamRepo.Update(team, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return Result<Team>.Failure(e.Message);
+        }
 
         return Result<Team>.Success(team);
     }

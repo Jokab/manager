@@ -1,6 +1,7 @@
 namespace ManagerGame.Core.Teams;
 
-public class CreateTeamCommandHandler(IRepository<Manager> managerRepo, IRepository<Team> teamRepo) : ICommandHandler<CreateTeamCommand, Team>
+public class CreateTeamCommandHandler(IRepository<Manager> managerRepo, IRepository<Team> teamRepo)
+    : ICommandHandler<CreateTeamCommand, Team>
 {
     public async Task<Result<Team>> Handle(CreateTeamCommand command,
         CancellationToken cancellationToken = default)

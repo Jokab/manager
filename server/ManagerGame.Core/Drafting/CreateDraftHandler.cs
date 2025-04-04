@@ -1,6 +1,7 @@
 namespace ManagerGame.Core.Drafting;
 
-public class CreateDraftHandler(IRepository<Draft> draftRepo, IRepository<League> leagueRepo) : ICommandHandler<CreateDraftRequest, Draft>
+public class CreateDraftHandler(IRepository<Draft> draftRepo, IRepository<League> leagueRepo)
+    : ICommandHandler<CreateDraftRequest, Draft>
 {
     public async Task<Result<Draft>> Handle(CreateDraftRequest command,
         CancellationToken cancellationToken = default)

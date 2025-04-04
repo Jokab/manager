@@ -21,8 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ManagerGame.Core\ManagerGame.Core.csproj"/>
-        <ProjectReference Include="..\ManagerGame.Infra\ManagerGame.Infra.csproj"/>
+        <ProjectReference Include="..\ManagerGame.Core\ManagerGame.Core.csproj" />
     </ItemGroup>
 
 

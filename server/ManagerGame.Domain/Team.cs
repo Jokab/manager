@@ -17,7 +17,7 @@ public class Team : Entity
     private Team(Guid id,
         TeamName name,
         Guid managerId,
-        ICollection<Player> players,
+        ICollection<TeamPlayer> players,
         League? league)
         : base(id)
     {
@@ -29,7 +29,7 @@ public class Team : Entity
 
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
-    public ICollection<Player> Players { get; init; } = [];
+    public virtual ICollection<TeamPlayer> Players { get; init; } = [];
     public Guid? LeagueId { get; }
     public League? League { get; private init; }
 
@@ -44,28 +44,29 @@ public class Team : Entity
         return team;
     }
 
-    public void SignPlayer(Player player)
+    public void SignPlayer(Player newPlayer)
     {
-        if (Players.Contains(player)) throw new ArgumentException($"Player with ID {player.Id} already added");
-        if (Players.Count(x => x.Country == player.Country) >= PlayersFromSameCountryLimit)
+        if (newPlayer.IsSigned) throw new ArgumentException("Player is already signed");
+        if (Players.Any(x => x.Id == newPlayer.Id)) throw new ArgumentException($"Player with ID {newPlayer.Id} already added");
+        if (Players.Count(x => x.Player.Country == newPlayer.Country) >= PlayersFromSameCountryLimit)
             throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");
         if (Players.Count >= PlayerLimit)
             throw new ArgumentException($"Cannot have more than {PlayerLimit} players");
-        if (SigningWillProhibitValidFormation(player))
+        if (SigningWillProhibitValidFormation(newPlayer))
             throw new ArgumentException(
-                $"Signing {player.Position.ToString()} will make it impossible to form valid formation");
+                $"Signing {newPlayer.Position.ToString()} will make it impossible to form valid formation");
 
-        Players.Add(player);
-        player.TeamId = Id;
+        Players.Add(new TeamPlayer(Guid.NewGuid(), this, newPlayer));
+        newPlayer.TeamId = Id;
     }
 
     private bool SigningWillProhibitValidFormation(Player player)
     {
         foreach (Formation? formation in Formation.ValidFormations)
         {
-            int requiredForPosition = formation.Positions[player.Position] -
-                                      Players.Count(x => x.Position == player.Position);
-            int signingsRemaining = PlayerLimit - Players.Count;
+            var requiredForPosition = formation.Positions[player.Position] -
+                                      Players.Count(x => x.Player.Position == player.Position);
+            var signingsRemaining = PlayerLimit - Players.Count;
             if (requiredForPosition > signingsRemaining) return true;
         }
 
