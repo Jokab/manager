@@ -1,4 +1,3 @@
-
 namespace ManagerGame.Domain;
 
 public class Player : Entity
@@ -12,6 +11,7 @@ public class Player : Entity
         Name = name;
         Position = position;
         Country = country;
+        Eliminated = false;
     }
 
     public Guid? TeamId { get; set; }
@@ -19,6 +19,13 @@ public class Player : Entity
     public Position Position { get; init; }
     public CountryRec Country { get; init; }
     public bool IsSigned => TeamId != null;
+
+    // Added for match tracking
+    public bool Eliminated { get; set; }
+
+    // References to team player associations
+    public virtual ICollection<TeamPlayer> TeamPlayers { get; private set; } = [];
+    public virtual ICollection<StartingElevenPlayer> StartingElevenPlayers { get; private set; } = [];
 
     public static IEqualityComparer<Player> IdNamePositionComparer { get; } = new IdNamePositionEqualityComparer();
 

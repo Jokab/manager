@@ -19,7 +19,7 @@ internal static class Api
 
         api.MapPost("login", Login);
 
-        api.MapPost("managers", CreateManager);
+        api.MapPost("managers", RegisterManager);
         api.MapGet("managers/{id:guid}", GetManager).RequireAuthorization("user");
 
         api.MapPost("teams", CreateTeam).RequireAuthorization("user");
@@ -122,9 +122,9 @@ internal static class Api
         return TypedResults.Problem(result.Error.Code);
     }
 
-    private static async Task<Results<Ok<ManagerDto>, ProblemHttpResult>> CreateManager(
-        CreateManagerRequest request,
-        ICommandHandler<CreateManagerCommand, Manager> handler,
+    private static async Task<Results<Ok<ManagerDto>, ProblemHttpResult>> RegisterManager(
+        RegisterManagerRequest request,
+        ICommandHandler<RegisterManagerCommand, Manager> handler,
         CancellationToken cancellationToken = default)
     {
         Result<Manager> result = await handler.Handle(request.ToCommand(), cancellationToken);

@@ -1,0 +1,103 @@
+@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using ManagerGame.Core
+@using ManagerGame.Domain
+@using MudBlazor
+@inject IRepository<Manager> ManagerRepository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Registrera - Fantasy Manager</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="my-4 pt-4">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Registrera nytt konto</MudText>
+        </MudCardHeader>
+        <MudForm @ref="form" Model="@registrationModel" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudCardContent>
+                <MudTextField @bind-Value="registrationModel.Username" Label="Användarnamn" Required="true"
+                              RequiredError="Användarnamn krävs"
+                              Validation="@(new StringLengthAttribute(50) { MinimumLength = 3, ErrorMessage = "Användarnamnet måste vara mellan 3 och 50 tecken" })" />
+
+                <MudTextField @bind-Value="registrationModel.Email" Label="E-post" Required="true"
+                              RequiredError="E-postadress krävs"
+                              Validation="@(new EmailAddressAttribute() { ErrorMessage = "Ogiltig e-postadress" })" />
+
+                @* <MudTextField @bind-Value="registrationModel.Password" Label="Lösenord" Required="true" *@
+                @*               RequiredError="Lösenord krävs" *@
+                @*               Validation="@(new StringLengthAttribute(100) { MinimumLength = 6, ErrorMessage = "Lösenordet måste vara minst 6 tecken långt" })" *@
+                @*               InputType="InputType.Password" /> *@
+                @* *@
+                @* <MudTextField @bind-Value="registrationModel.ConfirmPassword" Label="Bekräfta lösenord" Required="true" *@
+                @*               RequiredError="Du måste bekräfta lösenordet" *@
+                @*               Validation="@(new CompareAttribute("Password") { ErrorMessage = "Lösenorden matchar inte" })" *@
+                @*               InputType="InputType.Password" /> *@
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="HandleRegistration">Registrera</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="login">Redan registrerad? Logga in här</MudButton>
+            </MudCardActions>
+        </MudForm>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private RegistrationModel registrationModel = new();
+    private bool success;
+    private string[] errors = { };
+    private MudForm form;
+
+    private async Task HandleRegistration()
+    {
+        await form.Validate();
+
+        if (success)
+        {
+            try
+            {
+                // if (registrationModel.Password != registrationModel.ConfirmPassword)
+                // {
+                //     Snackbar.Add("Lösenorden matchar inte", Severity.Error);
+                //     return;
+                // }
+
+                var manager = Manager.Create(
+                    new ManagerName(registrationModel.Username),
+                    new Email(registrationModel.Email)
+                );
+
+                // TODO: Hash password properly in a real application
+                // In a real application, you would hash the password before storing it
+
+                await ManagerRepository.Add(manager);
+
+                Snackbar.Add("Registrering lyckades! Du kan nu logga in.", Severity.Success);
+                NavigationManager.NavigateTo("/login", true);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Registrering misslyckades: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    public class RegistrationModel
+    {
+        [Required(ErrorMessage = "Användarnamn krävs")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Användarnamnet måste vara mellan 3 och 50 tecken")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "E-postadress krävs")]
+        [EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Lösenord krävs")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Lösenordet måste vara minst 6 tecken långt")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Du måste bekräfta lösenordet")]
+        [Compare("Password", ErrorMessage = "Lösenorden matchar inte")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

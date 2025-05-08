@@ -30,7 +30,7 @@ public static class HttpClientExtensions
     public static async Task<(HttpResponseMessage, T?)> PostManager<T>(this HttpClient httpClient) =>
         await Post<T>(httpClient,
             "/api/managers",
-            new CreateManagerRequest
+            new RegisterManagerRequest
                 { Name = "Jakob", Email = $"jakob{Guid.NewGuid()}@jakobsson.com" });
 
     public static async Task<(HttpResponseMessage, T?)> Get<T>(this HttpClient httpClient,

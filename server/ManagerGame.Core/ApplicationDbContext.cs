@@ -7,11 +7,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Player> Players { get; set; }
-
     public DbSet<Draft> Drafts { get; set; }
-
     public DbSet<League> Leagues { get; set; }
-    // public DbSet<DoubledPeakTraversalDraftOrder> DoubledPeakTraversalDraftOrders { get; set; }
+    public DbSet<MatchResult> MatchResults { get; set; }
+    public DbSet<MatchEvent> MatchEvents { get; set; }
+    public DbSet<StartingEleven> StartingElevens { get; set; }
+    public DbSet<LeagueSettings> LeagueSettings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -41,6 +42,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(tp => tp.TeamId)
             .IsRequired();
         modelBuilder.Entity<Team>().Navigation(x => x.League).AutoInclude();
+        modelBuilder.Entity<Team>()
+            .HasMany(x => x.StartingElevens)
+            .WithOne(x => x.Team)
+            .HasForeignKey(x => x.TeamId)
+            .IsRequired();
 
         modelBuilder.Entity<Player>().HasKey(x => x.Id);
         modelBuilder.Entity<Player>()
@@ -49,6 +55,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Player>()
             .Property(x => x.Country)
             .HasConversion(x => x.Country.ToString(), x => new CountryRec(Enum.Parse<Country>(x)));
+        modelBuilder.Entity<Player>()
+            .HasMany(x => x.TeamPlayers)
+            .WithOne(x => x.Player)
+            .HasForeignKey(x => x.PlayerId)
+            .IsRequired();
+        modelBuilder.Entity<Player>()
+            .HasMany(x => x.StartingElevenPlayers)
+            .WithOne(x => x.Player)
+            .HasForeignKey(x => x.PlayerId)
+            .IsRequired();
 
         modelBuilder.Entity<Draft>().HasKey(x => x.Id);
         modelBuilder.Entity<Draft>().OwnsOne(typeof(DraftOrder),
@@ -76,14 +92,46 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne(x => x.League)
             .HasForeignKey(x => x.LeagueId)
             .IsRequired(false);
-            
+        modelBuilder.Entity<League>()
+            .HasMany(x => x.MatchResults)
+            .WithOne(x => x.League)
+            .HasForeignKey(x => x.LeagueId)
+            .IsRequired();
+        modelBuilder.Entity<League>()
+            .HasOne(x => x.Settings)
+            .WithOne(x => x.League)
+            .HasForeignKey<LeagueSettings>(x => x.LeagueId)
+            .IsRequired();
+
         modelBuilder.Entity<TeamPlayer>().HasKey(x => x.Id);
         modelBuilder.Entity<TeamPlayer>().Navigation(x => x.Team).AutoInclude();
         modelBuilder.Entity<TeamPlayer>().Navigation(x => x.Player).AutoInclude();
         modelBuilder.Entity<TeamPlayer>()
             .HasOne(x => x.Player)
-            .WithOne()
-            .HasForeignKey<TeamPlayer>(x => x.PlayerId)
+            .WithMany(x => x.TeamPlayers)
+            .HasForeignKey(x => x.PlayerId)
             .IsRequired();
+
+        modelBuilder.Entity<StartingEleven>().HasKey(x => x.Id);
+        modelBuilder.Entity<StartingEleven>().Navigation(x => x.Team).AutoInclude();
+        modelBuilder.Entity<StartingEleven>().Navigation(x => x.SelectedPlayers).AutoInclude();
+
+        modelBuilder.Entity<StartingElevenPlayer>().HasKey(x => x.Id);
+        modelBuilder.Entity<StartingElevenPlayer>().Navigation(x => x.StartingEleven).AutoInclude();
+        modelBuilder.Entity<StartingElevenPlayer>().Navigation(x => x.Player).AutoInclude();
+
+        modelBuilder.Entity<MatchResult>().HasKey(x => x.Id);
+        modelBuilder.Entity<MatchResult>().Navigation(x => x.League).AutoInclude();
+        modelBuilder.Entity<MatchResult>().Navigation(x => x.MatchEvents).AutoInclude();
+
+        modelBuilder.Entity<MatchEvent>().HasKey(x => x.Id);
+        modelBuilder.Entity<MatchEvent>().Navigation(x => x.Match).AutoInclude();
+        modelBuilder.Entity<MatchEvent>().Navigation(x => x.Player).AutoInclude();
+        modelBuilder.Entity<MatchEvent>()
+            .Property(x => x.EventType)
+            .HasConversion<string>(x => x.ToString(), x => Enum.Parse<MatchEventType>(x));
+
+        modelBuilder.Entity<LeagueSettings>().HasKey(x => x.Id);
+        modelBuilder.Entity<LeagueSettings>().Navigation(x => x.League).AutoInclude();
     }
 }

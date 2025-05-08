@@ -1,0 +1,178 @@
+@page "/dashboard"
+@using ManagerGame.Core
+@using ManagerGame.Domain
+@using MudBlazor
+@inject IRepository<League> LeagueRepository
+@inject IRepository<Team> TeamRepository
+@inject ISnackbar Snackbar
+
+<PageTitle>Kontrollpanel - Fantasy Manager</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h3" Class="mb-4">Välkommen till din Kontrollpanel</MudText>
+            <MudText Typo="Typo.subtitle1" Class="mb-8">Här kan du hantera dina lag och ligor</MudText>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudCard Class="mb-6" Style="height: 100%;">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Mina lag</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Href="/create-team" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (myTeams.Any())
+                    {
+                        <MudList T="Team" Clickable="true">
+                            @foreach (var team in myTeams)
+                            {
+                                <MudListItem T="Team" Href="@($"/team/{team.Id}")">
+                                    <div class="d-flex justify-space-between align-center">
+                                        <MudText>@team.Name.Name</MudText>
+                                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">@team.TotalPoints poäng</MudChip>
+                                    </div>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">Du har inga lag ännu.</MudAlert>
+                        <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary" Href="/create-team">Skapa ett lag</MudButton>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudCard Class="mb-6" Style="height: 100%;">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Mina ligor</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" Href="/create-league" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (myLeagues.Any())
+                    {
+                        <MudList T="League" Clickable="true">
+                            @foreach (var league in myLeagues)
+                            {
+                                <MudListItem T="League" Href="@($"/league/{league.Id}")">
+                                    @league.Name
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">Du är inte med i någon liga ännu.</MudAlert>
+                        <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Success" Href="/create-league">Skapa en liga</MudButton>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudCard Class="mb-6" Style="height: 100%;">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Gå med i en liga</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText>Har du en inbjudningskod? Använd den för att gå med i en liga.</MudText>
+                    <MudTextField @bind-Value="joinLeagueModel.InviteCode" Label="Inbjudningskod"
+                                  Variant="Variant.Outlined" Class="mt-3" />
+                    <MudButton Class="mt-3" Variant="Variant.Filled" Color="Color.Primary"
+                              OnClick="JoinLeague" FullWidth="true">Gå med</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="8">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Kommande matcher</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudAlert Severity="Severity.Info">Det finns inga kommande matcher just nu.</MudAlert>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Topplista</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudAlert Severity="Severity.Info">Välj en liga för att se topplistan.</MudAlert>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private List<Team> myTeams = new();
+    private List<League> myLeagues = new();
+    private JoinLeagueModel joinLeagueModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // In a real application, you would filter by the current user
+        myTeams = (await TeamRepository.GetAll()).ToList();
+        myLeagues = (await LeagueRepository.GetAll()).ToList();
+    }
+
+    private async Task JoinLeague()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(joinLeagueModel.InviteCode))
+            {
+                Snackbar.Add("Inbjudningskod krävs", Severity.Warning);
+                return;
+            }
+
+            var leagues = await LeagueRepository.GetAll();
+            var league = leagues.FirstOrDefault(l => l.InviteCode == joinLeagueModel.InviteCode);
+
+            if (league == null)
+            {
+                Snackbar.Add("Ogiltig inbjudningskod", Severity.Error);
+                return;
+            }
+
+            // In a real application, you would add the user to the league
+            // And redirect to the league page
+
+            Snackbar.Add("Du har gått med i ligan!", Severity.Success);
+            joinLeagueModel.InviteCode = string.Empty;
+
+            // Refresh the leagues list
+            myLeagues = (await LeagueRepository.GetAll()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Kunde inte gå med i ligan: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private class JoinLeagueModel
+    {
+        public string InviteCode { get; set; } = string.Empty;
+    }
+}

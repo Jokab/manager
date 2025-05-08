@@ -11,6 +11,8 @@ public class Team : Entity
     [JsonConstructor]
     private Team(Guid id) : base(id)
     {
+        Players = [];
+        StartingElevens = [];
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
@@ -25,13 +27,17 @@ public class Team : Entity
         ManagerId = managerId;
         Players = players;
         League = league;
+        StartingElevens = [];
+        TotalPoints = 0;
     }
 
     public TeamName Name { get; init; }
     public Guid ManagerId { get; init; }
     public virtual ICollection<TeamPlayer> Players { get; init; } = [];
+    public virtual ICollection<StartingEleven> StartingElevens { get; init; } = [];
     public Guid? LeagueId { get; }
     public League? League { get; private init; }
+    public int TotalPoints { get; private set; }
 
     public static Team Create(TeamName name,
         Guid managerId,
@@ -47,7 +53,7 @@ public class Team : Entity
     public void SignPlayer(Player newPlayer)
     {
         if (newPlayer.IsSigned) throw new ArgumentException("Player is already signed");
-        if (Players.Any(x => x.Id == newPlayer.Id)) throw new ArgumentException($"Player with ID {newPlayer.Id} already added");
+        if (Players.Any(x => x.PlayerId == newPlayer.Id)) throw new ArgumentException($"Player with ID {newPlayer.Id} already added");
         if (Players.Count(x => x.Player.Country == newPlayer.Country) >= PlayersFromSameCountryLimit)
             throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");
         if (Players.Count >= PlayerLimit)
@@ -58,6 +64,21 @@ public class Team : Entity
 
         Players.Add(new TeamPlayer(Guid.NewGuid(), this, newPlayer));
         newPlayer.TeamId = Id;
+    }
+
+    public StartingEleven CreateStartingEleven(string matchRound)
+    {
+        if (StartingElevens.Any(se => se.MatchRound == matchRound))
+            throw new InvalidOperationException($"Team already has a starting eleven for round {matchRound}");
+
+        var startingEleven = new StartingEleven(Guid.NewGuid(), Id, matchRound);
+        StartingElevens.Add(startingEleven);
+        return startingEleven;
+    }
+
+    public void AddPoints(int points)
+    {
+        TotalPoints += points;
     }
 
     private bool SigningWillProhibitValidFormation(Player player)

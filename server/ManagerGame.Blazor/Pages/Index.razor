@@ -1,0 +1,33 @@
+﻿@page "/"
+@using MudBlazor
+
+<PageTitle>Fantasy Manager Spel</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex flex-column align-center">
+            <MudText Typo="Typo.h2" Class="mb-4">Fantasy Manager Spel</MudText>
+            <MudText Typo="Typo.h5" Class="mb-6">Skapa ditt fantasy fotbollslag och tävla med vänner!</MudText>
+
+            <div class="d-flex gap-4 mb-8">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Href="/login">Logga in</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Href="/register">Registrera</MudButton>
+            </div>
+        </MudItem>
+
+        <MudItem xs="12" Class="mt-6">
+            <MudPaper Elevation="3" Class="pa-6">
+                <MudText Typo="Typo.h4" Class="mb-4">Hur man spelar</MudText>
+                <MudList T="string">
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.PersonAdd">Skapa ett konto eller logga in</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.Add">Skapa en ny liga eller gå med i en befintlig med en inbjudningskod</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.Groups">Delta i spelardraften för att bygga din trupp med 22 spelare</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.SportsFootball">Välj din startelva för varje matchomgång</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.StarRate">Tjäna poäng baserat på hur dina spelare presterar i verkliga matcher</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.EmojiEvents">Tävla i slutspelsdraften efter gruppspelet</MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.Celebration">Vinn din liga genom att samla flest poäng!</MudListItem>
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>

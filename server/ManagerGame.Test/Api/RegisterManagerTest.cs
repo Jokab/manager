@@ -4,12 +4,12 @@ using ManagerGame.Core;
 
 namespace ManagerGame.Test.Api;
 
-public class CreateManagerTest : IClassFixture<Fixture>
+public class RegisterManagerTest : IClassFixture<Fixture>
 {
     private readonly Fixture _fixture;
     private readonly HttpClient _httpClient;
 
-    public CreateManagerTest(Fixture fixture)
+    public RegisterManagerTest(Fixture fixture)
     {
         _fixture = fixture;
         _httpClient = fixture.CreateDefaultClient();

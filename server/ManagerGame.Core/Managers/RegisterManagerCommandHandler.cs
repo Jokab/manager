@@ -1,9 +1,9 @@
 namespace ManagerGame.Core.Managers;
 
-public class CreateManagerCommandHandler(IRepository<Manager> managerRepo)
-    : ICommandHandler<CreateManagerCommand, Manager>
+public class RegisterManagerCommandHandler(IRepository<Manager> managerRepo)
+    : ICommandHandler<RegisterManagerCommand, Manager>
 {
-    public async Task<Result<Manager>> Handle(CreateManagerCommand command,
+    public async Task<Result<Manager>> Handle(RegisterManagerCommand command,
         CancellationToken cancellationToken = default)
     {
         IReadOnlyCollection<Manager> managers = await managerRepo.GetAll(cancellationToken);

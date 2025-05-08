@@ -1,0 +1,19 @@
+﻿@using MudBlazor
+<MudNavMenu>
+    <MudText Typo="Typo.h6" Class="px-4 mt-2 mb-2">Fantasy Manager</MudText>
+    <MudDivider Class="mb-2" />
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Hem</MudNavLink>
+    <MudNavLink Href="dashboard" Icon="@Icons.Material.Filled.Dashboard">Kontrollpanel</MudNavLink>
+    <MudNavGroup Title="Lag" Icon="@Icons.Material.Filled.SportsSoccer" Expanded="true">
+        <MudNavLink Href="teams" Icon="@Icons.Material.Filled.List">Mina lag</MudNavLink>
+        <MudNavLink Href="create-team" Icon="@Icons.Material.Filled.Add">Skapa lag</MudNavLink>
+    </MudNavGroup>
+    <MudNavGroup Title="Ligor" Icon="@Icons.Material.Filled.EmojiEvents" Expanded="true">
+        <MudNavLink Href="leagues" Icon="@Icons.Material.Filled.List">Mina ligor</MudNavLink>
+        <MudNavLink Href="create-league" Icon="@Icons.Material.Filled.Add">Skapa liga</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="drafts" Icon="@Icons.Material.Filled.Groups">Draftar</MudNavLink>
+    <MudNavLink Href="matches" Icon="@Icons.Material.Filled.Score">Matcher</MudNavLink>
+    <MudNavLink Href="login" Icon="@Icons.Material.Filled.Login">Logga in</MudNavLink>
+    <MudNavLink Href="register" Icon="@Icons.Material.Filled.PersonAdd">Registrera</MudNavLink>
+</MudNavMenu>
