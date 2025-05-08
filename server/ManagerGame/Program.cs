@@ -7,7 +7,6 @@ using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;
 using ManagerGame.Core.Teams;
-using ManagerGame.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -101,7 +100,7 @@ void RegisterCommandHandlers()
     AddHandlerWithLogging(sp => new CreateTeamCommandHandler(
         sp.GetService<IRepository<Manager>>()!,
         sp.GetService<IRepository<Team>>()!));
-    AddHandlerWithLogging(sp => new CreateManagerCommandHandler(
+    AddHandlerWithLogging(sp => new RegisterManagerCommandHandler(
         sp.GetService<IRepository<Manager>>()!));
     AddHandlerWithLogging(sp => new LoginCommandHandler(
         sp.GetService<IRepository<Manager>>()!,
@@ -150,8 +149,8 @@ void ResetDb(ApplicationDbContext? applicationDbContext)
 async Task SeedDb(IServiceScope serviceScope,
     ApplicationDbContext? db)
 {
-    var createManagerCommandHandler = serviceScope.ServiceProvider.GetService<CreateManagerCommandHandler>();
-    Task<Result<Manager>> manager = createManagerCommandHandler!.Handle(new CreateManagerCommand()
+    var registerManagerCommandHandler = serviceScope.ServiceProvider.GetService<RegisterManagerCommandHandler>();
+    Task<Result<Manager>> manager = registerManagerCommandHandler!.Handle(new RegisterManagerCommand()
         { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
     Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
 
