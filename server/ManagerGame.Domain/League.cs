@@ -42,7 +42,7 @@ public class League : Entity
     {
         if (Drafts.Any(x => x.State != DraftState.Finished))
             throw new InvalidOperationException("Cannot create new draft while there unfinished drafts");
-        Drafts.Add(Draft.DoubledPeakTraversalDraft(this));
+        Drafts.Add(Draft.DoubledPeakTraversalDraft(Id, Teams.Select(x => x.Id).ToList()));
     }
 
     public void CreateKnockoutDraft()
@@ -54,7 +54,7 @@ public class League : Entity
             throw new InvalidOperationException("Knockout draft has already been completed");
 
         // Create a new draft for the knockout phase
-        Drafts.Add(Draft.DoubledPeakTraversalDraft(this));
+        Drafts.Add(Draft.DoubledPeakTraversalDraft(Id, Teams.Select(x => x.Id).ToList()));
         IsKnockoutDraftCompleted = true;
     }
 

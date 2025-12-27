@@ -2,24 +2,30 @@ namespace ManagerGame.Domain;
 
 public class DraftOrder
 {
-    private readonly IDraftStrategy _draftStrategy = null!;
-    private readonly Team[] _teams = null!;
+    private IDraftStrategy _draftStrategy = new DoubledPeakTraversalDraftOrder();
     private int _current;
     private int _previous;
 
-    public DraftOrder(List<Team> teams,
-        IDraftStrategy draftStrategy)
+    public DraftOrder(IDraftStrategy draftStrategy)
     {
         _draftStrategy = draftStrategy;
         _current = 0;
-        _teams = teams.ToArray();
+        _previous = 0;
     }
 
     public DraftOrder() { }
 
-    public Team GetNext()
+    public Guid PeekNextTeamId(Guid[] teamIds)
     {
-        (var next, _current, _previous) = _draftStrategy.GetNext(_current, _previous, _teams);
+        if (teamIds.Length == 0) throw new ArgumentException("No teams in draft", nameof(teamIds));
+        var (next, _, _) = _draftStrategy.GetNext(_current, _previous, teamIds);
+        return next;
+    }
+
+    public Guid AdvanceAndGetNextTeamId(Guid[] teamIds)
+    {
+        if (teamIds.Length == 0) throw new ArgumentException("No teams in draft", nameof(teamIds));
+        (var next, _current, _previous) = _draftStrategy.GetNext(_current, _previous, teamIds);
         return next;
     }
 }
@@ -28,35 +34,35 @@ public class DraftOrder
 /// Moves like: A -> B -> C -> C -> B -> A -> A -> B etc
 public class DoubledPeakTraversalDraftOrder : IDraftStrategy
 {
-    public (Team next, int current, int previous) GetNext(int current,
+    public (Guid next, int current, int previous) GetNext(int current,
         int previous,
-        Team[] teams)
+        Guid[] teamIds)
     {
-        Team next;
+        Guid next;
         if (current == 0)
         {
             if (previous == 0)
             {
                 previous = current;
-                next = teams[current++];
+                next = teamIds[current++];
             }
             else
             {
                 previous = current;
-                next = teams[current];
+                next = teamIds[current];
             }
         }
-        else if (current == teams.Length - 1)
+        else if (current == teamIds.Length - 1)
         {
-            if (previous == teams.Length - 1)
+            if (previous == teamIds.Length - 1)
             {
                 previous = current;
-                next = teams[current--];
+                next = teamIds[current--];
             }
             else
             {
                 previous = current;
-                next = teams[current];
+                next = teamIds[current];
             }
         }
         else
@@ -64,12 +70,12 @@ public class DoubledPeakTraversalDraftOrder : IDraftStrategy
             if (previous == current + 1)
             {
                 previous = current;
-                next = teams[current--];
+                next = teamIds[current--];
             }
             else if (previous == current - 1)
             {
                 previous = current;
-                next = teams[current++];
+                next = teamIds[current++];
             }
             else
             {
@@ -83,7 +89,7 @@ public class DoubledPeakTraversalDraftOrder : IDraftStrategy
 
 public interface IDraftStrategy
 {
-    public (Team next, int current, int previous) GetNext(int current,
+    public (Guid next, int current, int previous) GetNext(int current,
         int previous,
-        Team[] teams);
+        Guid[] teamIds);
 }

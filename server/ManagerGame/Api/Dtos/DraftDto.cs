@@ -13,13 +13,20 @@ internal record DraftDto
 
     public DraftDto(Draft draft)
     {
-        Teams = draft.Teams;
         Id = draft.Id;
         LeagueId = draft.LeagueId;
         State = draft.State;
         CreatedDate = draft.CreatedDate;
         UpdatedDate = draft.CreatedDate;
         DeletedDate = draft.DeletedDate;
+        ParticipantTeamIds = draft.Participants
+            .OrderBy(x => x.Seat)
+            .Select(x => x.TeamId)
+            .ToList();
+        Picks = draft.Picks
+            .OrderBy(x => x.PickNumber)
+            .Select(x => new DraftPickDto(x))
+            .ToList();
     }
 
     public Guid Id { get; set; }
@@ -29,6 +36,25 @@ internal record DraftDto
     public DateTime? DeletedDate { get; set; }
 
     public Guid LeagueId { get; set; }
-    public ICollection<Team> Teams { get; }
+    public List<Guid> ParticipantTeamIds { get; set; }
+    public List<DraftPickDto> Picks { get; set; }
     public DraftState State { get; private set; }
+}
+
+internal record DraftPickDto
+{
+    public DraftPickDto(DraftPick pick)
+    {
+        Id = pick.Id;
+        PickNumber = pick.PickNumber;
+        TeamId = pick.TeamId;
+        PlayerId = pick.PlayerId;
+        PickedAt = pick.PickedAt;
+    }
+
+    public Guid Id { get; set; }
+    public int PickNumber { get; set; }
+    public Guid TeamId { get; set; }
+    public Guid PlayerId { get; set; }
+    public DateTime PickedAt { get; set; }
 }

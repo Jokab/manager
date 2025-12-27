@@ -6,7 +6,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public AggregateRepository<Draft, Guid> Drafts2 => new(
         Set<Draft>(),
-        Set<Draft>().Include(x => x.League),
+        Set<Draft>()
+            .Include(x => x.Participants)
+            .Include(x => x.Picks),
         draft => draft.Id);
 
     public AggregateRepository<League, Guid> Leagues2 => new(
@@ -131,15 +133,38 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             "DraftOrder",
             x =>
             {
-                x.Ignore("_teams");
                 x.Property("_current").HasColumnName("draftOrderCurrent");
                 x.Property("_previous").HasColumnName("draftOrderPrevious");
             });
-        // Required by the domain but not part of the data model
-        modelBuilder.Entity<Draft>().Ignore(x => x.Teams);
         modelBuilder.Entity<Draft>().Property(x => x.State)
             .HasConversion<string>(x => x.ToString(), x => Enum.Parse<DraftState>(x));
-        modelBuilder.Entity<Draft>().Navigation(x => x.League).AutoInclude();
+        // Draft is an aggregate; avoid auto-including the entire League graph.
+
+        modelBuilder.Entity<DraftParticipant>().HasKey(x => x.Id);
+        modelBuilder.Entity<DraftParticipant>()
+            .HasIndex(x => new { x.DraftId, x.Seat })
+            .IsUnique();
+        modelBuilder.Entity<DraftParticipant>()
+            .HasIndex(x => new { x.DraftId, x.TeamId })
+            .IsUnique();
+        modelBuilder.Entity<DraftParticipant>()
+            .HasOne<Draft>()
+            .WithMany(x => x.Participants)
+            .HasForeignKey(x => x.DraftId)
+            .IsRequired();
+
+        modelBuilder.Entity<DraftPick>().HasKey(x => x.Id);
+        modelBuilder.Entity<DraftPick>()
+            .HasIndex(x => new { x.DraftId, x.PickNumber })
+            .IsUnique();
+        modelBuilder.Entity<DraftPick>()
+            .HasIndex(x => new { x.DraftId, x.PlayerId })
+            .IsUnique();
+        modelBuilder.Entity<DraftPick>()
+            .HasOne<Draft>()
+            .WithMany(x => x.Picks)
+            .HasForeignKey(x => x.DraftId)
+            .IsRequired();
 
         modelBuilder.Entity<League>().HasKey(x => x.Id);
         modelBuilder.Entity<League>().Navigation(x => x.Teams).AutoInclude();

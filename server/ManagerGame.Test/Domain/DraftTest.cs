@@ -14,22 +14,20 @@ public class DraftTest
         league.AdmitTeam(team2);
         league.AdmitTeam(team3);
         league.AdmitTeam(team4);
-        var draft = Draft.DoubledPeakTraversalDraft(league);
+        var draft = Draft.DoubledPeakTraversalDraft(league.Id, league.Teams.Select(x => x.Id).ToList());
         draft.Start();
 
-        Assert.Equal(team1, GetNext(draft));
-        Assert.Equal(team2, GetNext(draft));
-        Assert.Equal(team3, GetNext(draft));
-        Assert.Equal(team4, GetNext(draft));
-        Assert.Equal(team4, GetNext(draft));
-        Assert.Equal(team3, GetNext(draft));
-        Assert.Equal(team2, GetNext(draft));
-        Assert.Equal(team1, GetNext(draft));
-        Assert.Equal(team1, GetNext(draft));
-        Assert.Equal(team2, GetNext(draft));
+        Assert.Equal(team1.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team2.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team3.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team4.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team4.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team3.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team2.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team1.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team1.Id, draft.AdvanceAndGetNextTeamId());
+        Assert.Equal(team2.Id, draft.AdvanceAndGetNextTeamId());
         return;
-
-        Team GetNext(Draft d) => d.GetNext().Match(team => team, _ => null!);
     }
 
     [Fact]
@@ -38,7 +36,7 @@ public class DraftTest
         var team1 = TestData.TeamWithValidFullSquad();
         var league = League.Empty();
         league.AdmitTeam(team1);
-        var draft = Draft.DoubledPeakTraversalDraft(league);
+        var draft = Draft.DoubledPeakTraversalDraft(league.Id, league.Teams.Select(x => x.Id).ToList());
 
         Assert.Throws<ArgumentException>(() => draft.Start());
     }
@@ -49,12 +47,8 @@ public class DraftTest
         var team1 = TestData.TeamWithValidFullSquad();
         var league = League.Empty();
         league.AdmitTeam(team1);
-        var draft = Draft.DoubledPeakTraversalDraft(league);
+        var draft = Draft.DoubledPeakTraversalDraft(league.Id, league.Teams.Select(x => x.Id).ToList());
 
-        var next = draft.GetNext().Match(
-            team => team,
-            _ => null!);
-
-        Assert.Null(next);
+        Assert.Null(draft.PeekNextTeamId());
     }
 }

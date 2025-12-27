@@ -33,11 +33,11 @@ public class DraftHub : Hub
         if (draft.State != DraftState.Started)
             throw new InvalidOperationException("Draft is not in started state");
 
-        var nextTeam = draft.GetNext();
-        if (!nextTeam.IsT0)
+        var expectedTeamId = draft.PeekNextTeamId();
+        if (expectedTeamId is null)
             throw new InvalidOperationException("No next team available in draft");
 
-        if (nextTeam.AsT0.Id != teamId)
+        if (expectedTeamId.Value != teamId)
             throw new InvalidOperationException("It's not your turn to draft");
 
         try
@@ -45,9 +45,9 @@ public class DraftHub : Hub
             team.SignPlayer(player);
             await _dbContext.SaveChangesAsync();
 
-            // Get next team after selection
-            var newNextTeam = draft.GetNext();
-            Guid? nextTeamId = newNextTeam.IsT0 ? newNextTeam.AsT0.Id : null;
+            // Advance draft turn after selection (draft aggregate is the source of truth for order)
+            var nextTeamId = draft.AdvanceAndGetNextTeamId();
+            await _dbContext.SaveChangesAsync();
 
             await Clients.Group(draft.LeagueId.ToString()).SendAsync("PlayerPicked",
                 new {
