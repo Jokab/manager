@@ -10,8 +10,8 @@ public static class Seed
 {
     public static async Task<(ManagerDto manager, string token)> SeedManagerAndLogin(HttpClient httpClient)
     {
-        (_, ManagerDto? manager) = await httpClient.PostManager<ManagerDto>();
-        (_, LoginResponseDto? login) = await httpClient.Post<LoginResponseDto>("/api/login",
+        (_, var manager) = await httpClient.PostManager<ManagerDto>();
+        (_, var login) = await httpClient.Post<LoginResponseDto>("/api/login",
             new LoginRequest { ManagerEmail = manager!.Email.EmailAddress });
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
@@ -21,16 +21,16 @@ public static class Seed
 
     public static async Task<(ManagerDto manager, TeamDto team)> SeedAndLogin(HttpClient httpClient)
     {
-        (_, ManagerDto? manager) = await httpClient.PostManager<ManagerDto>();
+        (_, var manager) = await httpClient.PostManager<ManagerDto>();
         CreateTeamRequest createTeamRequest = new()
             { Name = "Lag", ManagerId = manager!.Id };
-        (_, LoginResponseDto? login) =
+        (_, var login) =
             await httpClient.Post<LoginResponseDto>("/api/login",
                 new LoginRequest { ManagerEmail = manager.Email.EmailAddress });
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
 
-        (HttpResponseMessage? createTeamResponseMessage, TeamDto? team) = await httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        (var createTeamResponseMessage, var team) = await httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
 
         Assert.Equal(HttpStatusCode.OK, createTeamResponseMessage.StatusCode);
 

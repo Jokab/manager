@@ -5,7 +5,7 @@ public class CreateLeagueHandler(IRepository<League> repo) : ICommandHandler<Cre
     public async Task<Result<League>> Handle(CreateLeagueRequest command,
         CancellationToken cancellationToken = default)
     {
-        League league = League.Empty();
+        var league = League.Empty();
         await repo.Add(league, cancellationToken);
 
         return Result<League>.Success(league);

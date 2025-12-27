@@ -21,8 +21,8 @@ public class CreateDraftTest : IClassFixture<Fixture>
     {
         TestDbFactory.Create(_fixture);
 
-        (_, TeamDto? team) = await Seed.SeedAndLogin(_httpClient);
-        (_, CreateLeagueDto? createLeagueDto) =
+        (_, var team) = await Seed.SeedAndLogin(_httpClient);
+        (_, var createLeagueDto) =
             await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
 
         await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
@@ -30,13 +30,13 @@ public class CreateDraftTest : IClassFixture<Fixture>
         await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
             new AdmitTeamRequest { LeagueId = createLeagueDto.Id, TeamId = team.Id });
 
-        (HttpResponseMessage? http1, CreateDraftDto? createDraftDto) =
+        (var http1, var createDraftDto) =
             await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(createLeagueDto.Id));
 
         Assert.Equal(HttpStatusCode.OK, http1.StatusCode);
         Assert.Equal(DraftState.Created, createDraftDto!.State);
 
-        (HttpResponseMessage? http2, StartDraftDto? startDraftDto) =
+        (var http2, var startDraftDto) =
             await _httpClient.Post<StartDraftDto>("/api/drafts/start",
                 new StartDraftRequest { DraftId = createDraftDto.Id });
 

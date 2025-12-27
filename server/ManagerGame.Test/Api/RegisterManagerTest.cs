@@ -18,9 +18,9 @@ public class RegisterManagerTest : IClassFixture<Fixture>
     [Fact]
     public async Task Test()
     {
-        ApplicationDbContext db = TestDbFactory.Create(_fixture);
+        var db = TestDbFactory.Create(_fixture);
 
-        (HttpResponseMessage? createManagerResponse, ManagerDto? manager) = await _httpClient.PostManager<ManagerDto>();
+        (var createManagerResponse, var manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
         Assert.NotNull(manager);

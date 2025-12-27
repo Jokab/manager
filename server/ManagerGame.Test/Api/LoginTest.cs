@@ -26,12 +26,12 @@ public class LoginTest : IClassFixture<Fixture>
     [Fact]
     public async Task GeneratesJwtTokenForManager()
     {
-        ApplicationDbContext db = TestDbFactory.Create(_fixture);
+        var db = TestDbFactory.Create(_fixture);
 
-        (HttpResponseMessage? createManagerResponse, ManagerDto? manager) = await _httpClient.PostManager<ManagerDto>();
+        (var createManagerResponse, var manager) = await _httpClient.PostManager<ManagerDto>();
         var request = new LoginRequest { ManagerEmail = manager!.Email.EmailAddress };
 
-        (HttpResponseMessage? loginResponse, LoginResponseDto? login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
+        (var loginResponse, var login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
 
         db.ChangeTracker.Clear();
 
@@ -52,7 +52,7 @@ public class LoginTest : IClassFixture<Fixture>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!))
         };
 
-        tokenHandler.ValidateToken(authToken, validationParameters, out SecurityToken? validatedToken);
+        tokenHandler.ValidateToken(authToken, validationParameters, out var validatedToken);
 
         return validatedToken;
     }

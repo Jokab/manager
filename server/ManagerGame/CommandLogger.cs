@@ -32,7 +32,7 @@ public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TRe
 
         try
         {
-            Result<TResult> result = await _innerHandler.Handle(command, cancellationToken);
+            var result = await _innerHandler.Handle(command, cancellationToken);
             _logger.LogInformation(
                 "Successfully executed {method} with result {result}",
                 typeof(ICommandHandler<TCommand, TResult>),

@@ -32,7 +32,7 @@ public class RepositoryFactory
 
         public async Task<T> Add(T entity, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
 
             var e = _table.Add(entity);
             await _dbContext.SaveChangesAsync(cancellationToken);

@@ -10,7 +10,7 @@ public static class HttpClientExtensions
         string uri,
         object data)
     {
-        HttpResponseMessage httpResponse = await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
+        var httpResponse = await httpClient.PostAsync(new Uri(uri, UriKind.Relative),
             new StringContent(
                 JsonSerializer.Serialize(data),
                 Encoding.UTF8,

@@ -87,7 +87,7 @@ public class StartingEleven : Entity
         if (!IsLocked)
             throw new InvalidOperationException("Starting eleven must be locked before calculating points");
 
-        int points = 0;
+        var points = 0;
 
         foreach (var matchResult in matchResults.Where(m => m.IsFinished))
         {
@@ -114,8 +114,8 @@ public class StartingEleven : Entity
                 }
 
                 // Add points for wins
-                bool isHomeTeam = matchResult.MatchEvents.Any(e => e.PlayerId == player.Id && e.IsHomeTeam);
-                bool isPlayerTeamWinner = isHomeTeam
+                var isHomeTeam = matchResult.MatchEvents.Any(e => e.PlayerId == player.Id && e.IsHomeTeam);
+                var isPlayerTeamWinner = isHomeTeam
                     ? matchResult.HomeGoals > matchResult.AwayGoals
                     : matchResult.AwayGoals > matchResult.HomeGoals;
 

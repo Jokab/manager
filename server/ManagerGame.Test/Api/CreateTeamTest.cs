@@ -20,11 +20,11 @@ public class CreateTeamTest : IClassFixture<Fixture>
     [Fact]
     public async Task CreateTeam()
     {
-        ApplicationDbContext db = TestDbFactory.Create(_fixture);
-        (ManagerDto? manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
+        var db = TestDbFactory.Create(_fixture);
+        (var manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
         var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id };
 
-        (HttpResponseMessage? createTeamResponse, TeamDto? team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        (var createTeamResponse, var team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
 
         Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
 
@@ -32,8 +32,8 @@ public class CreateTeamTest : IClassFixture<Fixture>
         Assert.Equal("Lag2", team.Name);
 
         Assert.Single(db.Teams);
-        Manager createdManagerInDb = db.Managers.Include(m => m.Teams).First(x => x.Id == manager.Id);
-        Team createdTeamInDb = createdManagerInDb.Teams.First(x => x.Id == team.Id);
+        var createdManagerInDb = db.Managers.Include(m => m.Teams).First(x => x.Id == manager.Id);
+        var createdTeamInDb = createdManagerInDb.Teams.First(x => x.Id == team.Id);
         Assert.Equal(manager.Id, createdTeamInDb.ManagerId);
         Assert.Equal("Lag2", createdTeamInDb.Name.Name);
     }
@@ -51,11 +51,11 @@ public class UnauthorizedTeamTest : IClassFixture<Fixture>
     [Fact]
     public async Task UnauthorizedIfNotLoggedIn()
     {
-        (_, ManagerDto? manager) = await _httpClient.PostManager<ManagerDto>();
+        (_, var manager) = await _httpClient.PostManager<ManagerDto>();
 
         _httpClient.DefaultRequestHeaders.Authorization = null;
 
-        (HttpResponseMessage? createTeamResponse, TeamDto? team) = await _httpClient.Post<TeamDto>("/api/teams",
+        (var createTeamResponse, var team) = await _httpClient.Post<TeamDto>("/api/teams",
             new CreateTeamRequest { Name = "Lag", ManagerId = manager!.Id });
 
         Assert.Equal(HttpStatusCode.Unauthorized, createTeamResponse.StatusCode);

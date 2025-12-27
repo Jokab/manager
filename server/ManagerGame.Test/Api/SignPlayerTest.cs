@@ -20,18 +20,18 @@ public class SignPlayerTest : IClassFixture<Fixture>
     [Fact]
     public async Task SignFirstPlayer()
     {
-        ApplicationDbContext db = TestDbFactory.Create(_fixture);
+        var db = TestDbFactory.Create(_fixture);
 
-        (_, TeamDto? newTeam) = await Seed.SeedAndLogin(_httpClient);
+        (_, var newTeam) = await Seed.SeedAndLogin(_httpClient);
 
-        Player player = TestData.Player();
+        var player = TestData.Player();
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        (HttpResponseMessage? httpResponseMessage, _) =
+        (var httpResponseMessage, _) =
             await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
-        (_, TeamDto? team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
+        (_, var team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);

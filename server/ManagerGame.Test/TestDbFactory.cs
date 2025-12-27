@@ -9,7 +9,7 @@ public static class TestDbFactory
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        ApplicationDbContext db = fixture.CreateContext();
+        var db = fixture.CreateContext();
         return db;
     }
 }

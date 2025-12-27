@@ -6,10 +6,10 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
         CancellationToken cancellationToken = default)
     {
-        Team? team = await teamRepo.Find(command.TeamId, cancellationToken);
+        var team = await teamRepo.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<Team>.Failure(Error.NotFound);
 
-        Player? player = await playerRepo.Find(command.PlayerId, cancellationToken);
+        var player = await playerRepo.Find(command.PlayerId, cancellationToken);
         if (player is null) return Result<Team>.Failure(Error.NotFound);
 
         try

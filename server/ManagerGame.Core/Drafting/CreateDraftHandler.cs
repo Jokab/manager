@@ -6,12 +6,12 @@ public class CreateDraftHandler(IRepository<Draft> draftRepo, IRepository<League
     public async Task<Result<Draft>> Handle(CreateDraftRequest command,
         CancellationToken cancellationToken = default)
     {
-        League? league = await leagueRepo.Find(command.LeagueId, cancellationToken);
+        var league = await leagueRepo.Find(command.LeagueId, cancellationToken);
         if (league is null) return Result<Draft>.Failure(Error.NotFound);
 
         var draft = Draft.DoubledPeakTraversalDraft(league);
 
-        Draft newDraft = await draftRepo.Add(draft, cancellationToken);
+        var newDraft = await draftRepo.Add(draft, cancellationToken);
 
         return Result<Draft>.Success(newDraft);
     }
