@@ -21,10 +21,10 @@ public class CreateTeamTest : IClassFixture<Fixture>
     public async Task CreateTeam()
     {
         var db = TestDbFactory.Create(_fixture);
-        (var manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
+        var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
         var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id };
 
-        (var createTeamResponse, var team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
 
         Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
 
@@ -51,11 +51,11 @@ public class UnauthorizedTeamTest : IClassFixture<Fixture>
     [Fact]
     public async Task UnauthorizedIfNotLoggedIn()
     {
-        (_, var manager) = await _httpClient.PostManager<ManagerDto>();
+        var (_, manager) = await _httpClient.PostManager<ManagerDto>();
 
         _httpClient.DefaultRequestHeaders.Authorization = null;
 
-        (var createTeamResponse, var team) = await _httpClient.Post<TeamDto>("/api/teams",
+        var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams",
             new CreateTeamRequest { Name = "Lag", ManagerId = manager!.Id });
 
         Assert.Equal(HttpStatusCode.Unauthorized, createTeamResponse.StatusCode);

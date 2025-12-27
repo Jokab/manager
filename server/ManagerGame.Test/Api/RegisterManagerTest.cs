@@ -20,7 +20,7 @@ public class RegisterManagerTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
 
-        (var createManagerResponse, var manager) = await _httpClient.PostManager<ManagerDto>();
+        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
 
         Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
         Assert.NotNull(manager);

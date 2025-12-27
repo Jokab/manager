@@ -28,10 +28,10 @@ public class LoginTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
 
-        (var createManagerResponse, var manager) = await _httpClient.PostManager<ManagerDto>();
+        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
         var request = new LoginRequest { ManagerEmail = manager!.Email.EmailAddress };
 
-        (var loginResponse, var login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
+        var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
 
         db.ChangeTracker.Clear();
 

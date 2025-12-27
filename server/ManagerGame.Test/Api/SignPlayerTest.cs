@@ -25,13 +25,13 @@ public class SignPlayerTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
 
-        (_, var newTeam) = await Seed.SeedAndLogin(_httpClient);
+        var (_, newTeam) = await Seed.SeedAndLogin(_httpClient);
 
         var player = TestData.Player();
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        (var httpResponseMessage, _) =
+        var (httpResponseMessage, _) =
             await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
 
         if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
@@ -41,7 +41,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
             _output.WriteLine(body);
         }
 
-        (_, var team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
+        var (_, team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
 
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);
