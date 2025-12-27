@@ -2,19 +2,17 @@ using System.Text.Json.Serialization;
 
 namespace ManagerGame.Domain;
 
-public class Team : Entity
+public sealed class Team : Entity
 {
     public const int PlayersFromSameCountryLimit = 4;
     public const int PlayerLimit = 22;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     [JsonConstructor]
     private Team(Guid id) : base(id)
     {
         Players = [];
         StartingElevens = [];
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     private Team(Guid id,
         TeamName name,
@@ -31,10 +29,10 @@ public class Team : Entity
         TotalPoints = 0;
     }
 
-    public TeamName Name { get; init; }
+    public TeamName Name { get; init; } = null!;
     public Guid ManagerId { get; init; }
-    public virtual ICollection<TeamPlayer> Players { get; init; } = [];
-    public virtual ICollection<StartingEleven> StartingElevens { get; init; } = [];
+    public ICollection<TeamPlayer> Players { get; init; }
+    public ICollection<StartingEleven> StartingElevens { get; init; }
     public Guid? LeagueId { get; }
     public League? League { get; private init; }
     public int TotalPoints { get; private set; }

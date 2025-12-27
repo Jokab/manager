@@ -23,7 +23,6 @@ public class Draft : Entity
 
     public Guid LeagueId { get; private init; }
 
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local used by EF core
     public League League { get; private init; }
     public DraftState State { get; private set; }
     private DraftOrder DraftOrder { get; }

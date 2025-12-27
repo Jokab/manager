@@ -2,8 +2,8 @@ namespace ManagerGame.Domain;
 
 public class DraftOrder
 {
-    private readonly IDraftStrategy _draftStrategy;
-    private readonly Team[] _teams;
+    private readonly IDraftStrategy _draftStrategy = null!;
+    private readonly Team[] _teams = null!;
     private int _current;
     private int _previous;
 
@@ -15,11 +15,7 @@ public class DraftOrder
         _teams = teams.ToArray();
     }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public DraftOrder()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public DraftOrder() { }
 
     public Team GetNext()
     {
