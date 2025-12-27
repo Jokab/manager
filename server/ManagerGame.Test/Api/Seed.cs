@@ -30,7 +30,7 @@ public static class Seed
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
 
         var (_, createLeagueDto) =
-            await httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+            await httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
         Assert.NotNull(createLeagueDto);
 
         var leagueId = createLeagueDto.Id;

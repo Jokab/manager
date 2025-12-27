@@ -66,7 +66,7 @@ public class DraftPickTest : IClassFixture<Fixture>
     private async Task<Guid> CreateLeagueAsync()
     {
         var (_, createLeagueDto) =
-            await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+            await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
         Assert.NotNull(createLeagueDto);
         return createLeagueDto.Id;
     }

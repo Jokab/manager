@@ -25,7 +25,7 @@ public class StartDraftTest : IClassFixture<Fixture>
         var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
 
         var (_, createLeagueDto) =
-            await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+            await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
         Assert.NotNull(createLeagueDto);
         var leagueId = createLeagueDto.Id;
 

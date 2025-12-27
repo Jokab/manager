@@ -1,0 +1,126 @@
+@page "/create-league"
+@using System.ComponentModel.DataAnnotations
+@using ManagerGame.Core
+@using ManagerGame.Core.Leagues
+@using ManagerGame.Domain
+@using MudBlazor
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Skapa liga - Fantasy Manager</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="my-4 pt-4">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Skapa ny liga</MudText>
+        </MudCardHeader>
+        <MudForm @ref="form" Model="@leagueModel" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudCardContent>
+                <MudTextField @bind-Value="leagueModel.Name" Label="Ligans namn" Required="true"
+                              RequiredError="Ligans namn krävs"
+                              Validation="@(new StringLengthAttribute(100) { MinimumLength = 3, ErrorMessage = "Ligans namn måste vara mellan 3 och 100 tecken" })" />
+
+                <MudDivider Class="my-4" />
+                <MudText Typo="Typo.h6" Class="mb-3">Inställningar</MudText>
+
+                <MudNumericField @bind-Value="leagueModel.MaxPlayersFromSameCountry"
+                                 Label="Max spelare från samma land"
+                                 Min="1" Max="11"
+                                 HelperText="Antal spelare som får vara från samma land (1-11)" />
+
+                <MudDivider Class="my-4" />
+                <MudText Typo="Typo.subtitle1" Class="mb-3">Poängsystem</MudText>
+
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudNumericField @bind-Value="leagueModel.PointsPerGoal"
+                                         Label="Poäng per mål"
+                                         Min="0" Max="10" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudNumericField @bind-Value="leagueModel.PointsPerAssist"
+                                         Label="Poäng per assist"
+                                         Min="0" Max="10" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudNumericField @bind-Value="leagueModel.PointsPerWin"
+                                         Label="Poäng per vinst"
+                                         Min="0" Max="10" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudNumericField @bind-Value="leagueModel.PointsPerCleanSheet"
+                                         Label="Poäng per hållen nolla"
+                                         Min="0" Max="10" />
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/dashboard">Avbryt</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="HandleCreate">Skapa liga</MudButton>
+            </MudCardActions>
+        </MudForm>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private CreateLeagueModel leagueModel = new();
+    private bool success;
+    private string[] errors = { };
+    private MudForm? form;
+
+    private async Task HandleCreate()
+    {
+        if (form is null)
+            return;
+
+        await form.Validate();
+
+        if (success)
+        {
+            try
+            {
+                var request = new CreateLeagueRequest
+                {
+                    Name = leagueModel.Name,
+                    MaxPlayersFromSameCountry = leagueModel.MaxPlayersFromSameCountry,
+                    PointsPerGoal = leagueModel.PointsPerGoal,
+                    PointsPerWin = leagueModel.PointsPerWin,
+                    PointsPerAssist = leagueModel.PointsPerAssist,
+                    PointsPerCleanSheet = leagueModel.PointsPerCleanSheet
+                };
+
+                var handler = new CreateLeagueHandler(DbContext);
+                var result = await handler.Handle(request);
+
+                if (result.IsSuccess)
+                {
+                    Snackbar.Add($"Liga '{leagueModel.Name}' skapades! Inbjudningskod: {result.Value!.InviteCode}", Severity.Success);
+                    NavigationManager.NavigateTo($"/league/{result.Value.Id}", true);
+                }
+                else
+                {
+                    Snackbar.Add($"Kunde inte skapa ligan: {result.Error}", Severity.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Kunde inte skapa ligan: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    public class CreateLeagueModel
+    {
+        [Required(ErrorMessage = "Ligans namn krävs")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Ligans namn måste vara mellan 3 och 100 tecken")]
+        public string Name { get; set; } = string.Empty;
+
+        public int MaxPlayersFromSameCountry { get; set; } = 4;
+        public int PointsPerGoal { get; set; } = 3;
+        public int PointsPerWin { get; set; } = 1;
+        public int PointsPerAssist { get; set; } = 1;
+        public int PointsPerCleanSheet { get; set; } = 1;
+    }
+}
+

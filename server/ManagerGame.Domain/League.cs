@@ -4,30 +4,34 @@ namespace ManagerGame.Domain;
 
 public class League : Entity
 {
-    [JsonConstructor]
-    private League()
+    private League() {}
+
+    private League(string name, LeagueSettings settings)
     {
+        Name = name;
         Teams = [];
         Drafts = [];
         MatchResults = [];
         InviteCode = GenerateInviteCode();
-        Settings = new LeagueSettings();
+        Settings = settings;
         IsGroupStageCompleted = false;
         IsKnockoutDraftCompleted = false;
         IsTournamentCompleted = false;
     }
 
     public string Name { get; set; } = string.Empty;
-    public string InviteCode { get; private set; }
-    public LeagueSettings Settings { get; private set; }
-    public ICollection<Team> Teams { get; init; }
-    public ICollection<Draft> Drafts { get; init; }
-    public ICollection<MatchResult> MatchResults { get; private set; }
+    public string InviteCode { get; private set; } = null!;
+    public LeagueSettings Settings { get; private set; } = null!;
+    public ICollection<Team> Teams { get; init; } = null!;
+    public ICollection<Draft> Drafts { get; init; } = null!;
+    public ICollection<MatchResult> MatchResults { get; private set; } = null!;
     public bool IsGroupStageCompleted { get; private set; }
     public bool IsKnockoutDraftCompleted { get; private set; }
     public bool IsTournamentCompleted { get; private set; }
 
-    public static League Empty() => new();
+    public static League Empty() => new(string.Empty, new LeagueSettings());
+
+    public static League Create(string name, LeagueSettings settings) => new(name, settings);
 
     public void AdmitTeam(Team team)
     {

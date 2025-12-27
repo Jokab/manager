@@ -23,7 +23,7 @@ public class CreateTeamTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
         var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
-        var (_, createLeagueDto) = await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+        var (_, createLeagueDto) = await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
         Assert.NotNull(createLeagueDto);
 
         var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id, LeagueId = createLeagueDto.Id };
