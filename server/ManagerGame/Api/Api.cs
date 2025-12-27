@@ -117,8 +117,9 @@ internal static class Api
         ICommandHandler<CreateTeamCommand, Team> handler, // gör alla andra såna här okså
         CancellationToken cancellationToken = default)
     {
+        if (request.LeagueId is null) return TypedResults.Problem("LeagueId is required");
         var result = await handler.Handle(new CreateTeamCommand
-                { Name = new TeamName(request.Name!), ManagerId = request.ManagerId!.Value },
+                { Name = new TeamName(request.Name!), ManagerId = request.ManagerId!.Value, LeagueId = request.LeagueId.Value },
             cancellationToken);
 
         if (result.IsSuccess) return TypedResults.Ok(new TeamDto(result.Value!));

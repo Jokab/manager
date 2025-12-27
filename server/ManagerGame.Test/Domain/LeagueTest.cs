@@ -7,7 +7,7 @@ public class LeagueTest
     {
         var sut = League.Empty();
 
-        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
 
         Assert.Single(sut.Drafts);
@@ -18,8 +18,8 @@ public class LeagueTest
     {
         var sut = League.Empty();
 
-        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
-        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
         sut.Drafts.First().Start();
 
@@ -32,8 +32,8 @@ public class LeagueTest
     {
         var sut = League.Empty();
 
-        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
-        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
         sut.Drafts.First().Start();
 
@@ -44,8 +44,8 @@ public class LeagueTest
     public void CannotCreateDraftWithCreatedDraft()
     {
         var sut = League.Empty();
-        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
-        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
 
         Assert.Equal(DraftState.Created, sut.Drafts.Single().State);
@@ -57,8 +57,8 @@ public class LeagueTest
     public void CannotCreateDraftWithStartedDraft()
     {
         var sut = League.Empty();
-        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut));
-        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
+        sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
         sut.Drafts.First().Start();
 

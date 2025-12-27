@@ -37,7 +37,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            League.Empty());
+            League.Empty().Id);
 
         var newPlayer = TestData.Player(country);
 
@@ -56,7 +56,7 @@ public class TeamTest
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            League.Empty());
+            League.Empty().Id);
 
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);
@@ -86,17 +86,6 @@ public class TeamTest
         team.SignPlayer(newPlayer);
 
         Assert.Contains(newPlayer, team.Players.Select(x => x.Player));
-    }
-
-    [Fact]
-    public void CannotSignSignedPlayer()
-    {
-        var team = TestData.TeamEmpty("Team");
-
-        var signedPlayer = TestData.Player(position: Position.Midfielder);
-        signedPlayer.TeamId = Guid.NewGuid();
-
-        Assert.Throws<ArgumentException>(() => team.SignPlayer(signedPlayer));
     }
 
     [Fact]

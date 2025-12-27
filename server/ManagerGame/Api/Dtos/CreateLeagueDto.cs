@@ -14,9 +14,9 @@ public class CreateLeagueDto
     public CreateLeagueDto(League league)
     {
         Id = league.Id;
-        Teams = league.Teams.ToList();
+        Teams = league.Teams.Select(x => new TeamDto(x)).ToList();
     }
 
     public Guid Id { get; set; }
-    public List<Team> Teams { get; set; }
+    public List<TeamDto> Teams { get; set; }
 }

@@ -10,7 +10,7 @@ public static class TestData
             new CountryRec(country));
 
     public static Team TeamEmpty(string name) =>
-        Team.Create(new TeamName(name), Guid.NewGuid(), [], League.Empty());
+        Team.Create(new TeamName(name), Guid.NewGuid(), [], League.Empty().Id);
 
     public static Team TeamWithValidFullSquad(string name = "Lag")
     {
@@ -52,6 +52,6 @@ public static class TestData
         return Team.Create(new TeamName(name),
             Guid.NewGuid(),
             players,
-            League.Empty());
+            League.Empty().Id);
     }
 }

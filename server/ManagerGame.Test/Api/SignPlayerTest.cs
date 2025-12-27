@@ -25,7 +25,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
 
-        var (_, newTeam) = await Seed.SeedAndLogin(_httpClient);
+        var (_, _, newTeam) = await Seed.SeedAndLogin(_httpClient);
 
         var player = TestData.Player();
         db.Players.Add(player);
@@ -46,9 +46,8 @@ public class SignPlayerTest : IClassFixture<Fixture>
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
         Assert.Single(team!.Players);
 
-        Assert.Equal("Jakob", team.Players.First().Name.Name);
-        Assert.Equal(Position.Defender, team.Players.First().Position);
-        Assert.Equal(team.Id, team.Players.First().TeamId);
-        Assert.Equal(Country.Se, team.Players.First().Country.Country);
+        Assert.Equal("Jakob", team.Players.First().Name);
+        Assert.Equal(Position.Defender.ToString(), team.Players.First().Position);
+        Assert.Equal(Country.Se.ToString(), team.Players.First().Country);
     }
 }

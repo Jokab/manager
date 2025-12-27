@@ -6,9 +6,12 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext)
     public async Task<Result<Team>> Handle(CreateTeamCommand command,
         CancellationToken cancellationToken = default)
     {
+        var league = await dbContext.Leagues2.Find(command.LeagueId, cancellationToken);
+        if (league is null) return Result<Team>.Failure(Error.NotFound);
+
         var manager = await dbContext.Managers2.Find(command.ManagerId, cancellationToken);
         if (manager == null) return Result<Team>.Failure(Error.NotFound);
-        var team = Team.Create(command.Name, manager.Id, [], null);
+        var team = Team.Create(command.Name, manager.Id, [], league.Id);
 
         manager.AddTeam(team);
 

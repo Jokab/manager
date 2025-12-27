@@ -18,13 +18,13 @@ public sealed class Team : Entity
         TeamName name,
         Guid managerId,
         ICollection<TeamPlayer> players,
-        League? league)
+        Guid leagueId)
         : base(id)
     {
         Name = name;
         ManagerId = managerId;
         Players = players;
-        League = league;
+        LeagueId = leagueId;
         StartingElevens = [];
         TotalPoints = 0;
     }
@@ -33,16 +33,16 @@ public sealed class Team : Entity
     public Guid ManagerId { get; init; }
     public ICollection<TeamPlayer> Players { get; init; }
     public ICollection<StartingEleven> StartingElevens { get; init; }
-    public Guid? LeagueId { get; }
-    public League? League { get; private init; }
+    public Guid LeagueId { get; private set; }
+    public League League { get; private set; } = null!;
     public int TotalPoints { get; private set; }
 
     public static Team Create(TeamName name,
         Guid managerId,
         ICollection<Player> players,
-        League? league)
+        Guid leagueId)
     {
-        var team = new Team(Guid.NewGuid(), name, managerId, [], league);
+        var team = new Team(Guid.NewGuid(), name, managerId, [], leagueId);
         foreach (var player in players) team.SignPlayer(player);
 
         return team;
@@ -50,7 +50,6 @@ public sealed class Team : Entity
 
     public void SignPlayer(Player newPlayer)
     {
-        if (newPlayer.IsSigned) throw new ArgumentException("Player is already signed");
         if (Players.Any(x => x.PlayerId == newPlayer.Id)) throw new ArgumentException($"Player with ID {newPlayer.Id} already added");
         if (Players.Count(x => x.Player.Country == newPlayer.Country) >= PlayersFromSameCountryLimit)
             throw new ArgumentException($"Cannot have more players than {PlayersFromSameCountryLimit} of same country");
@@ -61,7 +60,6 @@ public sealed class Team : Entity
                 $"Signing {newPlayer.Position.ToString()} will make it impossible to form valid formation");
 
         Players.Add(new TeamPlayer(Guid.NewGuid(), this, newPlayer));
-        newPlayer.TeamId = Id;
     }
 
     public StartingEleven CreateStartingEleven(string matchRound)

@@ -13,24 +13,24 @@ public record TeamDto
 
     public TeamDto(Team team)
     {
-        Players = [.. team.Players.Select(x => x.Player)];
+        Players = team.Players.Select(x => new PlayerDto(x.Player)).ToList();
         Id = team.Id;
         CreatedDate = team.CreatedDate;
         UpdatedDate = team.UpdatedDate;
         DeletedDate = team.DeletedDate;
         Name = team.Name.Name;
         ManagerId = team.ManagerId;
-        League = team.League;
+        LeagueId = team.LeagueId;
     }
 
     public Guid Id { get; set; }
 
     public string Name { get; set; }
     public Guid ManagerId { get; set; }
-    public List<Player> Players { get; set; }
+    public List<PlayerDto> Players { get; set; }
+    public Guid LeagueId { get; set; }
 
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public DateTime? DeletedDate { get; set; }
-    public League? League { get; set; }
 }

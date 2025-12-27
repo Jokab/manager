@@ -14,11 +14,9 @@ public class Player : Entity
         Eliminated = false;
     }
 
-    public Guid? TeamId { get; set; }
     public PlayerName Name { get; init; }
     public Position Position { get; init; }
     public CountryRec Country { get; init; }
-    public bool IsSigned => TeamId != null;
 
     // Added for match tracking
     public bool Eliminated { get; set; }

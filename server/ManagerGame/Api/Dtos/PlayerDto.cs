@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ManagerGame.Api.Dtos;
 
-internal record PlayerDto
+public record PlayerDto
 {
     public PlayerDto(Player player)
     {
@@ -12,9 +12,7 @@ internal record PlayerDto
         DeletedDate = player.DeletedDate;
         Country = player.Country.Country.ToString();
         Name = player.Name.Name;
-        TeamId = player.TeamId;
         Position = player.Position.ToString();
-        IsSigned = player.IsSigned;
     }
 
     [JsonConstructor]
@@ -31,9 +29,7 @@ internal record PlayerDto
     public DateTime CreatedDate { get; set; }
 
     public Guid Id { get; set; }
-    public Guid? TeamId { get; set; }
     public string Name { get; init; }
     public string Position { get; init; }
     public string Country { get; init; }
-    public bool IsSigned { get; set; }
 }

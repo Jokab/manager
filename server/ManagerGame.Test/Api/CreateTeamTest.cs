@@ -2,6 +2,7 @@ using System.Net;
 using ManagerGame.Api.Dtos;
 using ManagerGame.Api.Requests;
 using ManagerGame.Core;
+using ManagerGame.Core.Leagues;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Api;
@@ -22,7 +23,10 @@ public class CreateTeamTest : IClassFixture<Fixture>
     {
         var db = TestDbFactory.Create(_fixture);
         var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
-        var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id };
+        var (_, createLeagueDto) = await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+        Assert.NotNull(createLeagueDto);
+
+        var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id, LeagueId = createLeagueDto.Id };
 
         var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
 
@@ -56,7 +60,7 @@ public class UnauthorizedTeamTest : IClassFixture<Fixture>
         _httpClient.DefaultRequestHeaders.Authorization = null;
 
         var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams",
-            new CreateTeamRequest { Name = "Lag", ManagerId = manager!.Id });
+            new CreateTeamRequest { Name = "Lag", ManagerId = manager!.Id, LeagueId = Guid.NewGuid() });
 
         Assert.Equal(HttpStatusCode.Unauthorized, createTeamResponse.StatusCode);
         Assert.Null(team);

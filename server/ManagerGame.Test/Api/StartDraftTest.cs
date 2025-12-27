@@ -24,22 +24,17 @@ public class StartDraftTest : IClassFixture<Fixture>
 
         var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
 
-        var teams = new List<TeamDto>();
-        for (var i = 0; i < 4; i++)
-        {
-            var (_, t) = await _httpClient.Post<TeamDto>("/api/teams",
-                new CreateTeamRequest { Name = $"Lag-{i}-{Guid.NewGuid()}", ManagerId = manager.Id });
-            teams.Add(t!);
-        }
         var (_, createLeagueDto) =
             await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
         Assert.NotNull(createLeagueDto);
         var leagueId = createLeagueDto.Id;
 
-        foreach (var t in teams)
+        var teams = new List<TeamDto>();
+        for (var i = 0; i < 4; i++)
         {
-            await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
-                new AdmitTeamRequest { LeagueId = leagueId, TeamId = t.Id });
+            var (_, t) = await _httpClient.Post<TeamDto>("/api/teams",
+                new CreateTeamRequest { Name = $"Lag-{i}-{Guid.NewGuid()}", ManagerId = manager.Id, LeagueId = leagueId });
+            teams.Add(t!);
         }
 
         var (http, createDraftDto) =

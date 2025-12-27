@@ -13,8 +13,10 @@ public record AdmitTeamDto
 
     public AdmitTeamDto(League league)
     {
-        League = league;
+        LeagueId = league.Id;
+        Teams = league.Teams.Select(x => new TeamDto(x)).ToList();
     }
 
-    public League League { get; set; }
+    public Guid LeagueId { get; set; }
+    public List<TeamDto> Teams { get; set; }
 }
