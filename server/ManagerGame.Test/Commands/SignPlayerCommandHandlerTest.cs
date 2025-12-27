@@ -28,14 +28,16 @@ public class SignPlayerCommandHandlerTest
         await using var db = CreateDb();
         var league = League.Empty();
         var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
-        var team = Team.Create(new TeamName("Laget"), manager.Id, [], league.Id);
         var player = TestData.Player();
 
-        manager.AddTeam(team);
         db.Leagues.Add(league);
         db.Managers.Add(manager);
-        db.Teams.Add(team);
         db.Players.Add(player);
+        await db.SaveChangesAsync(); // Save to get IDs
+
+        var team = Team.Create(new TeamName("Laget"), manager.Id, [], league.Id);
+        manager.AddTeam(team);
+        db.Teams.Add(team);
         await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
@@ -59,13 +61,16 @@ public class SignPlayerCommandHandlerTest
         await using var db = CreateDb();
         var league = League.Empty();
         var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
-        var team = Team.Create(new TeamName("Laget"), manager.Id, [], league.Id);
         var player = TestData.Player();
-        manager.AddTeam(team);
+
         db.Leagues.Add(league);
         db.Managers.Add(manager);
-        db.Teams.Add(team);
         db.Players.Add(player);
+        await db.SaveChangesAsync(); // Save to get IDs
+
+        var team = Team.Create(new TeamName("Laget"), manager.Id, [], league.Id);
+        manager.AddTeam(team);
+        db.Teams.Add(team);
         await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
@@ -84,16 +89,18 @@ public class SignPlayerCommandHandlerTest
         var league1 = League.Empty();
         var league2 = League.Empty();
         var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
-        var team1 = Team.Create(new TeamName("Laget1"), manager.Id, [], league1.Id);
-        var team2 = Team.Create(new TeamName("Laget2"), manager.Id, [], league2.Id);
         var player = TestData.Player();
 
-        manager.AddTeam(team1);
-        manager.AddTeam(team2);
         db.Leagues.AddRange(league1, league2);
         db.Managers.Add(manager);
-        db.Teams.AddRange(team1, team2);
         db.Players.Add(player);
+        await db.SaveChangesAsync(); // Save to get IDs
+
+        var team1 = Team.Create(new TeamName("Laget1"), manager.Id, [], league1.Id);
+        var team2 = Team.Create(new TeamName("Laget2"), manager.Id, [], league2.Id);
+        manager.AddTeam(team1);
+        manager.AddTeam(team2);
+        db.Teams.AddRange(team1, team2);
         await db.SaveChangesAsync();
 
         var sut = CreateHandler(db);
@@ -110,16 +117,18 @@ public class SignPlayerCommandHandlerTest
         await using var db = CreateDb();
         var league = League.Empty();
         var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
-        var team1 = Team.Create(new TeamName("Laget1"), manager.Id, [], league.Id);
-        var team2 = Team.Create(new TeamName("Laget2"), manager.Id, [], league.Id);
         var player = TestData.Player();
 
-        manager.AddTeam(team1);
-        manager.AddTeam(team2);
         db.Leagues.Add(league);
         db.Managers.Add(manager);
-        db.Teams.AddRange(team1, team2);
         db.Players.Add(player);
+        await db.SaveChangesAsync(); // Save to get IDs
+
+        var team1 = Team.Create(new TeamName("Laget1"), manager.Id, [], league.Id);
+        var team2 = Team.Create(new TeamName("Laget2"), manager.Id, [], league.Id);
+        manager.AddTeam(team1);
+        manager.AddTeam(team2);
+        db.Teams.AddRange(team1, team2);
         await db.SaveChangesAsync();
 
         var sut = CreateHandler(db);

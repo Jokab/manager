@@ -1,11 +1,19 @@
+using ManagerGame.Domain;
+
 namespace ManagerGame.Test.Domain;
 
 public class DraftTest
 {
+    // Helper method to set ID for domain tests (since EF Core won't generate them)
+    private static void SetId(Entity entity, Guid id)
+    {
+        entity.Id = id;
+    }
     [Fact]
     public void DoublePeakDraftOrderIsCorrect()
     {
         var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         var team1 = TestData.TeamWithValidFullSquad("Lag 1");
         var team2 = TestData.TeamWithValidFullSquad("Lag 2");
         var team3 = TestData.TeamWithValidFullSquad("Lag 3");
@@ -35,6 +43,7 @@ public class DraftTest
     {
         var team1 = TestData.TeamWithValidFullSquad();
         var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         league.AdmitTeam(team1);
         var draft = Draft.DoubledPeakTraversalDraft(league.Id, league.Teams.Select(x => x.Id).ToList());
 
@@ -46,6 +55,7 @@ public class DraftTest
     {
         var team1 = TestData.TeamWithValidFullSquad();
         var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         league.AdmitTeam(team1);
         var draft = Draft.DoubledPeakTraversalDraft(league.Id, league.Teams.Select(x => x.Id).ToList());
 
@@ -56,6 +66,7 @@ public class DraftTest
     public void DraftFinishesAfterRequiredPicks()
     {
         var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         var team1 = TestData.TeamWithValidFullSquad("Lag 1");
         var team2 = TestData.TeamWithValidFullSquad("Lag 2");
         league.AdmitTeam(team1);
@@ -75,6 +86,7 @@ public class DraftTest
     public void CannotExceedPicksPerTeam()
     {
         var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         var team1 = TestData.TeamWithValidFullSquad("Lag 1");
         var team2 = TestData.TeamWithValidFullSquad("Lag 2");
         league.AdmitTeam(team1);

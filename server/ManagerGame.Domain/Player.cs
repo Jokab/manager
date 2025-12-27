@@ -2,11 +2,10 @@ namespace ManagerGame.Domain;
 
 public class Player : Entity
 {
-    public Player(Guid id,
+    public Player(
         PlayerName name,
         Position position,
         CountryRec country)
-        : base(id)
     {
         Name = name;
         Position = position;

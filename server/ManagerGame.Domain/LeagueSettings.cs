@@ -2,7 +2,7 @@ namespace ManagerGame.Domain;
 
 public class LeagueSettings : Entity
 {
-    public LeagueSettings(Guid id) : base(id)
+    public LeagueSettings()
     {
         MaxPlayersFromSameCountry = 4;
         PointsPerGoal = 3;
@@ -12,12 +12,11 @@ public class LeagueSettings : Entity
     }
 
     public LeagueSettings(
-        Guid id,
         int maxPlayersFromSameCountry,
         int pointsPerGoal,
         int pointsPerWin,
         int pointsPerAssist,
-        int pointsPerCleanSheet) : base(id)
+        int pointsPerCleanSheet)
     {
         MaxPlayersFromSameCountry = maxPlayersFromSameCountry;
         PointsPerGoal = pointsPerGoal;

@@ -1,16 +1,29 @@
+using ManagerGame.Domain;
+
 namespace ManagerGame.Test;
 
 public static class TestData
 {
     public static Player Player(Country country = Country.Se,
-        Position position = Position.Defender) =>
-        new(Guid.NewGuid(),
+        Position position = Position.Defender)
+    {
+        var player = new Player(
             new PlayerName("Jakob"),
             position,
             new CountryRec(country));
+        // Set ID for domain tests (since EF Core won't generate them)
+        SetId(player, Guid.NewGuid());
+        return player;
+    }
 
-    public static Team TeamEmpty(string name) =>
-        Team.Create(new TeamName(name), Guid.NewGuid(), [], League.Empty().Id);
+    public static Team TeamEmpty(string name)
+    {
+        var league = League.Empty();
+        SetId(league, Guid.NewGuid());
+        var team = Team.Create(new TeamName(name), Guid.NewGuid(), [], league.Id);
+        SetId(team, Guid.NewGuid());
+        return team;
+    }
 
     public static Team TeamWithValidFullSquad(string name = "Lag")
     {
@@ -49,9 +62,19 @@ public static class TestData
         players.Add(Player(Country.Es));
         players.Add(Player(Country.Es));
 
-        return Team.Create(new TeamName(name),
+        var league = League.Empty();
+        SetId(league, Guid.NewGuid());
+        var team = Team.Create(new TeamName(name),
             Guid.NewGuid(),
             players,
-            League.Empty().Id);
+            league.Id);
+        SetId(team, Guid.NewGuid());
+        return team;
+    }
+
+    // Helper method to set ID for domain tests (since EF Core won't generate them)
+    private static void SetId(Entity entity, Guid id)
+    {
+        entity.Id = id;
     }
 }

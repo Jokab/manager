@@ -5,13 +5,13 @@ namespace ManagerGame.Domain;
 public class League : Entity
 {
     [JsonConstructor]
-    private League(Guid id) : base(id)
+    private League()
     {
         Teams = [];
         Drafts = [];
         MatchResults = [];
         InviteCode = GenerateInviteCode();
-        Settings = new LeagueSettings(Guid.NewGuid()) { LeagueId = Id };
+        Settings = new LeagueSettings();
         IsGroupStageCompleted = false;
         IsKnockoutDraftCompleted = false;
         IsTournamentCompleted = false;
@@ -27,7 +27,7 @@ public class League : Entity
     public bool IsKnockoutDraftCompleted { get; private set; }
     public bool IsTournamentCompleted { get; private set; }
 
-    public static League Empty() => new(Guid.NewGuid());
+    public static League Empty() => new();
 
     public void AdmitTeam(Team team)
     {

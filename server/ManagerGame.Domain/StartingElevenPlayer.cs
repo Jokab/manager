@@ -2,9 +2,9 @@ namespace ManagerGame.Domain;
 
 public class StartingElevenPlayer : Entity
 {
-    public StartingElevenPlayer(Guid id,
+    public StartingElevenPlayer(
         StartingEleven startingEleven,
-        Player player) : base(id)
+        Player player)
     {
         StartingElevenId = startingEleven.Id;
         StartingEleven = startingEleven;
@@ -13,8 +13,8 @@ public class StartingElevenPlayer : Entity
     }
 
     // For EF Core
-    private StartingElevenPlayer(Guid id, Guid startingElevenId, Guid playerId) : base(id) =>
-        (StartingElevenId, PlayerId) = (startingElevenId, playerId);
+    private StartingElevenPlayer() =>
+        (StartingElevenId, PlayerId) = (Guid.Empty, Guid.Empty);
 
     public Guid StartingElevenId { get; private init; }
     public virtual StartingEleven StartingEleven { get; private init; } = null!;

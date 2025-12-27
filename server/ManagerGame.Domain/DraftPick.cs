@@ -6,7 +6,7 @@ namespace ManagerGame.Domain;
 /// </summary>
 public class DraftPick : Entity
 {
-    private DraftPick(Guid id, Guid draftId, int pickNumber, Guid teamId, Guid playerId) : base(id)
+    private DraftPick(Guid draftId, int pickNumber, Guid teamId, Guid playerId)
     {
         DraftId = draftId;
         PickNumber = pickNumber;
@@ -16,7 +16,7 @@ public class DraftPick : Entity
     }
 
     // EF Core constructor
-    private DraftPick(Guid id) : base(id) { }
+    private DraftPick() { }
 
     public Guid DraftId { get; private init; }
     public int PickNumber { get; private init; }
@@ -25,8 +25,6 @@ public class DraftPick : Entity
     public DateTime PickedAt { get; private init; }
 
     internal static DraftPick Create(Guid draftId, int pickNumber, Guid teamId, Guid playerId)
-        // Use default key so EF Core will treat this as a new entity when it is discovered via a tracked aggregate
-        // navigation and will generate the Guid key when tracking it.
-        => new(Guid.Empty, draftId, pickNumber, teamId, playerId);
+        => new(draftId, pickNumber, teamId, playerId);
 }
 

@@ -2,23 +2,24 @@ namespace ManagerGame.Domain;
 
 public class Draft : Entity
 {
-    private Draft(Guid id,
+    private Draft(
         Guid leagueId,
         DraftOrder draftOrder,
-        IReadOnlyList<Guid> participantTeamIds) : base(id)
+        IReadOnlyList<Guid> participantTeamIds)
     {
         LeagueId = leagueId;
         DraftOrder = draftOrder;
-        Participants = participantTeamIds
-            .Select((teamId, seat) => DraftParticipant.Create(id, teamId, seat))
-            .ToList();
         Picks = [];
         State = DraftState.Created;
         PicksPerTeam = 0;
+        foreach (var (teamId, seat) in participantTeamIds.Select((teamId, seat) => (teamId, seat)))
+        {
+            Participants.Add(DraftParticipant.Create(teamId, seat));
+        }
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    private Draft(Guid id) : base(id)
+    private Draft()
     {
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -41,7 +42,6 @@ public class Draft : Entity
         if (participantTeamIds.Count == 0) throw new ArgumentException("No teams in league", nameof(participantTeamIds));
 
         return new Draft(
-            Guid.NewGuid(),
             leagueId,
             new DraftOrder(new DoubledPeakTraversalDraftOrder()),
             participantTeamIds);

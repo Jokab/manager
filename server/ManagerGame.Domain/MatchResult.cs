@@ -3,10 +3,9 @@ namespace ManagerGame.Domain;
 public class MatchResult : Entity
 {
     public MatchResult(
-        Guid id,
         DateTime matchDate,
         string homeTeamCountry,
-        string awayTeamCountry) : base(id)
+        string awayTeamCountry)
     {
         MatchDate = matchDate;
         HomeTeamCountry = homeTeamCountry;
@@ -15,6 +14,14 @@ public class MatchResult : Entity
         AwayGoals = 0;
         IsFinished = false;
         MatchEvents = [];
+    }
+
+    // For EF Core
+    private MatchResult()
+    {
+        MatchEvents = [];
+        HomeTeamCountry = string.Empty;
+        AwayTeamCountry = string.Empty;
     }
 
     public DateTime MatchDate { get; private set; }

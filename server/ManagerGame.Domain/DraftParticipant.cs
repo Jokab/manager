@@ -5,22 +5,22 @@ namespace ManagerGame.Domain;
 /// </summary>
 public class DraftParticipant : Entity
 {
-    private DraftParticipant(Guid id, Guid draftId, Guid teamId, int seat) : base(id)
+    private DraftParticipant(Guid teamId, int seat)
     {
-        DraftId = draftId;
         TeamId = teamId;
         Seat = seat;
     }
 
     // EF Core constructor
-    private DraftParticipant(Guid id) : base(id) { }
+    private DraftParticipant() { }
 
-    public Guid DraftId { get; private init; }
+    // FK set by EF when attached to a Draft aggregate.
+    public Guid DraftId { get; private set; }
     public Guid TeamId { get; private init; }
     public int Seat { get; private init; }
 
-    internal static DraftParticipant Create(Guid draftId, Guid teamId, int seat)
-        => new(Guid.NewGuid(), draftId, teamId, seat);
+    internal static DraftParticipant Create(Guid teamId, int seat)
+        => new(teamId, seat);
 }
 
 

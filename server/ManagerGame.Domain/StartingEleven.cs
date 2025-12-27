@@ -3,9 +3,8 @@ namespace ManagerGame.Domain;
 public class StartingEleven : Entity
 {
     public StartingEleven(
-        Guid id,
         Guid teamId,
-        string matchRound) : base(id)
+        string matchRound)
     {
         TeamId = teamId;
         MatchRound = matchRound;
@@ -15,7 +14,7 @@ public class StartingEleven : Entity
     }
 
     // For EF Core
-    private StartingEleven(Guid id) : base(id)
+    private StartingEleven()
     {
         SelectedPlayers = [];
     }
@@ -44,7 +43,7 @@ public class StartingEleven : Entity
         if (player.Position == Position.Goalkeeper && goalkeepers >= 1)
             throw new InvalidOperationException("Cannot select more than 1 goalkeeper");
 
-        SelectedPlayers.Add(new StartingElevenPlayer(Guid.NewGuid(), this, player));
+        SelectedPlayers.Add(new StartingElevenPlayer(this, player));
     }
 
     public void RemovePlayer(Guid playerId)

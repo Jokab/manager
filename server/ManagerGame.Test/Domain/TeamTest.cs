@@ -1,7 +1,14 @@
+using ManagerGame.Domain;
+
 namespace ManagerGame.Test.Domain;
 
 public class TeamTest
 {
+    // Helper method to set ID for domain tests (since EF Core won't generate them)
+    private static void SetId(Entity entity, Guid id)
+    {
+        entity.Id = id;
+    }
     [Fact]
     public void CanSignNewPlayer()
     {
@@ -34,10 +41,13 @@ public class TeamTest
     {
         var players = Enumerable.Range(0, Team.PlayersFromSameCountryLimit + initialPlayersCountOverLimit)
             .Select(_ => TestData.Player(country)).ToList();
+        var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            League.Empty().Id);
+            league.Id);
+        SetId(team, Guid.NewGuid());
 
         var newPlayer = TestData.Player(country);
 
@@ -53,10 +63,13 @@ public class TeamTest
     {
         var players = Enumerable.Range(0, Team.PlayersFromSameCountryLimit - initialPlayersCountBelowLimit)
             .Select(_ => TestData.Player(country)).ToList();
+        var league = League.Empty();
+        SetId(league, Guid.NewGuid());
         var team = Team.Create(new TeamName("Lag"),
             Guid.NewGuid(),
             players,
-            League.Empty().Id);
+            league.Id);
+        SetId(team, Guid.NewGuid());
 
         var newPlayer = TestData.Player(country);
         team.SignPlayer(newPlayer);

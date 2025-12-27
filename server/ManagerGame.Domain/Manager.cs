@@ -2,10 +2,9 @@ namespace ManagerGame.Domain;
 
 public class Manager : Entity
 {
-    private Manager(Guid id,
+    private Manager(
         ManagerName name,
         Email email)
-        : base(id)
     {
         Name = name;
         Email = email;
@@ -17,7 +16,7 @@ public class Manager : Entity
 
     public static Manager Create(ManagerName name,
         Email email) =>
-        new(Guid.NewGuid(), name, email);
+        new(name, email);
 
     public void AddTeam(Team team)
     {

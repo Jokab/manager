@@ -3,12 +3,11 @@ namespace ManagerGame.Domain;
 public class MatchEvent : Entity
 {
     public MatchEvent(
-        Guid id,
         Guid matchId,
         Guid playerId,
         MatchEventType eventType,
         bool isHomeTeam,
-        int minute) : base(id)
+        int minute)
     {
         MatchId = matchId;
         PlayerId = playerId;
@@ -16,6 +15,9 @@ public class MatchEvent : Entity
         IsHomeTeam = isHomeTeam;
         Minute = minute;
     }
+
+    // For EF Core
+    private MatchEvent() { }
 
     public Guid MatchId { get; private set; }
     public MatchResult Match { get; set; } = null!;

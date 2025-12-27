@@ -158,7 +158,7 @@ async Task SeedDb(IServiceScope serviceScope,
     static Player Player(Country country = Country.Se,
         Position position = Position.Defender)
     {
-        return new Player(Guid.NewGuid(),
+        return new Player(
             new PlayerName("Jakob"),
             position,
             new CountryRec(country));

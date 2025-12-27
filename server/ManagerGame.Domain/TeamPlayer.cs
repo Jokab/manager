@@ -2,7 +2,7 @@ namespace ManagerGame.Domain;
 
 public class TeamPlayer : Entity
 {
-    public TeamPlayer(Guid id, Team team, Player player) : base(id)
+    public TeamPlayer(Team team, Player player)
     {
         LeagueId = team.LeagueId;
         TeamId = team.Id;
@@ -12,8 +12,8 @@ public class TeamPlayer : Entity
     }
 
     // ReSharper disable once UnusedMember.Local used by EF core
-    private TeamPlayer(Guid id, Guid leagueId, Guid teamId, Guid playerId) : base(id) =>
-        (LeagueId, TeamId, PlayerId) = (leagueId, teamId, playerId);
+    private TeamPlayer() =>
+        (LeagueId, TeamId, PlayerId) = (Guid.Empty, Guid.Empty, Guid.Empty);
 
     public Guid LeagueId { get; private set; }
 

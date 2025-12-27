@@ -83,6 +83,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Configure all Entity types to auto-generate Guid IDs
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(Entity).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property(nameof(Entity.Id))
+                    .ValueGeneratedOnAdd();
+            }
+        }
+
         modelBuilder.Entity<Manager>().Navigation(x => x.Teams).AutoInclude();
         modelBuilder.Entity<Manager>()
             .HasMany(x => x.Teams)

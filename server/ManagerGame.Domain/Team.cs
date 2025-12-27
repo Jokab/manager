@@ -8,18 +8,17 @@ public sealed class Team : Entity
     public const int PlayerLimit = 22;
 
     [JsonConstructor]
-    private Team(Guid id) : base(id)
+    private Team()
     {
         Players = [];
         StartingElevens = [];
     }
 
-    private Team(Guid id,
+    private Team(
         TeamName name,
         Guid managerId,
         ICollection<TeamPlayer> players,
         Guid leagueId)
-        : base(id)
     {
         Name = name;
         ManagerId = managerId;
@@ -42,7 +41,7 @@ public sealed class Team : Entity
         ICollection<Player> players,
         Guid leagueId)
     {
-        var team = new Team(Guid.NewGuid(), name, managerId, [], leagueId);
+        var team = new Team(name, managerId, [], leagueId);
         foreach (var player in players) team.SignPlayer(player);
 
         return team;
@@ -59,7 +58,7 @@ public sealed class Team : Entity
             throw new ArgumentException(
                 $"Signing {newPlayer.Position.ToString()} will make it impossible to form valid formation");
 
-        Players.Add(new TeamPlayer(Guid.NewGuid(), this, newPlayer));
+        Players.Add(new TeamPlayer(this, newPlayer));
     }
 
     public StartingEleven CreateStartingEleven(string matchRound)
@@ -67,7 +66,7 @@ public sealed class Team : Entity
         if (StartingElevens.Any(se => se.MatchRound == matchRound))
             throw new InvalidOperationException($"Team already has a starting eleven for round {matchRound}");
 
-        var startingEleven = new StartingEleven(Guid.NewGuid(), Id, matchRound);
+        var startingEleven = new StartingEleven(Id, matchRound);
         StartingElevens.Add(startingEleven);
         return startingEleven;
     }
