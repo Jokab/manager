@@ -45,7 +45,7 @@ public class StartDraftTest : IClassFixture<Fixture>
 
         var (http2, startDraftDto) =
             await _httpClient.Post<StartDraftDto>("/api/drafts/start",
-                new StartDraftRequest { DraftId = createDraftDto.Id });
+                new StartDraftRequest { DraftId = createDraftDto.Id, PicksPerTeam = 1 });
 
         Assert.Equal(HttpStatusCode.OK, http2.StatusCode);
         Assert.NotNull(startDraftDto);

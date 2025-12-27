@@ -44,6 +44,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
+builder.Services.AddScoped<ITeamSigningService, TeamSigningService>();
 RegisterCommandHandlers();
 
 if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Testing"))
@@ -104,6 +105,7 @@ void RegisterCommandHandlers()
     AddCommandHandlerWithLogging<SignPlayerRequest, Team, SignPlayerCommandHandler>();
     AddCommandHandlerWithLogging<CreateDraftRequest, Draft, CreateDraftHandler>();
     AddCommandHandlerWithLogging<StartDraftRequest, Draft, StartDraftHandler>();
+    AddCommandHandlerWithLogging<PickDraftPlayerRequest, DraftPickOutcome, PickDraftPlayerHandler>();
     AddCommandHandlerWithLogging<CreateLeagueRequest, League, CreateLeagueHandler>();
     AddCommandHandlerWithLogging<AdmitTeamRequest, League, AdmitTeamHandler>();
 }

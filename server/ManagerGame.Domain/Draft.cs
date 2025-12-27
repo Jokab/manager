@@ -1,6 +1,3 @@
-using OneOf;
-using OneOf.Types;
-
 namespace ManagerGame.Domain;
 
 public class Draft : Entity
@@ -17,6 +14,7 @@ public class Draft : Entity
             .ToList();
         Picks = [];
         State = DraftState.Created;
+        PicksPerTeam = 0;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -32,6 +30,8 @@ public class Draft : Entity
 
     public ICollection<DraftParticipant> Participants { get; private init; } = [];
     public ICollection<DraftPick> Picks { get; private init; } = [];
+    public int PicksPerTeam { get; private set; }
+    public int TotalPicksTarget => PicksPerTeam <= 0 ? 0 : Participants.Count * PicksPerTeam;
 
     private Guid[] ParticipantTeamIdsOrdered =>
         Participants.OrderBy(x => x.Seat).Select(x => x.TeamId).ToArray();
@@ -49,7 +49,7 @@ public class Draft : Entity
 
     public Guid? PeekNextTeamId()
     {
-        if (State is DraftState.Created)
+        if (State is DraftState.Created or DraftState.Finished)
         {
             return null;
         }
@@ -68,6 +68,10 @@ public class Draft : Entity
     {
         if (State is DraftState.Created)
             throw new InvalidOperationException("Draft is not started");
+        if (State is DraftState.Finished)
+            throw new InvalidOperationException("Draft is finished");
+        if (PicksPerTeam <= 0)
+            throw new InvalidOperationException("Draft picks per team not configured");
 
         var expectedTeamId = PeekNextTeamId();
         if (expectedTeamId is null)
@@ -75,18 +79,29 @@ public class Draft : Entity
         if (expectedTeamId.Value != teamId)
             throw new InvalidOperationException("It's not your turn to draft");
 
+        var picksByTeam = Picks.Count(x => x.TeamId == teamId);
+        if (picksByTeam >= PicksPerTeam)
+            throw new InvalidOperationException("Team has already drafted the maximum number of players");
+
         var pick = DraftPick.Create(Id, Picks.Count + 1, teamId, playerId);
         Picks.Add(pick);
         AdvanceAndGetNextTeamId();
+        if (Picks.Count >= TotalPicksTarget)
+        {
+            State = DraftState.Finished;
+        }
         return pick;
     }
 
-    public void Start()
+    public void Start(int picksPerTeam)
     {
         if (State is DraftState.Started) throw new InvalidOperationException("Draft is already started");
+        if (State is DraftState.Finished) throw new InvalidOperationException("Draft already finished");
+        if (picksPerTeam <= 0) throw new ArgumentException("Picks per team must be greater than zero", nameof(picksPerTeam));
         const int minimumTeamCount = 2;
         if (Participants.Count < minimumTeamCount)
             throw new ArgumentException($"Too few teams to draft, needs at least {minimumTeamCount}");
+        PicksPerTeam = picksPerTeam;
         State = DraftState.Started;
     }
 }

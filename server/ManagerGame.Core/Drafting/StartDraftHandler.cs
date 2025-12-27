@@ -8,7 +8,8 @@ public class StartDraftHandler(ApplicationDbContext dbContext) : ICommandHandler
         var draft = await dbContext.Drafts2.Find(command.DraftId, cancellationToken);
         if (draft is null) return Result<Draft>.Failure(Error.NotFound);
 
-        draft.Start();
+        var picksPerTeam = command.PicksPerTeam.GetValueOrDefault(Team.PlayerLimit);
+        draft.Start(picksPerTeam);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

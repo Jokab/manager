@@ -109,6 +109,7 @@ export async function createDraft(requestBody: CreateDraftRequest, token: string
 // 8. StartDraft (POST /api/drafts/start) - Requires JWT token
 export interface StartDraftRequest {
   draftId: string
+  picksPerTeam?: number
 }
 
 export async function startDraft(requestBody: StartDraftRequest, token: string): Promise<StartDraftDto> {

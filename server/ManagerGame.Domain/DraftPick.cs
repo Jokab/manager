@@ -25,6 +25,8 @@ public class DraftPick : Entity
     public DateTime PickedAt { get; private init; }
 
     internal static DraftPick Create(Guid draftId, int pickNumber, Guid teamId, Guid playerId)
-        => new(Guid.NewGuid(), draftId, pickNumber, teamId, playerId);
+        // Use default key so EF Core will treat this as a new entity when it is discovered via a tracked aggregate
+        // navigation and will generate the Guid key when tracking it.
+        => new(Guid.Empty, draftId, pickNumber, teamId, playerId);
 }
 

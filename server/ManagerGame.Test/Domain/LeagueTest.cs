@@ -21,7 +21,7 @@ public class LeagueTest
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
-        sut.Drafts.First().Start();
+        sut.Drafts.First().Start(Team.PlayerLimit);
 
         Assert.Equal(DraftState.Started, sut.Drafts.First().State);
     }
@@ -35,9 +35,9 @@ public class LeagueTest
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
-        sut.Drafts.First().Start();
+        sut.Drafts.First().Start(Team.PlayerLimit);
 
-        Assert.Throws<InvalidOperationException>(() => sut.Drafts.First().Start());
+        Assert.Throws<InvalidOperationException>(() => sut.Drafts.First().Start(Team.PlayerLimit));
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class LeagueTest
         sut.AdmitTeam(Team.Create(new TeamName("Lag"), Guid.NewGuid(), [], sut.Id));
         sut.AdmitTeam(Team.Create(new TeamName("Lag2"), Guid.NewGuid(), [], sut.Id));
         sut.CreateDraft();
-        sut.Drafts.First().Start();
+        sut.Drafts.First().Start(Team.PlayerLimit);
 
         Assert.Equal(DraftState.Started, sut.Drafts.Single().State);
 

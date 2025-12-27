@@ -29,6 +29,7 @@ internal static class Api
         api.MapGet("drafts/{id:guid}", GetDraft).RequireAuthorization("user");
         api.MapPost("drafts", CreateDraft).RequireAuthorization("user");
         api.MapPost("drafts/start", StartDraft).RequireAuthorization("user");
+        api.MapPost("drafts/pick", PickDraftPlayer).RequireAuthorization("user");
 
         api.MapGet("leagues/{id:guid}", GetLeague).RequireAuthorization("user");
         api.MapPost("leagues", CreateLeague).RequireAuthorization("user");
@@ -86,6 +87,32 @@ internal static class Api
         await hubContext.Clients.All.SendCoreAsync("signedPlayer", [request.TeamId, request.PlayerId]);
 
         return TypedResults.Ok(new SignPlayerDto());
+    }
+
+    private static async Task<Results<Ok<DraftPickResultDto>, ProblemHttpResult>> PickDraftPlayer(
+        PickDraftPlayerRequest request,
+        ICommandHandler<PickDraftPlayerRequest, DraftPickOutcome> handler,
+        IHubContext<TestHub> hubContext)
+    {
+        var result = await handler.Handle(request);
+        if (result.IsFailure)
+            return TypedResults.Problem(result.Error.Code);
+
+        var outcome = result.Value!;
+
+        await hubContext.Clients.All.SendCoreAsync("signedPlayer", [request.TeamId, request.PlayerId]);
+        await hubContext.Clients.All.SendAsync("draftPickMade", new
+        {
+            outcome.Draft.Id,
+            outcome.Draft.LeagueId,
+            outcome.Pick.PickNumber,
+            outcome.Pick.TeamId,
+            outcome.Pick.PlayerId,
+            outcome.NextTeamId,
+            outcome.Draft.State
+        });
+
+        return TypedResults.Ok(new DraftPickResultDto(outcome.Draft, outcome.Pick, outcome.NextTeamId));
     }
 
     private static async Task<Ok<List<PlayerDto>>> GetPlayers(ApplicationDbContext dbContext,
@@ -160,7 +187,7 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var draft = await dbContext.Drafts.FindAsync([id, cancellationToken], cancellationToken);
+        var draft = await dbContext.Drafts2.Find(id, cancellationToken);
         return TypedResults.Ok(new DraftDto(draft!));
     }
 

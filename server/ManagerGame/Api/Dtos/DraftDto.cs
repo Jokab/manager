@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ManagerGame.Api.Dtos;
 
-internal record DraftDto
+public record DraftDto
 {
     [JsonConstructor]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -41,8 +41,13 @@ internal record DraftDto
     public DraftState State { get; private set; }
 }
 
-internal record DraftPickDto
+public record DraftPickDto
 {
+    [JsonConstructor]
+    public DraftPickDto()
+    {
+    }
+
     public DraftPickDto(DraftPick pick)
     {
         Id = pick.Id;
@@ -57,4 +62,27 @@ internal record DraftPickDto
     public Guid TeamId { get; set; }
     public Guid PlayerId { get; set; }
     public DateTime PickedAt { get; set; }
+}
+
+public record DraftPickResultDto
+{
+    [JsonConstructor]
+    public DraftPickResultDto()
+    {
+    }
+
+    public DraftPickResultDto(Draft draft, DraftPick pick, Guid? nextTeamId)
+    {
+        DraftId = draft.Id;
+        LeagueId = draft.LeagueId;
+        Pick = new DraftPickDto(pick);
+        NextTeamId = nextTeamId;
+        DraftState = draft.State;
+    }
+
+    public Guid DraftId { get; set; }
+    public Guid LeagueId { get; set; }
+    public DraftPickDto Pick { get; set; } = null!;
+    public Guid? NextTeamId { get; set; }
+    public DraftState DraftState { get; set; }
 }

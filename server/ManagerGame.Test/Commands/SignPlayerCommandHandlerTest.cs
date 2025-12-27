@@ -39,7 +39,7 @@ public class SignPlayerCommandHandlerTest
         await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
-        var sut = new SignPlayerCommandHandler(db);
+        var sut = CreateHandler(db);
 
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
@@ -69,7 +69,7 @@ public class SignPlayerCommandHandlerTest
         await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
-        var sut = new SignPlayerCommandHandler(db);
+        var sut = CreateHandler(db);
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
         var signResult = await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
@@ -96,7 +96,7 @@ public class SignPlayerCommandHandlerTest
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        var sut = new SignPlayerCommandHandler(db);
+        var sut = CreateHandler(db);
         var r1 = await sut.Handle(new SignPlayerRequest(team1.Id, player.Id));
         var r2 = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
 
@@ -122,7 +122,7 @@ public class SignPlayerCommandHandlerTest
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        var sut = new SignPlayerCommandHandler(db);
+        var sut = CreateHandler(db);
         var r1 = await sut.Handle(new SignPlayerRequest(team1.Id, player.Id));
         var r2 = await sut.Handle(new SignPlayerRequest(team2.Id, player.Id));
 
@@ -130,4 +130,7 @@ public class SignPlayerCommandHandlerTest
         Assert.True(r2.IsFailure);
         Assert.Equal("Player already drafted in this league", r2.Error.Code);
     }
+
+    private static SignPlayerCommandHandler CreateHandler(ApplicationDbContext db) =>
+        new(new TeamSigningService(db));
 }
