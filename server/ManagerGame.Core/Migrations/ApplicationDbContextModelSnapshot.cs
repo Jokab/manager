@@ -653,7 +653,7 @@ namespace ManagerGame.Core.Migrations
 
                             b1.HasKey("DraftId");
 
-                            b1.ToTable("drafts");
+                            b1.ToTable("drafts", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("DraftId")

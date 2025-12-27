@@ -6,6 +6,8 @@ public class StartingElevenConfiguration : IEntityTypeConfiguration<StartingElev
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<StartingEleven> builder)
     {
+        // Keep table name stable even if DbSet properties are removed from DbContext.
+        builder.ToTable("starting_elevens");
         builder.HasKey(x => x.Id);
     }
 }
