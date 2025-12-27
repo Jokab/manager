@@ -74,12 +74,15 @@ internal static class Api
         return TypedResults.Ok(new AdmitTeamDto(result.Value!));
     }
 
-    private static async Task<Ok<SignPlayerDto>> SignPlayer(
+    private static async Task<Results<Ok<SignPlayerDto>, ProblemHttpResult>> SignPlayer(
         SignPlayerRequest request,
         ICommandHandler<SignPlayerRequest, Team> handler,
         IHubContext<TestHub> hubContext)
     {
-        await handler.Handle(request);
+        var result = await handler.Handle(request);
+        if (result.IsFailure)
+            return TypedResults.Problem(result.Error.Code);
+
         await hubContext.Clients.All.SendCoreAsync("signedPlayer", [request.TeamId, request.PlayerId]);
 
         return TypedResults.Ok(new SignPlayerDto());
@@ -144,7 +147,11 @@ internal static class Api
         ApplicationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        var team = await dbContext.Teams.FindAsync([id, cancellationToken], cancellationToken);
+        var team = await dbContext.Teams
+            .Include(x => x.Players)
+            .ThenInclude(x => x.Player)
+            .Include(x => x.League)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return TypedResults.Ok(new TeamDto(team!));
     }
 

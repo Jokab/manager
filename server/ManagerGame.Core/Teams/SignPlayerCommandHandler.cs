@@ -1,6 +1,9 @@
 namespace ManagerGame.Core.Teams;
 
-public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepository<Team> teamRepo)
+public class SignPlayerCommandHandler(
+    IRepository<Player> playerRepo,
+    IRepository<Team> teamRepo,
+    IRepository<TeamPlayer> teamPlayerRepo)
     : ICommandHandler<SignPlayerRequest, Team>
 {
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
@@ -15,10 +18,11 @@ public class SignPlayerCommandHandler(IRepository<Player> playerRepo, IRepositor
         try
         {
             team.SignPlayer(player);
-            // Update the player first since its TeamId was changed
-            await playerRepo.Update(player, cancellationToken);
-            // Then update the team with the new player
-            await teamRepo.Update(team, cancellationToken);
+            // Persist the join entity explicitly.
+            // Relying on aggregate graph updates has proven brittle across providers (SQLite/Postgres),
+            // and can lead to UPDATEs against non-existent rows.
+            var teamPlayer = team.Players.Last();
+            await teamPlayerRepo.Add(teamPlayer, cancellationToken);
         }
         catch (Exception e)
         {

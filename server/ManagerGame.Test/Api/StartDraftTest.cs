@@ -1,5 +1,6 @@
 using System.Net;
 using ManagerGame.Api.Dtos;
+using ManagerGame.Api.Requests;
 using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 
@@ -21,17 +22,28 @@ public class StartDraftTest : IClassFixture<Fixture>
     {
         TestDbFactory.Create(_fixture);
 
-        (_, var team) = await Seed.SeedAndLogin(_httpClient);
+        (var manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
+
+        var teams = new List<TeamDto>();
+        for (var i = 0; i < 4; i++)
+        {
+            (_, var t) = await _httpClient.Post<TeamDto>("/api/teams",
+                new CreateTeamRequest { Name = $"Lag-{i}-{Guid.NewGuid()}", ManagerId = manager.Id });
+            teams.Add(t!);
+        }
         (_, var createLeagueDto) =
             await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest());
+        Assert.NotNull(createLeagueDto);
+        var leagueId = createLeagueDto.Id;
 
-        await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
-            new AdmitTeamRequest { LeagueId = createLeagueDto!.Id, TeamId = team.Id });
-        await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
-            new AdmitTeamRequest { LeagueId = createLeagueDto.Id, TeamId = team.Id });
+        foreach (var t in teams)
+        {
+            await _httpClient.Post<CreateLeagueDto>("/api/leagues/admitTeam",
+                new AdmitTeamRequest { LeagueId = leagueId, TeamId = t.Id });
+        }
 
         (var http, var createDraftDto) =
-            await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(createLeagueDto.Id));
+            await _httpClient.Post<CreateDraftDto>("/api/drafts", new CreateDraftRequest(leagueId));
 
         Assert.Equal(HttpStatusCode.OK, http.StatusCode);
         Assert.NotNull(createDraftDto);

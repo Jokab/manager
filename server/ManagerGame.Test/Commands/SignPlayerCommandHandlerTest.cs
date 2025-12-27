@@ -17,18 +17,20 @@ public class SignPlayerCommandHandlerTest
         var player = TestData.Player();
         playerRepo.Find(player.Id).Returns(player);
 
+        var teamPlayerRepo = Substitute.For<IRepository<TeamPlayer>>();
+
         Assert.Empty(team.Players);
         Assert.Null(player.TeamId);
-        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
+        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo, teamPlayerRepo);
 
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
-        await teamRepo.Received().Update(Arg.Is<Team>(t =>
-            t.Players.First().Player.Id == player.Id
-            && t.Players.First().TeamId == team.Id
-            && t.Players.First().Player.Name.Name == "Jakob"
-            && t.Players.First().Player.Position == Position.Defender
-            && t.Players.First().Player.Country.Country == Country.Se));
+        await teamPlayerRepo.Received().Add(Arg.Is<TeamPlayer>(tp =>
+            tp.Player.Id == player.Id
+            && tp.TeamId == team.Id
+            && tp.Player.Name.Name == "Jakob"
+            && tp.Player.Position == Position.Defender
+            && tp.Player.Country.Country == Country.Se));
     }
 
     [Fact]
@@ -44,9 +46,11 @@ public class SignPlayerCommandHandlerTest
         var player = TestData.Player();
         playerRepo.Find(player.Id).Returns(player);
 
+        var teamPlayerRepo = Substitute.For<IRepository<TeamPlayer>>();
+
         Assert.Empty(team.Players);
         Assert.Empty(team2.Players);
-        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo);
+        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo, teamPlayerRepo);
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
         Assert.True(player.IsSigned);

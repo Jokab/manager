@@ -6,10 +6,10 @@ public class DraftTest
     public void DoublePeakDraftOrderIsCorrect()
     {
         var league = League.Empty();
-        var team1 = TestData.TeamWithValidFullSquad();
-        var team2 = TestData.TeamWithValidFullSquad();
-        var team3 = TestData.TeamWithValidFullSquad();
-        var team4 = TestData.TeamWithValidFullSquad();
+        var team1 = TestData.TeamWithValidFullSquad("Lag 1");
+        var team2 = TestData.TeamWithValidFullSquad("Lag 2");
+        var team3 = TestData.TeamWithValidFullSquad("Lag 3");
+        var team4 = TestData.TeamWithValidFullSquad("Lag 4");
         league.AdmitTeam(team1);
         league.AdmitTeam(team2);
         league.AdmitTeam(team3);

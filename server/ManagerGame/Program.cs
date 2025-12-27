@@ -46,7 +46,17 @@ builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 RegisterCommandHandlers();
 RegisterRepositories();
 
-builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
+if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Testing"))
+{
+    var connectionString =
+        configuration["Test:Sqlite:ConnectionString"]
+        ?? $"Data Source={Path.Combine(Path.GetTempPath(), "manager-test.db")}";
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
+}
+else
+{
+    builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
+}
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -91,6 +101,7 @@ void RegisterRepositories()
     builder.Services.AddTransient<IRepository<Manager>, Repository<Manager>>();
     builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
     builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
+    builder.Services.AddTransient<IRepository<TeamPlayer>, Repository<TeamPlayer>>();
     builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
     builder.Services.AddTransient<IRepository<League>, Repository<League>>();
 }
@@ -107,7 +118,8 @@ void RegisterCommandHandlers()
         sp.GetService<IConfiguration>()!));
     AddHandlerWithLogging(sp => new SignPlayerCommandHandler(
         sp.GetService<IRepository<Player>>()!,
-        sp.GetService<IRepository<Team>>()!));
+        sp.GetService<IRepository<Team>>()!,
+        sp.GetService<IRepository<TeamPlayer>>()!));
     AddHandlerWithLogging(sp => new CreateDraftHandler(
         sp.GetService<IRepository<Draft>>()!,
         sp.GetService<IRepository<League>>()!));

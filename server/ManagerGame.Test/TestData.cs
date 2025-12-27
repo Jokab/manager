@@ -12,7 +12,7 @@ public static class TestData
     public static Team TeamEmpty(string name) =>
         Team.Create(new TeamName(name), Guid.NewGuid(), [], League.Empty());
 
-    public static Team TeamWithValidFullSquad()
+    public static Team TeamWithValidFullSquad(string name = "Lag")
     {
         const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
         var goalkeepersRemaining = 1;
@@ -49,7 +49,7 @@ public static class TestData
         players.Add(Player(Country.Es));
         players.Add(Player(Country.Es));
 
-        return Team.Create(new TeamName("Lag"),
+        return Team.Create(new TeamName(name),
             Guid.NewGuid(),
             players,
             League.Empty());
