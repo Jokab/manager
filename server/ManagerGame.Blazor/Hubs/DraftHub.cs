@@ -24,7 +24,7 @@ public class DraftHub : Hub
     public async Task PickPlayer(Guid playerId, Guid draftId, Guid teamId)
     {
         var draft = await _dbContext.Drafts2.Find(draftId);
-        var player = await _dbContext.Players2.Find(playerId);
+        var player = await _dbContext.Players.FindAsync(playerId);
         var team = await _dbContext.Teams2.Find(teamId);
 
         if (draft == null || player == null || team == null)

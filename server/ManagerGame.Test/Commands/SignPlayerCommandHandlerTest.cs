@@ -45,7 +45,9 @@ public class SignPlayerCommandHandlerTest
 
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
-        var teamPlayers = await db.TeamPlayers2.GetAll();
+        var teamPlayers = await db.Set<TeamPlayer>()
+            .Include(x => x.Player)
+            .ToListAsync();
         Assert.Single(teamPlayers);
         var tp = teamPlayers.Single();
         Assert.Equal(player.Id, tp.Player.Id);

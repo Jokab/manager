@@ -34,47 +34,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .ThenInclude(x => x.SelectedPlayers),
         team => team.Id);
 
-    public AggregateRepository<Player, Guid> Players2 => new(
-        Set<Player>(),
-        Set<Player>()
-            .Include(x => x.TeamPlayers)
-            .Include(x => x.StartingElevenPlayers),
-        player => player.Id);
-
-    public AggregateRepository<TeamPlayer, Guid> TeamPlayers2 => new(
-        Set<TeamPlayer>(),
-        Set<TeamPlayer>().Include(x => x.Team).Include(x => x.Player),
-        teamPlayer => teamPlayer.Id);
-
-    public AggregateRepository<MatchResult, Guid> MatchResults2 => new(
-        Set<MatchResult>(),
-        Set<MatchResult>().Include(x => x.League).Include(x => x.MatchEvents),
-        match => match.Id);
-
-    public AggregateRepository<MatchEvent, Guid> MatchEvents2 => new(
-        Set<MatchEvent>(),
-        Set<MatchEvent>().Include(x => x.Match).Include(x => x.Player),
-        matchEvent => matchEvent.Id);
-
-    public AggregateRepository<StartingEleven, Guid> StartingElevens2 => new(
-        Set<StartingEleven>(),
-        Set<StartingEleven>().Include(x => x.Team).Include(x => x.SelectedPlayers),
-        startingEleven => startingEleven.Id);
-
-    public AggregateRepository<LeagueSettings, Guid> LeagueSettings2 => new(
-        Set<LeagueSettings>(),
-        Set<LeagueSettings>().Include(x => x.League),
-        leagueSettings => leagueSettings.Id);
-
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Player> Players { get; set; }
     public DbSet<Draft> Drafts { get; set; }
     public DbSet<League> Leagues { get; set; }
-    public DbSet<MatchResult> MatchResults { get; set; }
-    public DbSet<MatchEvent> MatchEvents { get; set; }
-    public DbSet<StartingEleven> StartingElevens { get; set; }
-    public DbSet<LeagueSettings> LeagueSettings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -12,7 +12,7 @@ public class TeamSigningService(ApplicationDbContext dbContext) : ITeamSigningSe
         var team = await dbContext.Teams2.Find(teamId, cancellationToken);
         if (team is null) return Result<Team>.Failure(Error.NotFound);
 
-        var player = await dbContext.Players2.Find(playerId, cancellationToken);
+        var player = await dbContext.Players.FindAsync([playerId], cancellationToken);
         if (player is null) return Result<Team>.Failure(Error.NotFound);
 
         var alreadyOwnedInLeague = await dbContext.Set<TeamPlayer>().AnyAsync(
@@ -27,8 +27,6 @@ public class TeamSigningService(ApplicationDbContext dbContext) : ITeamSigningSe
         try
         {
             team.SignPlayer(player);
-            var teamPlayer = team.Players.Last();
-            dbContext.TeamPlayers2.Add(teamPlayer);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateException e) when (IsUniqueRosterViolation(e))
