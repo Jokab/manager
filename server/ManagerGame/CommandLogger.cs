@@ -4,19 +4,20 @@ using ManagerGame.Core;
 
 namespace ManagerGame;
 
-public class LoggingDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult>
+public class LoggingDecorator<TCommand, TResult, TInnerHandler> : ICommandHandler<TCommand, TResult>
     where TCommand : class
     where TResult : class
+    where TInnerHandler : class, ICommandHandler<TCommand, TResult>
 {
-    private readonly ICommandHandler<TCommand, TResult> _innerHandler;
+    private readonly TInnerHandler _innerHandler;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, ReferenceHandler = ReferenceHandler.Preserve };
 
-    private readonly ILogger<LoggingDecorator<TCommand, TResult>> _logger;
+    private readonly ILogger<LoggingDecorator<TCommand, TResult, TInnerHandler>> _logger;
 
-    public LoggingDecorator(ICommandHandler<TCommand, TResult> innerHandler,
-        ILogger<LoggingDecorator<TCommand, TResult>> logger)
+    public LoggingDecorator(TInnerHandler innerHandler,
+        ILogger<LoggingDecorator<TCommand, TResult, TInnerHandler>> logger)
     {
         _innerHandler = innerHandler;
         _logger = logger;

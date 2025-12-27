@@ -8,6 +8,7 @@ using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;
 using ManagerGame.Core.Teams;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,7 +88,7 @@ app.MapApi();
 if (args.Contains("seed"))
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     ResetDb(db);
     await SeedDb(scope, db);
@@ -108,39 +109,23 @@ void RegisterRepositories()
 
 void RegisterCommandHandlers()
 {
-    AddHandlerWithLogging(sp => new CreateTeamCommandHandler(
-        sp.GetService<IRepository<Manager>>()!,
-        sp.GetService<IRepository<Team>>()!));
-    AddHandlerWithLogging(sp => new RegisterManagerCommandHandler(
-        sp.GetService<IRepository<Manager>>()!));
-    AddHandlerWithLogging(sp => new LoginCommandHandler(
-        sp.GetService<IRepository<Manager>>()!,
-        sp.GetService<IConfiguration>()!));
-    AddHandlerWithLogging(sp => new SignPlayerCommandHandler(
-        sp.GetService<IRepository<Player>>()!,
-        sp.GetService<IRepository<Team>>()!,
-        sp.GetService<IRepository<TeamPlayer>>()!));
-    AddHandlerWithLogging(sp => new CreateDraftHandler(
-        sp.GetService<ApplicationDbContext>()!,
-        sp.GetService<IRepository<League>>()!));
-    AddHandlerWithLogging(sp => new StartDraftHandler
-        (sp.GetService<ApplicationDbContext>()!));
-    AddHandlerWithLogging(sp => new CreateLeagueHandler(
-        sp.GetService<IRepository<League>>()!));
-    AddHandlerWithLogging(sp => new AdmitTeamHandler(
-        sp.GetService<IRepository<Team>>()!,
-        sp.GetService<IRepository<League>>()!));
+    AddCommandHandlerWithLogging<CreateTeamCommand, Team, CreateTeamCommandHandler>();
+    AddCommandHandlerWithLogging<RegisterManagerCommand, Manager, RegisterManagerCommandHandler>();
+    AddCommandHandlerWithLogging<LoginCommand, LoginResponse, LoginCommandHandler>();
+    AddCommandHandlerWithLogging<SignPlayerRequest, Team, SignPlayerCommandHandler>();
+    AddCommandHandlerWithLogging<CreateDraftRequest, Draft, CreateDraftHandler>();
+    AddCommandHandlerWithLogging<StartDraftRequest, Draft, StartDraftHandler>();
+    AddCommandHandlerWithLogging<CreateLeagueRequest, League, CreateLeagueHandler>();
+    AddCommandHandlerWithLogging<AdmitTeamRequest, League, AdmitTeamHandler>();
 }
 
-void AddHandlerWithLogging<TCommand, TResult>(Func<IServiceProvider, ICommandHandler<TCommand, TResult>> handler)
+void AddCommandHandlerWithLogging<TCommand, TResult, THandler>()
     where TCommand : class
     where TResult : class
+    where THandler : class, ICommandHandler<TCommand, TResult>
 {
-    builder.Services.AddScoped<ICommandHandler<TCommand, TResult>>(provider =>
-    {
-        var logger = provider.GetRequiredService<ILogger<LoggingDecorator<TCommand, TResult>>>();
-        return new LoggingDecorator<TCommand, TResult>(handler(provider), logger);
-    });
+    builder.Services.AddScoped<THandler>();
+    builder.Services.AddScoped<ICommandHandler<TCommand, TResult>, LoggingDecorator<TCommand, TResult, THandler>>();
 }
 
 void ResetDb(ApplicationDbContext? applicationDbContext)
@@ -161,14 +146,17 @@ void ResetDb(ApplicationDbContext? applicationDbContext)
 async Task SeedDb(IServiceScope serviceScope,
     ApplicationDbContext? db)
 {
-    var registerManagerCommandHandler = serviceScope.ServiceProvider.GetService<RegisterManagerCommandHandler>();
-    var manager = registerManagerCommandHandler!.Handle(new RegisterManagerCommand()
-        { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
-    Console.WriteLine("Created manager with id: " + manager.Result.Value?.Id);
+    var registerManagerCommandHandler =
+        serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
 
-    var createTeamCommandHandler = serviceScope.ServiceProvider.GetService<CreateTeamCommandHandler>();
-    await createTeamCommandHandler!.Handle(new CreateTeamCommand()
-        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Result.Value!.Id });
+    var manager = await registerManagerCommandHandler.Handle(new RegisterManagerCommand()
+        { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
+    Console.WriteLine("Created manager with id: " + manager.Value?.Id);
+
+    var createTeamCommandHandler =
+        serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
+    await createTeamCommandHandler.Handle(new CreateTeamCommand()
+        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Value!.Id });
 
 
     const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
