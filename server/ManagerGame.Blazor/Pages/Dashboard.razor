@@ -28,7 +28,7 @@
                 <MudCardContent>
                     @if (myTeams.Any())
                     {
-                        <MudList T="Team" Clickable="true">
+                        <MudList T="Team">
                             @foreach (var team in myTeams)
                             {
                                 <MudListItem T="Team" Href="@($"/team/{team.Id}")">
@@ -62,7 +62,7 @@
                 <MudCardContent>
                     @if (myLeagues.Any())
                     {
-                        <MudList T="League" Clickable="true">
+                        <MudList T="League">
                             @foreach (var league in myLeagues)
                             {
                                 <MudListItem T="League" Href="@($"/league/{league.Id}")">

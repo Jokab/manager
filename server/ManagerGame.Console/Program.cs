@@ -1,4 +1,4 @@
-﻿﻿using ManagerGame.Core;
+﻿using ManagerGame.Core;
 using ManagerGame.Core.Managers;
 using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;

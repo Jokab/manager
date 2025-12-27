@@ -46,10 +46,13 @@
     private RegistrationModel registrationModel = new();
     private bool success;
     private string[] errors = { };
-    private MudForm form;
+    private MudForm? form;
 
     private async Task HandleRegistration()
     {
+        if (form is null)
+            return;
+
         await form.Validate();
 
         if (success)

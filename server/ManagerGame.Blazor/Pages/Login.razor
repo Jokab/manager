@@ -35,10 +35,13 @@
     private LoginModel loginModel = new();
     private bool success;
     private string[] errors = { };
-    private MudForm form;
+    private MudForm? form;
 
     private async Task HandleLogin()
     {
+        if (form is null)
+            return;
+
         await form.Validate();
 
         if (success)
