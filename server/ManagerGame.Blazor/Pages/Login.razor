@@ -2,10 +2,12 @@
 @using System.ComponentModel.DataAnnotations
 @using ManagerGame.Core
 @using ManagerGame.Domain
+@using ManagerGame.Blazor.Services
 @using MudBlazor
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject CurrentManagerService CurrentManager
 
 <PageTitle>Logga in - Fantasy Manager</PageTitle>
 
@@ -62,6 +64,7 @@
 
                 // Simulate successful login
                 // In a real app, you would use authentication services
+                await CurrentManager.SetManagerAsync(manager.Id);
 
                 // Redirect to dashboard on successful login
                 NavigationManager.NavigateTo("/dashboard", true);

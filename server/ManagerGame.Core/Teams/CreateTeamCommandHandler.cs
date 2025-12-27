@@ -13,6 +13,7 @@ public class CreateTeamCommandHandler(ApplicationDbContext dbContext)
         if (manager == null) return Result<Team>.Failure(Error.NotFound);
         var team = Team.Create(command.Name, manager.Id, [], league.Id);
 
+        league.AdmitTeam(team);
         manager.AddTeam(team);
 
         dbContext.Teams2.Add(team);

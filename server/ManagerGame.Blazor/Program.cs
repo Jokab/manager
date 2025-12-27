@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using ManagerGame.Blazor.Services;
 using ManagerGame.Core;
 using ManagerGame.Domain;
 using ManagerGame.Blazor.Hubs;
@@ -30,6 +32,10 @@ builder.Services.AddMudServices(config =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Simple client-side persisted session (until real auth lands)
+builder.Services.AddScoped<ProtectedLocalStorage>();
+builder.Services.AddScoped<CurrentManagerService>();
 
 // SignalR
 builder.Services.AddSignalR();

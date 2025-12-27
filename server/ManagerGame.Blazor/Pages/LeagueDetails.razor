@@ -1,0 +1,369 @@
+@page "/league/{Id:guid}"
+@using ManagerGame.Core
+@using ManagerGame.Domain
+@using ManagerGame.Core.Teams
+@using ManagerGame.Blazor.Services
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject CurrentManagerService CurrentManager
+
+<PageTitle>@(_league?.Name ?? "Liga") - Fantasy Manager</PageTitle>
+
+@if (_league == null)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudProgressCircular Indeterminate="true" />
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudGrid>
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mb-4">
+                    <div>
+                        <MudText Typo="Typo.h3">@_league.Name</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
+                            Inbjudningskod: <MudChip T="string" Size="Size.Small" Color="Color.Primary">@_league.InviteCode</MudChip>
+                        </MudText>
+                    </div>
+                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/dashboard">
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1" /> Tillbaka
+                    </MudButton>
+                </div>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Class="mb-4" Style="height: 100%;">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">
+                                <MudIcon Icon="@Icons.Material.Filled.Settings" Class="mr-2" />
+                                Inställningar
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (_league.Settings != null)
+                        {
+                            <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Max spelare från samma land</strong></td>
+                                        <td>@_league.Settings.MaxPlayersFromSameCountry</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Poäng per mål</strong></td>
+                                        <td>@_league.Settings.PointsPerGoal</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Poäng per vinst</strong></td>
+                                        <td>@_league.Settings.PointsPerWin</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Poäng per assist</strong></td>
+                                        <td>@_league.Settings.PointsPerAssist</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Poäng per hållen nolla</strong></td>
+                                        <td>@_league.Settings.PointsPerCleanSheet</td>
+                                    </tr>
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">Inga inställningar tillgängliga</MudAlert>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Class="mb-4" Style="height: 100%;">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">
+                                <MudIcon Icon="@Icons.Material.Filled.People" Class="mr-2" />
+                                Managers (@_league.Teams.Count)
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (_currentManagerId is not null)
+                        {
+                            @if (!_hasTeamInLeague)
+                            {
+                                <MudAlert Severity="Severity.Info" Class="mb-3">
+                                    Du har inget lag i den här ligan ännu. Skapa ett lag för att gå med.
+                                </MudAlert>
+
+                                <MudTextField @bind-Value="_joinModel.TeamName"
+                                              Label="Lagnamn"
+                                              Variant="Variant.Outlined"
+                                              Required="true"
+                                              RequiredError="Lagnamn krävs" />
+                                <MudButton Class="mt-3"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Disabled="@_isJoining"
+                                           OnClick="CreateTeamAndJoin">
+                                    Skapa lag & gå med
+                                </MudButton>
+                            }
+                            else
+                            {
+                                <MudAlert Severity="Severity.Success" Class="mb-3">
+                                    Du är med i ligan med: <strong>@_myTeamInLeague!.Name.Name</strong>
+                                </MudAlert>
+                            }
+                        }
+
+                        @if (_league.Teams.Any())
+                        {
+                            <MudList T="Team" Dense="true">
+                                @foreach (var team in _league.Teams)
+                                {
+                                    <MudListItem T="Team">
+                                        <div class="d-flex justify-space-between align-center" style="width: 100%;">
+                                            <div>
+                                                <MudText Typo="Typo.body1">
+                                                    <strong>@team.Name.Name</strong>
+                                                </MudText>
+                                                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                                    @GetManagerName(team.ManagerId)
+                                                </MudText>
+                                            </div>
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Info">
+                                                @team.TotalPoints poäng
+                                            </MudChip>
+                                        </div>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">Inga lag har gått med i ligan ännu.</MudAlert>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">
+                                <MudIcon Icon="@Icons.Material.Filled.EventNote" Class="mr-2" />
+                                Drafts (@_league.Drafts.Count)
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (_league.Drafts.Any())
+                        {
+                            <MudTable Items="@_league.Drafts" Dense="true" Hover="true" Striped="true">
+                                <HeaderContent>
+                                    <MudTh>Draft</MudTh>
+                                    <MudTh>Status</MudTh>
+                                    <MudTh>Skapad</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>Draft @context.Id.ToString().Substring(0, 8)</MudTd>
+                                    <MudTd>
+                                        <MudChip T="string" Size="Size.Small" Color="@GetDraftStateColor(context.State)">
+                                            @GetDraftStateText(context.State)
+                                        </MudChip>
+                                    </MudTd>
+                                    <MudTd>@context.CreatedDate.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">Inga drafts har skapats ännu.</MudAlert>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">
+                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                                Ligastatus
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <div class="d-flex gap-4 flex-wrap">
+                            <MudChip T="string" Color="@(_league.IsGroupStageCompleted ? Color.Success : Color.Default)">
+                                Gruppspel: @(_league.IsGroupStageCompleted ? "Slutfört" : "Pågår")
+                            </MudChip>
+                            <MudChip T="string" Color="@(_league.IsKnockoutDraftCompleted ? Color.Success : Color.Default)">
+                                Slutspelsdraft: @(_league.IsKnockoutDraftCompleted ? "Slutfört" : "Ej startat")
+                            </MudChip>
+                            <MudChip T="string" Color="@(_league.IsTournamentCompleted ? Color.Success : Color.Default)">
+                                Turnering: @(_league.IsTournamentCompleted ? "Slutfört" : "Pågår")
+                            </MudChip>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private League? _league;
+    private Dictionary<Guid, Manager> _managers = new();
+    private Guid? _currentManagerId;
+    private bool _hasTeamInLeague;
+    private Team? _myTeamInLeague;
+    private bool _isJoining;
+    private JoinLeagueWithTeamModel _joinModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _league = await DbContext.Leagues2.Find(Id);
+
+        if (_league == null)
+        {
+            Snackbar.Add("Ligan kunde inte hittas", Severity.Error);
+            NavigationManager.NavigateTo("/dashboard");
+            return;
+        }
+
+        // Load managers separately since Manager is its own aggregate
+        var managerIds = _league.Teams.Select(t => t.ManagerId).Distinct().ToList();
+        var managers = await DbContext.Managers
+            .Where(m => managerIds.Contains(m.Id))
+            .ToListAsync();
+        _managers = managers.ToDictionary(m => m.Id);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await CurrentManager.InitializeAsync();
+        _currentManagerId = CurrentManager.ManagerId;
+        if (_currentManagerId is null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+            return;
+        }
+
+        UpdateMyTeamState();
+        StateHasChanged();
+    }
+
+    private void UpdateMyTeamState()
+    {
+        if (_league is null || _currentManagerId is null)
+        {
+            _hasTeamInLeague = false;
+            _myTeamInLeague = null;
+            return;
+        }
+
+        _myTeamInLeague = _league.Teams.FirstOrDefault(t => t.ManagerId == _currentManagerId.Value);
+        _hasTeamInLeague = _myTeamInLeague is not null;
+    }
+
+    private async Task CreateTeamAndJoin()
+    {
+        if (_league is null || _currentManagerId is null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(_joinModel.TeamName))
+        {
+            Snackbar.Add("Lagnamn krävs", Severity.Warning);
+            return;
+        }
+
+        _isJoining = true;
+        try
+        {
+            var handler = new CreateTeamCommandHandler(DbContext);
+            var result = await handler.Handle(new CreateTeamCommand
+            {
+                Name = new TeamName(_joinModel.TeamName.Trim()),
+                ManagerId = _currentManagerId.Value,
+                LeagueId = _league.Id
+            });
+
+            if (result.IsFailure)
+            {
+                Snackbar.Add($"Kunde inte skapa lag: {result.Error}", Severity.Error);
+                return;
+            }
+
+            Snackbar.Add("Du har gått med i ligan!", Severity.Success);
+            _joinModel.TeamName = string.Empty;
+
+            // Reload league + managers to reflect the new team
+            _league = await DbContext.Leagues2.Find(Id);
+            if (_league is null)
+            {
+                NavigationManager.NavigateTo("/dashboard", true);
+                return;
+            }
+
+            UpdateMyTeamState();
+
+            var managerIds = _league.Teams.Select(t => t.ManagerId).Distinct().ToList();
+            var managers = await DbContext.Managers
+                .Where(m => managerIds.Contains(m.Id))
+                .ToListAsync();
+            _managers = managers.ToDictionary(m => m.Id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Kunde inte skapa lag: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isJoining = false;
+        }
+    }
+
+    private string GetManagerName(Guid managerId)
+    {
+        return _managers.TryGetValue(managerId, out var manager)
+            ? manager.Name.Name
+            : "Okänd manager";
+    }
+
+    private Color GetDraftStateColor(DraftState state) => state switch
+    {
+        DraftState.Created => Color.Default,
+        DraftState.Started => Color.Warning,
+        DraftState.Finished => Color.Success,
+        _ => Color.Default
+    };
+
+    private string GetDraftStateText(DraftState state) => state switch
+    {
+        DraftState.Created => "Ej startad",
+        DraftState.Started => "Pågår",
+        DraftState.Finished => "Slutförd",
+        _ => "Okänd"
+    };
+
+    private class JoinLeagueWithTeamModel
+    {
+        public string TeamName { get; set; } = string.Empty;
+    }
+}
+

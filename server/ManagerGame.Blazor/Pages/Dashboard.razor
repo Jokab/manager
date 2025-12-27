@@ -1,13 +1,24 @@
 @page "/dashboard"
 @using ManagerGame.Core
 @using ManagerGame.Domain
+@using ManagerGame.Blazor.Services
 @using MudBlazor
 @inject ApplicationDbContext DbContext
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject CurrentManagerService CurrentManager
 
 <PageTitle>Kontrollpanel - Fantasy Manager</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large">
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-center pa-6">
+            <MudProgressCircular Indeterminate="true" />
+        </div>
+    }
+    else
+    {
     <MudGrid>
         <MudItem xs="12">
             <MudText Typo="Typo.h3" Class="mb-4">Välkommen till din Kontrollpanel</MudText>
@@ -21,7 +32,7 @@
                         <MudText Typo="Typo.h5">Mina lag</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Href="/create-team" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Href="/dashboard#join-league" />
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
@@ -42,7 +53,7 @@
                     else
                     {
                         <MudAlert Severity="Severity.Info">Du har inga lag ännu.</MudAlert>
-                        <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary" Href="/create-team">Skapa ett lag</MudButton>
+                        <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary" Href="/dashboard#join-league">Gå med i en liga</MudButton>
                     }
                 </MudCardContent>
             </MudCard>
@@ -86,7 +97,7 @@
                         <MudText Typo="Typo.h5">Gå med i en liga</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
-                <MudCardContent>
+                <MudCardContent id="join-league">
                     <MudText>Har du en inbjudningskod? Använd den för att gå med i en liga.</MudText>
                     <MudTextField @bind-Value="joinLeagueModel.InviteCode" Label="Inbjudningskod"
                                   Variant="Variant.Outlined" Class="mt-3" />
@@ -122,24 +133,60 @@
             </MudCard>
         </MudItem>
     </MudGrid>
+    }
 </MudContainer>
 
 @code {
     private List<Team> myTeams = new();
     private List<League> myLeagues = new();
     private JoinLeagueModel joinLeagueModel = new();
+    private bool _isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
-        // In a real application, you would filter by the current user
-        myTeams = (await DbContext.Teams2.GetAll()).ToList();
-        myLeagues = (await DbContext.Leagues2.GetAll()).ToList();
+        // Session (ProtectedLocalStorage) is loaded after first render.
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await CurrentManager.InitializeAsync();
+        if (CurrentManager.ManagerId is null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+            return;
+        }
+
+        await LoadDashboardData(CurrentManager.ManagerId.Value);
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadDashboardData(Guid managerId)
+    {
+        myTeams = (await DbContext.Teams2.GetAll())
+            .Where(t => t.ManagerId == managerId)
+            .ToList();
+
+        myLeagues = (await DbContext.Leagues2.GetAll())
+            .Where(l => l.Teams.Any(t => t.ManagerId == managerId))
+            .ToList();
     }
 
     private async Task JoinLeague()
     {
         try
         {
+            await CurrentManager.InitializeAsync();
+            if (CurrentManager.ManagerId is null)
+            {
+                NavigationManager.NavigateTo("/login", true);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(joinLeagueModel.InviteCode))
             {
                 Snackbar.Add("Inbjudningskod krävs", Severity.Warning);
@@ -155,14 +202,11 @@
                 return;
             }
 
-            // In a real application, you would add the user to the league
-            // And redirect to the league page
-
-            Snackbar.Add("Du har gått med i ligan!", Severity.Success);
+            // Joining happens by creating a team in the league on the league page
+            Snackbar.Add("Liga hittad! Skapa ett lag för att gå med.", Severity.Info);
             joinLeagueModel.InviteCode = string.Empty;
 
-            // Refresh the leagues list
-            myLeagues = (await DbContext.Leagues2.GetAll()).ToList();
+            NavigationManager.NavigateTo($"/league/{league.Id}", true);
         }
         catch (Exception ex)
         {
