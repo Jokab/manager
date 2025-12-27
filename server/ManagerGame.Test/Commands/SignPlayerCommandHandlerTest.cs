@@ -1,56 +1,75 @@
 using ManagerGame.Core;
 using ManagerGame.Core.Teams;
-using NSubstitute;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManagerGame.Test.Commands;
 
 public class SignPlayerCommandHandlerTest
 {
+    private static ApplicationDbContext CreateDb()
+    {
+        // Use SQLite in-memory, consistent with the rest of the test suite (and closer to production behavior).
+        var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlite(connection)
+            .Options;
+
+        var db = new ApplicationDbContext(options);
+        db.Database.EnsureCreated();
+        return db;
+    }
+
     [Fact]
     public async Task PersistsPlayerInTeam()
     {
-        var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = TestData.TeamEmpty("Laget");
-        teamRepo.Find(team.Id).Returns(team);
-
-        var playerRepo = Substitute.For<IRepository<Player>>();
+        await using var db = CreateDb();
+        var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
+        var team = Team.Create(new TeamName("Laget"), manager.Id, [], null);
         var player = TestData.Player();
-        playerRepo.Find(player.Id).Returns(player);
 
-        var teamPlayerRepo = Substitute.For<IRepository<TeamPlayer>>();
+        manager.AddTeam(team);
+        db.Managers.Add(manager);
+        db.Teams.Add(team);
+        db.Players.Add(player);
+        await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
         Assert.Null(player.TeamId);
-        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo, teamPlayerRepo);
+        var sut = new SignPlayerCommandHandler(db);
 
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
-        await teamPlayerRepo.Received().Add(Arg.Is<TeamPlayer>(tp =>
-            tp.Player.Id == player.Id
-            && tp.TeamId == team.Id
-            && tp.Player.Name.Name == "Jakob"
-            && tp.Player.Position == Position.Defender
-            && tp.Player.Country.Country == Country.Se));
+        var teamPlayers = await db.TeamPlayers2.GetAll();
+        Assert.Single(teamPlayers);
+        var tp = teamPlayers.Single();
+        Assert.Equal(player.Id, tp.Player.Id);
+        Assert.Equal(team.Id, tp.TeamId);
+        Assert.Equal("Jakob", tp.Player.Name.Name);
+        Assert.Equal(Position.Defender, tp.Player.Position);
+        Assert.Equal(Country.Se, tp.Player.Country.Country);
     }
 
     [Fact]
     public async Task CannotSignSignedPlayer()
     {
-        var teamRepo = Substitute.For<IRepository<Team>>();
-        var team = TestData.TeamEmpty("Laget");
-        var team2 = TestData.TeamEmpty("Laget2");
-        teamRepo.Find(team.Id).Returns(team);
-        teamRepo.Find(team2.Id).Returns(team2);
-
-        var playerRepo = Substitute.For<IRepository<Player>>();
+        await using var db = CreateDb();
+        var manager = Manager.Create(new ManagerName("M1"), new Email("m1@test.se"));
+        var team = Team.Create(new TeamName("Laget"), manager.Id, [], null);
+        var team2 = Team.Create(new TeamName("Laget2"), manager.Id, [], null);
         var player = TestData.Player();
-        playerRepo.Find(player.Id).Returns(player);
-
-        var teamPlayerRepo = Substitute.For<IRepository<TeamPlayer>>();
+        manager.AddTeam(team);
+        manager.AddTeam(team2);
+        db.Managers.Add(manager);
+        db.Teams.AddRange(team, team2);
+        db.Players.Add(player);
+        await db.SaveChangesAsync();
 
         Assert.Empty(team.Players);
         Assert.Empty(team2.Players);
-        var sut = new SignPlayerCommandHandler(playerRepo, teamRepo, teamPlayerRepo);
+        var sut = new SignPlayerCommandHandler(db);
         await sut.Handle(new SignPlayerRequest(team.Id, player.Id));
 
         Assert.True(player.IsSigned);

@@ -1,19 +1,20 @@
 namespace ManagerGame.Core.Teams;
 
-public class CreateTeamCommandHandler(IRepository<Manager> managerRepo, IRepository<Team> teamRepo)
+public class CreateTeamCommandHandler(ApplicationDbContext dbContext)
     : ICommandHandler<CreateTeamCommand, Team>
 {
     public async Task<Result<Team>> Handle(CreateTeamCommand command,
         CancellationToken cancellationToken = default)
     {
-        var manager = await managerRepo.Find(command.ManagerId, cancellationToken);
+        var manager = await dbContext.Managers2.Find(command.ManagerId, cancellationToken);
         if (manager == null) return Result<Team>.Failure(Error.NotFound);
         var team = Team.Create(command.Name, manager.Id, [], null);
 
         manager.AddTeam(team);
 
-        var createdTeam = await teamRepo.Add(team, cancellationToken);
+        dbContext.Teams2.Add(team);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<Team>.Success(createdTeam);
+        return Result<Team>.Success(team);
     }
 }

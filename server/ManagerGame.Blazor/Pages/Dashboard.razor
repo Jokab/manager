@@ -2,8 +2,7 @@
 @using ManagerGame.Core
 @using ManagerGame.Domain
 @using MudBlazor
-@inject IRepository<League> LeagueRepository
-@inject IRepository<Team> TeamRepository
+@inject ApplicationDbContext DbContext
 @inject ISnackbar Snackbar
 
 <PageTitle>Kontrollpanel - Fantasy Manager</PageTitle>
@@ -133,8 +132,8 @@
     protected override async Task OnInitializedAsync()
     {
         // In a real application, you would filter by the current user
-        myTeams = (await TeamRepository.GetAll()).ToList();
-        myLeagues = (await LeagueRepository.GetAll()).ToList();
+        myTeams = (await DbContext.Teams2.GetAll()).ToList();
+        myLeagues = (await DbContext.Leagues2.GetAll()).ToList();
     }
 
     private async Task JoinLeague()
@@ -147,7 +146,7 @@
                 return;
             }
 
-            var leagues = await LeagueRepository.GetAll();
+            var leagues = await DbContext.Leagues2.GetAll();
             var league = leagues.FirstOrDefault(l => l.InviteCode == joinLeagueModel.InviteCode);
 
             if (league == null)
@@ -163,7 +162,7 @@
             joinLeagueModel.InviteCode = string.Empty;
 
             // Refresh the leagues list
-            myLeagues = (await LeagueRepository.GetAll()).ToList();
+            myLeagues = (await DbContext.Leagues2.GetAll()).ToList();
         }
         catch (Exception ex)
         {

@@ -6,13 +6,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ManagerGame.Core.Managers;
 
-public class LoginCommandHandler(IRepository<Manager> managerRepo, IConfiguration configuration)
+public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration configuration)
     : ICommandHandler<LoginCommand, LoginResponse>
 {
     public async Task<Result<LoginResponse>> Handle(LoginCommand command,
         CancellationToken cancellationToken = default)
     {
-        var managers = await managerRepo.GetAll(cancellationToken);
+        var managers = await dbContext.Managers2.GetAll(cancellationToken);
         var manager = managers.FirstOrDefault(x => x.Email == command.ManagerEmail);
         if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
 

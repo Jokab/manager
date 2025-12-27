@@ -31,29 +31,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Add repository factory
-builder.Services.AddScoped<ManagerGame.Blazor.RepositoryFactory>();
-
-// Add repositories using factory
-builder.Services.AddScoped<IRepository<Manager>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<Manager>());
-builder.Services.AddScoped<IRepository<Team>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<Team>());
-builder.Services.AddScoped<IRepository<Player>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<Player>());
-builder.Services.AddScoped<IRepository<League>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<League>());
-builder.Services.AddScoped<IRepository<Draft>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<Draft>());
-builder.Services.AddScoped<IRepository<MatchResult>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<MatchResult>());
-builder.Services.AddScoped<IRepository<MatchEvent>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<MatchEvent>());
-builder.Services.AddScoped<IRepository<StartingEleven>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<StartingEleven>());
-builder.Services.AddScoped<IRepository<LeagueSettings>>(sp =>
-    sp.GetRequiredService<ManagerGame.Blazor.RepositoryFactory>().CreateRepository<LeagueSettings>());
-
 // SignalR
 builder.Services.AddSignalR();
 

@@ -3,7 +3,7 @@
 @using ManagerGame.Core
 @using ManagerGame.Domain
 @using MudBlazor
-@inject IRepository<Manager> ManagerRepository
+@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
@@ -48,7 +48,7 @@
         {
             try
             {
-                var managers = await ManagerRepository.GetAll();
+                var managers = await DbContext.Managers2.GetAll();
 
                 // In a real application, you would authenticate properly with hashed passwords
                 var manager = managers.FirstOrDefault(m =>

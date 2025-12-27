@@ -45,7 +45,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
 RegisterCommandHandlers();
-RegisterRepositories();
 
 if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Testing"))
 {
@@ -96,16 +95,6 @@ if (args.Contains("seed"))
 
 app.Run();
 return;
-
-void RegisterRepositories()
-{
-    builder.Services.AddTransient<IRepository<Manager>, Repository<Manager>>();
-    builder.Services.AddTransient<IRepository<Player>, Repository<Player>>();
-    builder.Services.AddTransient<IRepository<Team>, Repository<Team>>();
-    builder.Services.AddTransient<IRepository<TeamPlayer>, Repository<TeamPlayer>>();
-    builder.Services.AddTransient<IRepository<Draft>, Repository<Draft>>();
-    builder.Services.AddTransient<IRepository<League>, Repository<League>>();
-}
 
 void RegisterCommandHandlers()
 {

@@ -3,7 +3,7 @@
 @using ManagerGame.Core
 @using ManagerGame.Domain
 @using MudBlazor
-@inject IRepository<Manager> ManagerRepository
+@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
@@ -73,7 +73,8 @@
                 // TODO: Hash password properly in a real application
                 // In a real application, you would hash the password before storing it
 
-                await ManagerRepository.Add(manager);
+                DbContext.Managers2.Add(manager);
+                await DbContext.SaveChangesAsync();
 
                 Snackbar.Add("Registrering lyckades! Du kan nu logga in.", Severity.Success);
                 NavigationManager.NavigateTo("/login", true);

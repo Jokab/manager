@@ -1,18 +1,16 @@
 namespace ManagerGame.Core.Teams;
 
 public class SignPlayerCommandHandler(
-    IRepository<Player> playerRepo,
-    IRepository<Team> teamRepo,
-    IRepository<TeamPlayer> teamPlayerRepo)
+    ApplicationDbContext dbContext)
     : ICommandHandler<SignPlayerRequest, Team>
 {
     public async Task<Result<Team>> Handle(SignPlayerRequest command,
         CancellationToken cancellationToken = default)
     {
-        var team = await teamRepo.Find(command.TeamId, cancellationToken);
+        var team = await dbContext.Teams2.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<Team>.Failure(Error.NotFound);
 
-        var player = await playerRepo.Find(command.PlayerId, cancellationToken);
+        var player = await dbContext.Players2.Find(command.PlayerId, cancellationToken);
         if (player is null) return Result<Team>.Failure(Error.NotFound);
 
         try
@@ -22,7 +20,8 @@ public class SignPlayerCommandHandler(
             // Relying on aggregate graph updates has proven brittle across providers (SQLite/Postgres),
             // and can lead to UPDATEs against non-existent rows.
             var teamPlayer = team.Players.Last();
-            await teamPlayerRepo.Add(teamPlayer, cancellationToken);
+            dbContext.TeamPlayers2.Add(teamPlayer);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception e)
         {
