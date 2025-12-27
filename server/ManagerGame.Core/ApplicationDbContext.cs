@@ -4,6 +4,11 @@ namespace ManagerGame.Core;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
+    public AggregateRepository<Draft, Guid> Drafts2 => new(
+        Set<Draft>(),
+        Set<Draft>(),
+        draft => draft.Id);
+
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Player> Players { get; set; }

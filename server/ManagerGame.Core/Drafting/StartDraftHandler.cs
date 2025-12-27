@@ -1,17 +1,17 @@
 namespace ManagerGame.Core.Drafting;
 
-public class StartDraftHandler(IRepository<Draft> draftRepo) : ICommandHandler<StartDraftRequest, Draft>
+public class StartDraftHandler(ApplicationDbContext dbContext) : ICommandHandler<StartDraftRequest, Draft>
 {
     public async Task<Result<Draft>> Handle(StartDraftRequest command,
         CancellationToken cancellationToken = default)
     {
-        var draft = await draftRepo.Find(command.DraftId, cancellationToken);
+        var draft = await dbContext.Drafts2.Find(command.DraftId, cancellationToken);
         if (draft is null) return Result<Draft>.Failure(Error.NotFound);
 
         draft.Start();
 
-        var updatedDraft = await draftRepo.Update(draft, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<Draft>.Success(updatedDraft);
+        return Result<Draft>.Success(draft);
     }
 }

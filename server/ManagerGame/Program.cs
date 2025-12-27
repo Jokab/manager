@@ -121,10 +121,10 @@ void RegisterCommandHandlers()
         sp.GetService<IRepository<Team>>()!,
         sp.GetService<IRepository<TeamPlayer>>()!));
     AddHandlerWithLogging(sp => new CreateDraftHandler(
-        sp.GetService<IRepository<Draft>>()!,
+        sp.GetService<ApplicationDbContext>()!,
         sp.GetService<IRepository<League>>()!));
     AddHandlerWithLogging(sp => new StartDraftHandler
-        (sp.GetService<IRepository<Draft>>()!));
+        (sp.GetService<ApplicationDbContext>()!));
     AddHandlerWithLogging(sp => new CreateLeagueHandler(
         sp.GetService<IRepository<League>>()!));
     AddHandlerWithLogging(sp => new AdmitTeamHandler(
