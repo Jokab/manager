@@ -108,7 +108,7 @@ if (args.Contains("seed"))
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     ResetDb(db);
-    await SeedDb(scope, db);
+    await SeedDraftDebugData(scope, db);
 }
 
 app.Run();
@@ -151,66 +151,97 @@ void ResetDb(ApplicationDbContext? applicationDbContext)
     }
 }
 
-async Task SeedDb(IServiceScope serviceScope,
-    ApplicationDbContext? db)
+async Task SeedDraftDebugData(IServiceScope serviceScope, ApplicationDbContext db)
 {
-    var registerManagerCommandHandler =
-        serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+    var registerHandler = serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+    var createLeagueHandler = serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<CreateLeagueRequest, League>>();
+    var createTeamHandler = serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
+    var createDraftHandler = serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<CreateDraftRequest, Draft>>();
 
-    var manager = await registerManagerCommandHandler.Handle(new RegisterManagerCommand()
-        { Email = new Email("jako1@jakob.se"), Name = new ManagerName("Jakob") });
-    Console.WriteLine("Created manager with id: " + manager.Value?.Id);
-
-    var createTeamCommandHandler =
-        serviceScope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
-    await createTeamCommandHandler.Handle(new CreateTeamCommand()
-        { Name = new TeamName("Laget 2.0"), ManagerId = manager.Value!.Id });
-
-
-    const int countriesToChooseFrom = Team.PlayerLimit / Team.PlayersFromSameCountryLimit;
-    var goalkeepersRemaining = 1;
-    var minDefendersRemaining = 4;
-    var minMidfieldersRemaining = 4;
-
-    static Player Player(Country country = Country.Se,
-        ManagerGame.Domain.Position position = ManagerGame.Domain.Position.Defender)
+    // Create two managers
+    var manager1Result = await registerHandler.Handle(new RegisterManagerCommand
     {
-        return new Player(
-            new PlayerName("Jakob"),
-            position,
-            new CountryRec(country));
-    }
+        Email = new Email("manager1@test.com"),
+        Name = new ManagerName("Manager 1")
+    });
+    var manager2Result = await registerHandler.Handle(new RegisterManagerCommand
+    {
+        Email = new Email("manager2@test.com"),
+        Name = new ManagerName("Manager 2")
+    });
 
-    var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
-        Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>
-        {
-            ManagerGame.Domain.Position position;
-            if (goalkeepersRemaining > 0)
-            {
-                goalkeepersRemaining--;
-                position = ManagerGame.Domain.Position.Goalkeeper;
-            }
-            else if (minDefendersRemaining > 0)
-            {
-                minDefendersRemaining--;
-                position = ManagerGame.Domain.Position.Defender;
-            }
-            else if (minMidfieldersRemaining > 0)
-            {
-                minMidfieldersRemaining--;
-                position = ManagerGame.Domain.Position.Midfielder;
-            }
-            else
-            {
-                position = ManagerGame.Domain.Position.Forward;
-            }
+    Console.WriteLine($"Created Manager 1: {manager1Result.Value?.Id}");
+    Console.WriteLine($"Created Manager 2: {manager2Result.Value?.Id}");
 
-            return Player((Country)i, position);
-        })
-    ).ToList();
+    // Create a league
+    var leagueResult = await createLeagueHandler.Handle(new CreateLeagueRequest
+    {
+        Name = "Test Draft Liga"
+    });
+    var league = leagueResult.Value!;
+    Console.WriteLine($"Created League: {league.Id} - {league.Name}");
 
-    db!.Players.AddRange(players);
+    // Create teams for both managers in the league
+    var team1Result = await createTeamHandler.Handle(new CreateTeamCommand
+    {
+        Name = new TeamName("Team Alpha"),
+        ManagerId = manager1Result.Value!.Id,
+        LeagueId = league.Id
+    });
+    var team2Result = await createTeamHandler.Handle(new CreateTeamCommand
+    {
+        Name = new TeamName("Team Beta"),
+        ManagerId = manager2Result.Value!.Id,
+        LeagueId = league.Id
+    });
+
+    Console.WriteLine($"Created Team 1: {team1Result.Value?.Id}");
+    Console.WriteLine($"Created Team 2: {team2Result.Value?.Id}");
+
+    // Seed players - enough for a draft (need 44+ for 2 teams with 22 each)
+    var playerNames = new[]
+    {
+        "Emil Forsberg", "Alexander Isak", "Dejan Kulusevski", "Viktor Gyökeres", "Robin Olsen",
+        "Ludwig Augustinsson", "Victor Lindelöf", "Kristoffer Olsson", "Sebastian Larsson", "Albin Ekdal",
+        "Mikael Lustig", "Marcus Berg", "John Guidetti", "Oscar Hiljemark", "Ken Sema",
+        "Pierre Højbjerg", "Christian Eriksen", "Kasper Schmeichel", "Simon Kjær", "Andreas Christensen",
+        "Joachim Andersen", "Mikkel Damsgaard", "Rasmus Højlund", "Jonas Wind", "Yussuf Poulsen",
+        "Thomas Delaney", "Daniel Wass", "Joakim Mæhle", "Jannik Vestergaard", "Robert Skov",
+        "Joshua Kimmich", "Jamal Musiala", "Florian Wirtz", "Kai Havertz", "Leroy Sané",
+        "Thomas Müller", "Antonio Rüdiger", "Jonathan Tah", "Niclas Füllkrug", "Manuel Neuer",
+        "Erling Haaland", "Martin Ødegaard", "Sander Berge", "Jens Petter Hauge", "Morten Thorsby",
+        "Pedri", "Gavi", "Lamine Yamal", "Nico Williams", "Dani Olmo",
+        "Alvaro Morata", "Ferran Torres", "Rodri", "Unai Simón", "Marc Cucurella"
+    };
+
+    var countries = new[] { Country.Se, Country.Dk, Country.De, Country.No, Country.Es };
+
+    var players = playerNames.Select((name, idx) =>
+    {
+        var country = countries[idx % countries.Length];
+        // Distribute positions: ~10% GK, ~30% DEF, ~35% MID, ~25% FWD
+        ManagerGame.Domain.Position position;
+        var posRoll = idx % 20;
+        if (posRoll < 2) position = ManagerGame.Domain.Position.Goalkeeper;
+        else if (posRoll < 8) position = ManagerGame.Domain.Position.Defender;
+        else if (posRoll < 15) position = ManagerGame.Domain.Position.Midfielder;
+        else position = ManagerGame.Domain.Position.Forward;
+
+        return new Player(new PlayerName(name), position, new CountryRec(country));
+    }).ToList();
+
+    db.Players.AddRange(players);
     await db.SaveChangesAsync();
+    Console.WriteLine($"Seeded {players.Count} players");
+
+    // Create a draft for the league
+    var draftResult = await createDraftHandler.Handle(new CreateDraftRequest(league.Id));
+    Console.WriteLine($"Created Draft: {draftResult.Value?.Id} (State: {draftResult.Value?.State})");
+
+    Console.WriteLine("\n=== Debug Login Info ===");
+    Console.WriteLine($"Manager 1: manager1@test.com");
+    Console.WriteLine($"Manager 2: manager2@test.com");
+    Console.WriteLine($"League: {league.Name} ({league.Id})");
 }
 
 // Make the implicit Program class public so test projects can access it

@@ -1,0 +1,553 @@
+@page "/draft/{Id:guid}"
+@using ManagerGame.Core
+@using ManagerGame.Core.Drafting
+@using ManagerGame.Domain
+@using ManagerGame.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject CurrentManagerService CurrentManager
+@implements IAsyncDisposable
+
+<PageTitle>Draft - Fantasy Manager</PageTitle>
+
+@if (_isLoading)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudProgressCircular Indeterminate="true" />
+    </MudContainer>
+}
+else if (_draft is null)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudAlert Severity="Severity.Error">Draft kunde inte hittas</MudAlert>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-4">
+        <MudGrid>
+            @* Header *@
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mb-4">
+                    <div>
+                        <MudText Typo="Typo.h3">Draft</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
+                            @_league?.Name
+                        </MudText>
+                    </div>
+                    <div class="d-flex align-center gap-2">
+                        <MudChip T="string" Size="Size.Medium" Color="@GetDraftStateColor(_draft.State)">
+                            @GetDraftStateText(_draft.State)
+                        </MudChip>
+                        @if (_hubConnection?.State == HubConnectionState.Connected)
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.Wifi">
+                                Live
+                            </MudChip>
+                        }
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="@($"/league/{_draft.LeagueId}")">
+                            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1" /> Tillbaka
+                        </MudButton>
+                    </div>
+                </div>
+            </MudItem>
+
+            @* Draft Controls (for starting the draft) *@
+            @if (_draft.State == DraftState.Created)
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="pa-4 mb-4" Elevation="2" Style="background: linear-gradient(135deg, #1a237e 0%, #283593 100%);">
+                        <div class="d-flex align-center justify-space-between">
+                            <div>
+                                <MudText Typo="Typo.h6" Style="color: white;">Draft har inte startat ännu</MudText>
+                                <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.7);">
+                                    @_participants.Count lag deltar
+                                </MudText>
+                            </div>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Size="Size.Large"
+                                       OnClick="StartDraft"
+                                       Disabled="@(_isStartingDraft || _participants.Count < 2)">
+                                @if (_isStartingDraft)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                }
+                                Starta Draft
+                            </MudButton>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            }
+
+            @* Current Turn Indicator *@
+            @if (_draft.State == DraftState.Started && _nextTeamId.HasValue)
+            {
+                var nextTeam = _participants.FirstOrDefault(p => p.TeamId == _nextTeamId.Value);
+                var isMyTurn = _myTeam?.Id == _nextTeamId.Value;
+                <MudItem xs="12">
+                    <MudPaper Class="pa-4 mb-4" Elevation="3"
+                              Style="@(isMyTurn ? "background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);" : "background: linear-gradient(135deg, #424242 0%, #616161 100%);")">
+                        <div class="d-flex align-center gap-4">
+                            <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Large" Style="color: white;" />
+                            <div>
+                                <MudText Typo="Typo.h5" Style="color: white;">
+                                    @if (isMyTurn)
+                                    {
+                                        <span>🎯 Din tur att välja!</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Väntar på: @(nextTeam is not null ? _teamNames.GetValueOrDefault(nextTeam.TeamId, "Okänt lag") : "...")</span>
+                                    }
+                                </MudText>
+                                <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.7);">
+                                    Val @(_draft.Picks.Count + 1) av @_draft.TotalPicksTarget
+                                </MudText>
+                            </div>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            }
+
+            @* Draft Finished *@
+            @if (_draft.State == DraftState.Finished)
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="pa-4 mb-4" Elevation="2" Style="background: linear-gradient(135deg, #1b5e20 0%, #388e3c 100%);">
+                        <div class="d-flex align-center gap-4">
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Style="color: white;" />
+                            <MudText Typo="Typo.h5" Style="color: white;">
+                                Draft är slutförd! 🎉
+                            </MudText>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            }
+
+            @* Participants Panel *@
+            <MudItem xs="12" md="4">
+                <MudCard Style="height: 100%;">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">
+                                <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-2" />
+                                Deltagare
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudList T="DraftParticipant" Dense="true">
+                            @foreach (var participant in _participants.OrderBy(p => p.Seat))
+                            {
+                                var teamName = _teamNames.GetValueOrDefault(participant.TeamId, "Okänt lag");
+                                var pickCount = _draft.Picks.Count(p => p.TeamId == participant.TeamId);
+                                var isCurrentPicker = _nextTeamId == participant.TeamId;
+                                var isMe = _myTeam?.Id == participant.TeamId;
+                                <MudListItem T="DraftParticipant"
+                                             Style="@(isCurrentPicker ? "background-color: rgba(76, 175, 80, 0.15); border-left: 3px solid #4caf50;" : "")">
+                                    <div class="d-flex justify-space-between align-center" style="width: 100%;">
+                                        <div class="d-flex align-center gap-2">
+                                            @if (isCurrentPicker)
+                                            {
+                                                <MudIcon Icon="@Icons.Material.Filled.ArrowRight" Color="Color.Success" Size="Size.Small" />
+                                            }
+                                            <div>
+                                                <MudText Typo="Typo.body1">
+                                                    <strong>@teamName</strong>
+                                                    @if (isMe)
+                                                    {
+                                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Class="ml-2">Du</MudChip>
+                                                    }
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Default">
+                                            @pickCount / @_draft.PicksPerTeam
+                                        </MudChip>
+                                    </div>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            @* Players List *@
+            <MudItem xs="12" md="8">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">
+                                <MudIcon Icon="@Icons.Material.Filled.SportsSoccer" Class="mr-2" />
+                                Tillgängliga spelare (@_availablePlayers.Count)
+                            </MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudTextField @bind-Value="_searchText"
+                                          Placeholder="Sök spelare..."
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search"
+                                          Immediate="true"
+                                          Class="mr-4"
+                                          Style="width: 200px;" />
+                            <MudSelect T="string" @bind-Value="_positionFilter" Label="Position" Style="width: 140px;">
+                                <MudSelectItem Value="@("")">Alla</MudSelectItem>
+                                <MudSelectItem Value="@("Goalkeeper")">Målvakt</MudSelectItem>
+                                <MudSelectItem Value="@("Defender")">Försvarare</MudSelectItem>
+                                <MudSelectItem Value="@("Midfielder")">Mittfältare</MudSelectItem>
+                                <MudSelectItem Value="@("Forward")">Anfallare</MudSelectItem>
+                            </MudSelect>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="max-height: 600px; overflow-y: auto;">
+                        <MudTable Items="@FilteredPlayers" Dense="true" Hover="true" Striped="true" FixedHeader="true">
+                            <HeaderContent>
+                                <MudTh>Namn</MudTh>
+                                <MudTh>Position</MudTh>
+                                <MudTh>Land</MudTh>
+                                <MudTh Style="width: 100px;"></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                @{
+                                    var isPicked = _pickedPlayerIds.Contains(context.Id);
+                                    var isMyTurn = _myTeam?.Id == _nextTeamId;
+                                    var canPick = _draft.State == DraftState.Started && isMyTurn && !isPicked;
+                                }
+                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
+                                    <MudText>@context.Name.Name</MudText>
+                                </MudTd>
+                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
+                                    <MudChip T="string" Size="Size.Small" Color="@GetPositionColor(context.Position)">
+                                        @GetPositionText(context.Position)
+                                    </MudChip>
+                                </MudTd>
+                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
+                                    <MudText Typo="Typo.body2">@GetCountryCode(context.Country.Country)</MudText>
+                                </MudTd>
+                                <MudTd>
+                                    @if (isPicked)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Disabled="true">
+                                            Vald
+                                        </MudChip>
+                                    }
+                                    else if (canPick)
+                                    {
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => PickPlayer(context))"
+                                                   Disabled="@_isPicking">
+                                            Välj
+                                        </MudButton>
+                                    }
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            @* Recent Picks *@
+            @if (_draft.Picks.Any())
+            {
+                <MudItem xs="12">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">
+                                    <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2" />
+                                    Senaste val
+                                </MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudSimpleTable Dense="true" Hover="true">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Lag</th>
+                                        <th>Spelare</th>
+                                        <th>Position</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pick in _draft.Picks.OrderByDescending(p => p.PickNumber).Take(10))
+                                    {
+                                        var player = _allPlayers.FirstOrDefault(p => p.Id == pick.PlayerId);
+                                        <tr>
+                                            <td>@pick.PickNumber</td>
+                                            <td>@_teamNames.GetValueOrDefault(pick.TeamId, "Okänt")</td>
+                                            <td>@(player?.Name.Name ?? "Okänd")</td>
+                                            <td>
+                                                @if (player is not null)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Color="@GetPositionColor(player.Position)">
+                                                        @GetPositionText(player.Position)
+                                                    </MudChip>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private ManagerGame.Domain.Draft? _draft;
+    private League? _league;
+    private List<DraftParticipant> _participants = [];
+    private List<Player> _allPlayers = [];
+    private List<Player> _availablePlayers = [];
+    private HashSet<Guid> _pickedPlayerIds = [];
+    private Dictionary<Guid, string> _teamNames = new();
+    private Team? _myTeam;
+    private Guid? _nextTeamId;
+
+    private bool _isLoading = true;
+    private bool _isStartingDraft;
+    private bool _isPicking;
+    private string _searchText = "";
+    private string _positionFilter = "";
+
+    private HubConnection? _hubConnection;
+
+    private IEnumerable<Player> FilteredPlayers => _allPlayers
+        .Where(p => string.IsNullOrEmpty(_searchText) ||
+                    p.Name.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+        .Where(p => string.IsNullOrEmpty(_positionFilter) ||
+                    p.Position.ToString() == _positionFilter)
+        .OrderBy(p => _pickedPlayerIds.Contains(p.Id))
+        .ThenBy(p => p.Position)
+        .ThenBy(p => p.Name.Name);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        await CurrentManager.InitializeAsync();
+        if (CurrentManager.ManagerId is null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+            return;
+        }
+
+        // Load all draft data after first render to avoid DbContext concurrency issues
+        await LoadDraftData();
+
+        // Find my team in this draft
+        if (_draft is not null)
+        {
+            var myTeamIds = _participants.Select(p => p.TeamId).ToList();
+            var teams = await DbContext.Teams
+                .Where(t => myTeamIds.Contains(t.Id) && t.ManagerId == CurrentManager.ManagerId.Value)
+                .ToListAsync();
+            _myTeam = teams.FirstOrDefault();
+        }
+
+        await SetupSignalR();
+        StateHasChanged();
+    }
+
+    private async Task LoadDraftData()
+    {
+        // Clear the change tracker to ensure we get fresh data from the database
+        DbContext.ChangeTracker.Clear();
+
+        _draft = await DbContext.Drafts2.Find(Id);
+        if (_draft is null)
+        {
+            _isLoading = false;
+            return;
+        }
+
+        _league = await DbContext.Leagues2.Find(_draft.LeagueId);
+        _participants = _draft.Participants.ToList();
+        _nextTeamId = _draft.PeekNextTeamId();
+
+        // Load team names
+        var teamIds = _participants.Select(p => p.TeamId).ToList();
+        var teams = await DbContext.Teams.Where(t => teamIds.Contains(t.Id)).ToListAsync();
+        _teamNames = teams.ToDictionary(t => t.Id, t => t.Name.Name);
+
+        // Load all players
+        _allPlayers = await DbContext.Players.ToListAsync();
+
+        // Get picked player IDs (from draft picks)
+        _pickedPlayerIds = _draft.Picks.Select(p => p.PlayerId).ToHashSet();
+
+        // Available = all players not yet picked
+        _availablePlayers = _allPlayers.Where(p => !_pickedPlayerIds.Contains(p.Id)).ToList();
+
+        _isLoading = false;
+    }
+
+    private async Task SetupSignalR()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/drafthub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On<object>("PlayerPicked", async (data) =>
+        {
+            await InvokeAsync(async () =>
+            {
+                _isPicking = false;
+                await LoadDraftData();
+                Snackbar.Add("En spelare har valts!", Severity.Info);
+                StateHasChanged();
+            });
+        });
+
+        _hubConnection.On<object>("DraftStarted", async (data) =>
+        {
+            await InvokeAsync(async () =>
+            {
+                _isStartingDraft = false;
+                await LoadDraftData();
+                Snackbar.Add("Draft har startat! 🎉", Severity.Success);
+                StateHasChanged();
+            });
+        });
+
+        _hubConnection.On<string>("PickError", async (error) =>
+        {
+            await InvokeAsync(() =>
+            {
+                Snackbar.Add($"Fel: {error}", Severity.Error);
+                _isPicking = false;
+                StateHasChanged();
+            });
+        });
+
+        _hubConnection.On<string>("DraftError", async (error) =>
+        {
+            await InvokeAsync(() =>
+            {
+                Snackbar.Add($"Draft fel: {error}", Severity.Error);
+                _isStartingDraft = false;
+                StateHasChanged();
+            });
+        });
+
+        _hubConnection.On<object>("JoinedDraft", async (data) =>
+        {
+            await InvokeAsync(() =>
+            {
+                Snackbar.Add("Ansluten till draft", Severity.Success);
+            });
+        });
+
+        try
+        {
+            await _hubConnection.StartAsync();
+            await _hubConnection.SendAsync("JoinDraft", Id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Kunde inte ansluta till draft: {ex.Message}", Severity.Warning);
+        }
+    }
+
+    private async Task StartDraft()
+    {
+        if (_draft is null || _hubConnection is null) return;
+
+        _isStartingDraft = true;
+        try
+        {
+            // Use SignalR to start the draft so all clients get notified
+            await _hubConnection.SendAsync("StartDraft", _draft.Id, 11); // 11 picks per team for testing
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Kunde inte starta draft: {ex.Message}", Severity.Error);
+            _isStartingDraft = false;
+        }
+    }
+
+    private async Task PickPlayer(Player player)
+    {
+        if (_draft is null || _myTeam is null || _hubConnection is null) return;
+
+        _isPicking = true;
+        try
+        {
+            await _hubConnection.SendAsync("PickPlayer", player.Id, _draft.Id, _myTeam.Id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Fel vid val: {ex.Message}", Severity.Error);
+            _isPicking = false;
+        }
+    }
+
+    private Color GetDraftStateColor(DraftState state) => state switch
+    {
+        DraftState.Created => Color.Default,
+        DraftState.Started => Color.Warning,
+        DraftState.Finished => Color.Success,
+        _ => Color.Default
+    };
+
+    private string GetDraftStateText(DraftState state) => state switch
+    {
+        DraftState.Created => "Ej startad",
+        DraftState.Started => "Pågår",
+        DraftState.Finished => "Slutförd",
+        _ => "Okänd"
+    };
+
+    private Color GetPositionColor(ManagerGame.Domain.Position position) => position switch
+    {
+        ManagerGame.Domain.Position.Goalkeeper => Color.Warning,
+        ManagerGame.Domain.Position.Defender => Color.Info,
+        ManagerGame.Domain.Position.Midfielder => Color.Success,
+        ManagerGame.Domain.Position.Forward => Color.Error,
+        _ => Color.Default
+    };
+
+    private string GetPositionText(ManagerGame.Domain.Position position) => position switch
+    {
+        ManagerGame.Domain.Position.Goalkeeper => "MV",
+        ManagerGame.Domain.Position.Defender => "FÖR",
+        ManagerGame.Domain.Position.Midfielder => "MF",
+        ManagerGame.Domain.Position.Forward => "ANF",
+        _ => "?"
+    };
+
+    private string GetCountryCode(Country country) => country switch
+    {
+        Country.Se => "SWE",
+        Country.Dk => "DEN",
+        Country.De => "GER",
+        Country.No => "NOR",
+        Country.Es => "ESP",
+        Country.En => "ENG",
+        _ => "???"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}
+

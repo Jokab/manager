@@ -171,6 +171,7 @@ else
                                     <MudTh>Draft</MudTh>
                                     <MudTh>Status</MudTh>
                                     <MudTh>Skapad</MudTh>
+                                    <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
                                     <MudTd>Draft @context.Id.ToString().Substring(0, 8)</MudTd>
@@ -180,6 +181,14 @@ else
                                         </MudChip>
                                     </MudTd>
                                     <MudTd>@context.CreatedDate.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                                    <MudTd>
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   Href="@($"/draft/{context.Id}")">
+                                            Öppna
+                                        </MudButton>
+                                    </MudTd>
                                 </RowTemplate>
                             </MudTable>
                         }

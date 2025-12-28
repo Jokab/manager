@@ -1,5 +1,13 @@
 ﻿@page "/"
+@using ManagerGame.Core
+@using ManagerGame.Services
+@using Microsoft.EntityFrameworkCore
 @using MudBlazor
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject CurrentManagerService CurrentManager
+@inject ISnackbar Snackbar
+@inject IHostEnvironment Environment
 
 <PageTitle>Fantasy Manager Spel</PageTitle>
 
@@ -14,6 +22,42 @@
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Href="/register">Registrera</MudButton>
             </div>
         </MudItem>
+
+        @if (Environment.IsDevelopment())
+        {
+            <MudItem xs="12" Class="d-flex flex-column align-center mb-6">
+                <MudPaper Elevation="2" Class="pa-4" Style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #e94560;">
+                    <MudText Typo="Typo.h6" Class="mb-3" Style="color: #e94560;">🔧 Debug Mode</MudText>
+                    <div class="d-flex gap-3">
+                        <MudButton Variant="Variant.Filled"
+                                   Style="background-color: #0f3460; color: white;"
+                                   Size="Size.Large"
+                                   OnClick="@(() => DebugLogin("manager1@test.com"))"
+                                   Disabled="@_isLoggingIn">
+                            @if (_isLoggingIn && _loggingInAs == "manager1@test.com")
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                            }
+                            Manager 1 (Alpha)
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Style="background-color: #533483; color: white;"
+                                   Size="Size.Large"
+                                   OnClick="@(() => DebugLogin("manager2@test.com"))"
+                                   Disabled="@_isLoggingIn">
+                            @if (_isLoggingIn && _loggingInAs == "manager2@test.com")
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                            }
+                            Manager 2 (Beta)
+                        </MudButton>
+                    </div>
+                    <MudText Typo="Typo.caption" Class="mt-2" Style="color: #a0a0a0;">
+                        Run with <code>seed</code> arg to create test data
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        }
 
         <MudItem xs="12" Class="mt-6">
             <MudPaper Elevation="3" Class="pa-6">
@@ -31,3 +75,53 @@
         </MudItem>
     </MudGrid>
 </MudContainer>
+
+@code {
+    private bool _isLoggingIn;
+    private string? _loggingInAs;
+
+    private async Task DebugLogin(string email)
+    {
+        _isLoggingIn = true;
+        _loggingInAs = email;
+        StateHasChanged();
+
+        try
+        {
+            // Load managers to memory first since Email is a value object that can't be translated
+            var managers = await DbContext.Managers
+                .Include(m => m.Teams)
+                .ToListAsync();
+
+            var manager = managers.FirstOrDefault(m => m.Email.EmailAddress == email);
+
+            if (manager is null)
+            {
+                Snackbar.Add($"Manager not found. Run the app with 'seed' argument first.", Severity.Error);
+                return;
+            }
+
+            await CurrentManager.SetManagerAsync(manager.Id);
+
+            // Find the league the manager's team is in
+            var team = manager.Teams.FirstOrDefault();
+            if (team is not null)
+            {
+                NavigationManager.NavigateTo($"/league/{team.LeagueId}", true);
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Debug login failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoggingIn = false;
+            _loggingInAs = null;
+        }
+    }
+}
