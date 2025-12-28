@@ -8,6 +8,7 @@ using ManagerGame.Core.Teams;
 using ManagerGame.Hubs;
 using ManagerGame.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
@@ -52,7 +53,12 @@ if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironme
 }
 else
 {
-    builder.Services.AddNpgsql<ApplicationDbContext>(builder.Configuration.GetConnectionString("Db"));
+    var connectionString = builder.Configuration.GetConnectionString("Db");
+    if (string.IsNullOrWhiteSpace(connectionString))
+        throw new InvalidOperationException(
+            "Missing PostgreSQL connection string. Configure ConnectionStrings:Db (e.g. env var ConnectionStrings__Db).");
+
+    builder.Services.AddNpgsql<ApplicationDbContext>(connectionString);
 }
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -61,6 +67,16 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+// Support Fly (and other reverse proxies): respect X-Forwarded-Proto so HTTPS redirects don't loop.
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+};
+// .NET 10: prefer KnownIP* lists (KnownNetworks/KnownProxies are deprecated)
+forwardedHeadersOptions.KnownIPNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
@@ -79,6 +95,25 @@ app.MapHub<DraftHub>("/drafthub");
 // Blazor routing
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+// Migrate command: supports --migrate-db (used by Fly release_command)
+if (args.Contains("--migrate-db", StringComparer.OrdinalIgnoreCase))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+
+    if (env.IsEnvironment("Testing") || env.IsEnvironment("Test"))
+    {
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        db.Database.Migrate();
+    }
+
+    return;
+}
 
 if (args.Contains("seed"))
 {
