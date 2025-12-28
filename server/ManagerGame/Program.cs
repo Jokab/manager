@@ -36,7 +36,6 @@ builder.Services.AddSignalR();
 
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
-builder.Services.AddScoped<ITeamSigningService, TeamSigningService>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<CurrentManagerService>();
 
@@ -119,7 +118,6 @@ void RegisterCommandHandlers()
     AddCommandHandlerWithLogging<CreateTeamCommand, Team, CreateTeamCommandHandler>();
     AddCommandHandlerWithLogging<RegisterManagerCommand, Manager, RegisterManagerCommandHandler>();
     AddCommandHandlerWithLogging<LoginCommand, LoginResponse, LoginCommandHandler>();
-    AddCommandHandlerWithLogging<SignPlayerRequest, Team, SignPlayerCommandHandler>();
     AddCommandHandlerWithLogging<CreateDraftRequest, Draft, CreateDraftHandler>();
     AddCommandHandlerWithLogging<StartDraftRequest, Draft, StartDraftHandler>();
     AddCommandHandlerWithLogging<PickDraftPlayerRequest, DraftPickOutcome, PickDraftPlayerHandler>();
