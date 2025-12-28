@@ -50,7 +50,7 @@
         {
             try
             {
-                var managers = await DbContext.Managers2.GetAll();
+                var managers = await DbContext.ManagersRepo.GetAll();
 
                 // In a real application, you would authenticate properly with hashed passwords
                 var manager = managers.FirstOrDefault(m =>

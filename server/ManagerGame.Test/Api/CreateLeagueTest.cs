@@ -52,7 +52,7 @@ public class CreateLeagueTest : IClassFixture<Fixture>
 
         // Verify team is in the league
         db.ChangeTracker.Clear();
-        var teamInDb = await db.Teams2.Find(team.Id);
+        var teamInDb = await db.TeamsRepo.Find(team.Id);
         Assert.NotNull(teamInDb);
         Assert.Equal(league.Id, teamInDb.LeagueId);
     }

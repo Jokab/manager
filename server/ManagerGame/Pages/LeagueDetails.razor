@@ -243,7 +243,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _league = await DbContext.Leagues2.Find(Id);
+        _league = await DbContext.LeaguesRepo.Find(Id);
 
         if (_league == null)
         {
@@ -322,7 +322,7 @@ else
             _joinModel.TeamName = string.Empty;
 
             // Reload league + managers to reflect the new team
-            _league = await DbContext.Leagues2.Find(Id);
+            _league = await DbContext.LeaguesRepo.Find(Id);
             if (_league is null)
             {
                 NavigationManager.NavigateTo("/dashboard", true);

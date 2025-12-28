@@ -13,7 +13,7 @@ public class CreateLeagueHandler(ApplicationDbContext dbContext) : ICommandHandl
             command.PointsPerCleanSheet);
 
         var league = League.Create(command.Name, settings);
-        dbContext.Leagues2.Add(league);
+        dbContext.LeaguesRepo.Add(league);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Result<League>.Success(league);

@@ -28,7 +28,7 @@ public class DraftHub : Hub
     {
         _logger.LogInformation("Client {ConnectionId} joining draft {DraftId}", Context.ConnectionId, draftId);
 
-        var draft = await _dbContext.Drafts2.Find(draftId);
+        var draft = await _dbContext.DraftsRepo.Find(draftId);
         if (draft is null)
         {
             _logger.LogWarning("Draft {DraftId} not found", draftId);
@@ -85,7 +85,7 @@ public class DraftHub : Hub
 
     public async Task PickPlayer(Guid playerId, Guid draftId, Guid teamId)
     {
-        var draft = await _dbContext.Drafts2.Find(draftId);
+        var draft = await _dbContext.DraftsRepo.Find(draftId);
         if (draft is null)
         {
             await Clients.Caller.SendAsync("PickError", "Draft not found");

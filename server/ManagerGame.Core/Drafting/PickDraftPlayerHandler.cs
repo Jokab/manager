@@ -12,7 +12,7 @@ public class PickDraftPlayerHandler(
     public async Task<Result<DraftPickOutcome>> Handle(PickDraftPlayerRequest command,
         CancellationToken cancellationToken = default)
     {
-        var draft = await dbContext.Drafts2.Find(command.DraftId, cancellationToken);
+        var draft = await dbContext.DraftsRepo.Find(command.DraftId, cancellationToken);
         if (draft is null) return Result<DraftPickOutcome>.Failure(Error.NotFound);
 
         if (draft.State is not DraftState.Started)

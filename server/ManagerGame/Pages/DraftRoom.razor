@@ -368,14 +368,14 @@ else
         // Clear the change tracker to ensure we get fresh data from the database
         DbContext.ChangeTracker.Clear();
 
-        _draft = await DbContext.Drafts2.Find(Id);
+        _draft = await DbContext.DraftsRepo.Find(Id);
         if (_draft is null)
         {
             _isLoading = false;
             return;
         }
 
-        _league = await DbContext.Leagues2.Find(_draft.LeagueId);
+        _league = await DbContext.LeaguesRepo.Find(_draft.LeagueId);
         _participants = _draft.Participants.ToList();
         _nextTeamId = _draft.PeekNextTeamId();
 

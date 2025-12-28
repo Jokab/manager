@@ -93,7 +93,7 @@ public class DraftPickTest : IClassFixture<Fixture>
         Assert.Equal(DraftState.Started, pick1.Draft.State);
 
         db.ChangeTracker.Clear();
-        var updatedTeam = await db.Teams2.Find(firstTeam.Id);
+        var updatedTeam = await db.TeamsRepo.Find(firstTeam.Id);
         Assert.Single(updatedTeam!.Players);
 
         // Try to pick out of order (should fail)

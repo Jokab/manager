@@ -9,7 +9,7 @@ public class TeamSigningService(ApplicationDbContext dbContext) : ITeamSigningSe
         Guid playerId,
         CancellationToken cancellationToken = default)
     {
-        var team = await dbContext.Teams2.Find(teamId, cancellationToken);
+        var team = await dbContext.TeamsRepo.Find(teamId, cancellationToken);
         if (team is null) return Result<Team>.Failure(Error.NotFound);
 
         var player = await dbContext.Players.FindAsync([playerId], cancellationToken);

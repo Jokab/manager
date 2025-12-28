@@ -5,7 +5,7 @@ public class StartDraftHandler(ApplicationDbContext dbContext) : ICommandHandler
     public async Task<Result<Draft>> Handle(StartDraftRequest command,
         CancellationToken cancellationToken = default)
     {
-        var draft = await dbContext.Drafts2.Find(command.DraftId, cancellationToken);
+        var draft = await dbContext.DraftsRepo.Find(command.DraftId, cancellationToken);
         if (draft is null) return Result<Draft>.Failure(Error.NotFound);
 
         var picksPerTeam = command.PicksPerTeam.GetValueOrDefault(Team.PlayerLimit);

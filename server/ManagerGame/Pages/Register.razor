@@ -73,7 +73,7 @@
                 // TODO: Hash password properly in a real application
                 // In a real application, you would hash the password before storing it
 
-                DbContext.Managers2.Add(manager);
+                DbContext.ManagersRepo.Add(manager);
                 await DbContext.SaveChangesAsync();
 
                 Snackbar.Add("Registrering lyckades! Du kan nu logga in.", Severity.Success);

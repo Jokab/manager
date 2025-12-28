@@ -55,7 +55,7 @@ public class CreateTeamTest : IClassFixture<Fixture>
         Assert.Equal("Lag2", team.Name.Name);
 
         db.ChangeTracker.Clear();
-        var allTeams = await db.Teams2.GetAll();
+        var allTeams = await db.TeamsRepo.GetAll();
         Assert.Single(allTeams);
         var createdManagerInDb = await db.Managers
             .Include(m => m.Teams)

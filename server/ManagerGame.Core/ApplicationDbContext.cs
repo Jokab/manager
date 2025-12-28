@@ -4,14 +4,14 @@ namespace ManagerGame.Core;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public AggregateRepository<Draft, Guid> Drafts2 => new(
+    public AggregateRepository<Draft, Guid> DraftsRepo => new(
         Set<Draft>(),
         Set<Draft>()
             .Include(x => x.Participants)
             .Include(x => x.Picks),
         draft => draft.Id);
 
-    public AggregateRepository<League, Guid> Leagues2 => new(
+    public AggregateRepository<League, Guid> LeaguesRepo => new(
         Set<League>(),
         Set<League>()
             .Include(x => x.Teams)
@@ -19,12 +19,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .Include(x => x.Drafts),
         league => league.Id);
 
-    public AggregateRepository<Manager, Guid> Managers2 => new(
+    public AggregateRepository<Manager, Guid> ManagersRepo => new(
         Set<Manager>(),
         Set<Manager>().Include(x => x.Teams),
         manager => manager.Id);
 
-    public AggregateRepository<Team, Guid> Teams2 => new(
+    public AggregateRepository<Team, Guid> TeamsRepo => new(
         Set<Team>(),
         Set<Team>()
             .Include(x => x.Players)

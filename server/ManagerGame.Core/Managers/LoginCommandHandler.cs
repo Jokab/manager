@@ -12,7 +12,7 @@ public class LoginCommandHandler(ApplicationDbContext dbContext, IConfiguration 
     public async Task<Result<LoginResponse>> Handle(LoginCommand command,
         CancellationToken cancellationToken = default)
     {
-        var managers = await dbContext.Managers2.GetAll(cancellationToken);
+        var managers = await dbContext.ManagersRepo.GetAll(cancellationToken);
         var manager = managers.FirstOrDefault(x => x.Email == command.ManagerEmail);
         if (manager == null) return Result<LoginResponse>.Failure(Error.NotFound);
 

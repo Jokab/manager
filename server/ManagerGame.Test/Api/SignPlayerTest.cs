@@ -37,7 +37,7 @@ public class SignPlayerTest : IClassFixture<Fixture>
         Assert.True(signResult.IsSuccess);
 
         db.ChangeTracker.Clear();
-        var updatedTeam = await db.Teams2.Find(team.Id);
+        var updatedTeam = await db.TeamsRepo.Find(team.Id);
         Assert.NotNull(updatedTeam);
 
         Assert.Single(updatedTeam.Players);

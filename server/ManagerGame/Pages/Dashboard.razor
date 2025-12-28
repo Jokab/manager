@@ -167,11 +167,11 @@
 
     private async Task LoadDashboardData(Guid managerId)
     {
-        myTeams = (await DbContext.Teams2.GetAll())
+        myTeams = (await DbContext.TeamsRepo.GetAll())
             .Where(t => t.ManagerId == managerId)
             .ToList();
 
-        myLeagues = (await DbContext.Leagues2.GetAll())
+        myLeagues = (await DbContext.LeaguesRepo.GetAll())
             .Where(l => l.Teams.Any(t => t.ManagerId == managerId))
             .ToList();
     }
@@ -193,7 +193,7 @@
                 return;
             }
 
-            var leagues = await DbContext.Leagues2.GetAll();
+            var leagues = await DbContext.LeaguesRepo.GetAll();
             var league = leagues.FirstOrDefault(l => l.InviteCode == joinLeagueModel.InviteCode);
 
             if (league == null)

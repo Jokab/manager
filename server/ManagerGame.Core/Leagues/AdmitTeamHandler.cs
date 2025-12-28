@@ -7,9 +7,9 @@ public class AdmitTeamHandler(ApplicationDbContext dbContext)
     public async Task<Result<League>> Handle(AdmitTeamRequest command,
         CancellationToken cancellationToken = default)
     {
-        var league = await dbContext.Leagues2.Find(command.LeagueId, cancellationToken);
+        var league = await dbContext.LeaguesRepo.Find(command.LeagueId, cancellationToken);
         if (league is null) return Result<League>.Failure(Error.NotFound);
-        var team = await dbContext.Teams2.Find(command.TeamId, cancellationToken);
+        var team = await dbContext.TeamsRepo.Find(command.TeamId, cancellationToken);
         if (team is null) return Result<League>.Failure(Error.NotFound);
 
         league.AdmitTeam(team);
