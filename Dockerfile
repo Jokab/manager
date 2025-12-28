@@ -16,9 +16,12 @@ RUN dotnet publish ./server/ManagerGame/ManagerGame.csproj -c Release -o /app/pu
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
 
+EXPOSE 8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:8080
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "ManagerGame.dll"]
 
