@@ -37,7 +37,7 @@ builder.Services.AddSignalR();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
 builder.Services.AddScoped<ITeamSigningService, TeamSigningService>();
-builder.Services.AddScoped<ProtectedLocalStorage>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<CurrentManagerService>();
 
 RegisterCommandHandlers();

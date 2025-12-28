@@ -2,7 +2,11 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace ManagerGame.Services;
 
-public class CurrentManagerService(ProtectedLocalStorage storage)
+/// <summary>
+/// Uses ProtectedSessionStorage so each browser tab can have a different logged-in manager.
+/// This is especially useful for local development when testing with multiple users.
+/// </summary>
+public class CurrentManagerService(ProtectedSessionStorage storage)
 {
     private const string ManagerIdKey = "current-manager-id";
 
