@@ -1,5 +1,3 @@
-using ManagerGame.Domain;
-
 namespace ManagerGame.Test.Domain;
 
 public class DraftTest

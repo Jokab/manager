@@ -3,7 +3,6 @@ using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;
 using ManagerGame.Core.Teams;
-using ManagerGame.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test.Api;

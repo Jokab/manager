@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.SignalR;
-using ManagerGame.Domain;
 using ManagerGame.Core;
 using ManagerGame.Core.Drafting;
 

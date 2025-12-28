@@ -1,5 +1,3 @@
-using ManagerGame.Domain;
-
 namespace ManagerGame.Test;
 
 public static class TestData
