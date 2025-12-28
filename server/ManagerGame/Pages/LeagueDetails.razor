@@ -133,7 +133,7 @@ else
                             <MudList T="Team" Dense="true">
                                 @foreach (var team in _league.Teams)
                                 {
-                                    <MudListItem T="Team">
+                                    <MudListItem T="Team" Href="@($"/team/{team.Id}")">
                                         <div class="d-flex justify-space-between align-center"
                                              style="width: 100%;">
                                             <div>

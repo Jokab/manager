@@ -1,0 +1,163 @@
+@page "/team/{Id:guid}"
+@using ManagerGame.Core
+@using ManagerGame.Services
+@using MudBlazor
+@using Position=ManagerGame.Domain.Position
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject CurrentManagerService CurrentManager
+
+<PageTitle>@(_team?.Name.Name ?? "Lag") - Fantasy Manager</PageTitle>
+
+@if (_isLoading)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudProgressCircular Indeterminate="true"/>
+    </MudContainer>
+}
+else if (_team is null)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudAlert Severity="Severity.Error">Lag kunde inte hittas</MudAlert>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudGrid>
+            @* Header *@
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mb-4">
+                    <div>
+                        <MudText Typo="Typo.h3">@_team.Name.Name</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
+                            Manager: <strong>@(_manager?.Name.Name ?? "Okänd")</strong>
+                        </MudText>
+                    </div>
+                    <div class="d-flex align-center gap-2">
+                        <MudChip T="string" Size="Size.Medium" Color="Color.Info">
+                            @_team.TotalPoints poäng
+                        </MudChip>
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary"
+                                   Href="@($"/league/{_team.LeagueId}")">
+                            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1"/>
+                            Tillbaka till ligan
+                        </MudButton>
+                    </div>
+                </div>
+            </MudItem>
+
+            @* Players List *@
+            <MudItem xs="12">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">
+                                <MudIcon Icon="@Icons.Material.Filled.SportsSoccer" Class="mr-2"/>
+                                Spelare (@_team.Players.Count)
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (_team.Players.Any())
+                        {
+                            <MudTable Items="@_team.Players.OrderBy(p => p.Player.Position).ThenBy(p => p.Player.Name.Name)"
+                                      Dense="true" Hover="true" Striped="true">
+                                <HeaderContent>
+                                    <MudTh>Namn</MudTh>
+                                    <MudTh>Position</MudTh>
+                                    <MudTh>Land</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>
+                                        <MudText>@context.Player.Name.Name</MudText>
+                                    </MudTd>
+                                    <MudTd>
+                                        <MudChip T="string" Size="Size.Small"
+                                                 Color="@GetPositionColor(context.Player.Position)">
+                                            @GetPositionText(context.Player.Position)
+                                        </MudChip>
+                                    </MudTd>
+                                    <MudTd>
+                                        <MudText Typo="Typo.body2">@GetCountryCode(context.Player.Country.Country)</MudText>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">
+                                Inga spelare har lagts till i laget ännu.
+                            </MudAlert>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Team? _team;
+    private Manager? _manager;
+    private bool _isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        await CurrentManager.InitializeAsync();
+        if (CurrentManager.ManagerId is null)
+        {
+            NavigationManager.NavigateTo("/login", true);
+            return;
+        }
+
+        _team = await DbContext.TeamsRepo.Find(Id);
+
+        if (_team is null)
+        {
+            _isLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        _manager = await DbContext.ManagersRepo.Find(_team.ManagerId);
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private Color GetPositionColor(Position position) => position switch
+    {
+        Position.Goalkeeper => Color.Warning,
+        Position.Defender => Color.Info,
+        Position.Midfielder => Color.Success,
+        Position.Forward => Color.Error,
+        _ => Color.Default
+    };
+
+    private string GetPositionText(Position position) => position switch
+    {
+        Position.Goalkeeper => "MV",
+        Position.Defender => "FÖR",
+        Position.Midfielder => "MF",
+        Position.Forward => "ANF",
+        _ => "?"
+    };
+
+    private string GetCountryCode(Country country) => country switch
+    {
+        Country.Se => "SWE",
+        Country.Dk => "DEN",
+        Country.De => "GER",
+        Country.No => "NOR",
+        Country.Es => "ESP",
+        Country.En => "ENG",
+        _ => "???"
+    };
+}
+
