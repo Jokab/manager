@@ -1,7 +1,6 @@
 @page "/login"
 @using System.ComponentModel.DataAnnotations
 @using ManagerGame.Core
-@using ManagerGame.Domain
 @using ManagerGame.Services
 @using MudBlazor
 @inject ApplicationDbContext DbContext
@@ -19,24 +18,33 @@
         <MudForm @ref="form" Model="@loginModel" @bind-IsValid="@success" @bind-Errors="@errors">
             <MudCardContent>
                 <MudTextField @bind-Value="loginModel.Email" Label="E-post" Required="true"
-                                RequiredError="E-postadress krävs"
-                                Validation="@(new EmailAddressAttribute() { ErrorMessage = "Ogiltig e-postadress" })"/>
+                              RequiredError="E-postadress krävs"
+                              Validation="@(new EmailAddressAttribute
+                                          {
+                                              ErrorMessage = "Ogiltig e-postadress"
+                                          })"/>
 
                 @* <MudTextField @bind-Value="loginModel.Password" Label="Lösenord" Required="true" RequiredError="Lösenord krävs" *@
                 @*                 InputType="InputType.Password" /> *@
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="HandleLogin">Logga in</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="register">Inget konto? Registrera dig här</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
+                           OnClick="HandleLogin">Logga in
+                </MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="register">Inget
+                    konto? Registrera dig här
+                </MudButton>
             </MudCardActions>
         </MudForm>
     </MudCard>
 </MudContainer>
 
 @code {
-    private LoginModel loginModel = new();
+    private readonly LoginModel loginModel = new();
     private bool success;
-    private string[] errors = { };
+    private string[] errors =
+    {
+    };
     private MudForm? form;
 
     private async Task HandleLogin()
@@ -78,8 +86,7 @@
 
     public class LoginModel
     {
-        [Required(ErrorMessage = "E-postadress krävs")]
-        [EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
+        [Required(ErrorMessage = "E-postadress krävs"),EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Lösenord krävs")]

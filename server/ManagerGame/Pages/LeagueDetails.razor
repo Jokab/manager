@@ -1,6 +1,5 @@
 @page "/league/{Id:guid}"
 @using ManagerGame.Core
-@using ManagerGame.Domain
 @using ManagerGame.Core.Teams
 @using ManagerGame.Services
 @using Microsoft.EntityFrameworkCore
@@ -15,7 +14,7 @@
 @if (_league == null)
 {
     <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
-        <MudProgressCircular Indeterminate="true" />
+        <MudProgressCircular Indeterminate="true"/>
     </MudContainer>
 }
 else
@@ -27,11 +26,14 @@ else
                     <div>
                         <MudText Typo="Typo.h3">@_league.Name</MudText>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
-                            Inbjudningskod: <MudChip T="string" Size="Size.Small" Color="Color.Primary">@_league.InviteCode</MudChip>
+                            Inbjudningskod:
+                            <MudChip T="string" Size="Size.Small"
+                                     Color="Color.Primary">@_league.InviteCode</MudChip>
                         </MudText>
                     </div>
                     <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/dashboard">
-                        <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1" /> Tillbaka
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1"/>
+                        Tillbaka
                     </MudButton>
                 </div>
             </MudItem>
@@ -41,7 +43,7 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h5">
-                                <MudIcon Icon="@Icons.Material.Filled.Settings" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.Settings" Class="mr-2"/>
                                 Inställningar
                             </MudText>
                         </CardHeaderContent>
@@ -49,34 +51,36 @@ else
                     <MudCardContent>
                         @if (_league.Settings != null)
                         {
-                            <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true">
+                            <MudSimpleTable Dense="true" Hover="true" Bordered="true"
+                                            Striped="true">
                                 <tbody>
-                                    <tr>
-                                        <td><strong>Max spelare från samma land</strong></td>
-                                        <td>@_league.Settings.MaxPlayersFromSameCountry</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Poäng per mål</strong></td>
-                                        <td>@_league.Settings.PointsPerGoal</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Poäng per vinst</strong></td>
-                                        <td>@_league.Settings.PointsPerWin</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Poäng per assist</strong></td>
-                                        <td>@_league.Settings.PointsPerAssist</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Poäng per hållen nolla</strong></td>
-                                        <td>@_league.Settings.PointsPerCleanSheet</td>
-                                    </tr>
+                                <tr>
+                                    <td><strong>Max spelare från samma land</strong></td>
+                                    <td>@_league.Settings.MaxPlayersFromSameCountry</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Poäng per mål</strong></td>
+                                    <td>@_league.Settings.PointsPerGoal</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Poäng per vinst</strong></td>
+                                    <td>@_league.Settings.PointsPerWin</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Poäng per assist</strong></td>
+                                    <td>@_league.Settings.PointsPerAssist</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Poäng per hållen nolla</strong></td>
+                                    <td>@_league.Settings.PointsPerCleanSheet</td>
+                                </tr>
                                 </tbody>
                             </MudSimpleTable>
                         }
                         else
                         {
-                            <MudAlert Severity="Severity.Info">Inga inställningar tillgängliga</MudAlert>
+                            <MudAlert Severity="Severity.Info">Inga inställningar tillgängliga
+                            </MudAlert>
                         }
                     </MudCardContent>
                 </MudCard>
@@ -87,7 +91,7 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h5">
-                                <MudIcon Icon="@Icons.Material.Filled.People" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.People" Class="mr-2"/>
                                 Managers (@_league.Teams.Count)
                             </MudText>
                         </CardHeaderContent>
@@ -98,14 +102,15 @@ else
                             @if (!_hasTeamInLeague)
                             {
                                 <MudAlert Severity="Severity.Info" Class="mb-3">
-                                    Du har inget lag i den här ligan ännu. Skapa ett lag för att gå med.
+                                    Du har inget lag i den här ligan ännu. Skapa ett lag för att gå
+                                    med.
                                 </MudAlert>
 
                                 <MudTextField @bind-Value="_joinModel.TeamName"
                                               Label="Lagnamn"
                                               Variant="Variant.Outlined"
                                               Required="true"
-                                              RequiredError="Lagnamn krävs" />
+                                              RequiredError="Lagnamn krävs"/>
                                 <MudButton Class="mt-3"
                                            Variant="Variant.Filled"
                                            Color="Color.Primary"
@@ -117,7 +122,8 @@ else
                             else
                             {
                                 <MudAlert Severity="Severity.Success" Class="mb-3">
-                                    Du är med i ligan med: <strong>@_myTeamInLeague!.Name.Name</strong>
+                                    Du är med i ligan med:
+                                    <strong>@_myTeamInLeague!.Name.Name</strong>
                                 </MudAlert>
                             }
                         }
@@ -128,16 +134,19 @@ else
                                 @foreach (var team in _league.Teams)
                                 {
                                     <MudListItem T="Team">
-                                        <div class="d-flex justify-space-between align-center" style="width: 100%;">
+                                        <div class="d-flex justify-space-between align-center"
+                                             style="width: 100%;">
                                             <div>
                                                 <MudText Typo="Typo.body1">
                                                     <strong>@team.Name.Name</strong>
                                                 </MudText>
-                                                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                                <MudText Typo="Typo.caption"
+                                                         Class="mud-text-secondary">
                                                     @GetManagerName(team.ManagerId)
                                                 </MudText>
                                             </div>
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Info">
+                                            <MudChip T="string" Size="Size.Small"
+                                                     Color="Color.Info">
                                                 @team.TotalPoints poäng
                                             </MudChip>
                                         </div>
@@ -147,7 +156,8 @@ else
                         }
                         else
                         {
-                            <MudAlert Severity="Severity.Info">Inga lag har gått med i ligan ännu.</MudAlert>
+                            <MudAlert Severity="Severity.Info">Inga lag har gått med i ligan ännu.
+                            </MudAlert>
                         }
                     </MudCardContent>
                 </MudCard>
@@ -158,7 +168,7 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h5">
-                                <MudIcon Icon="@Icons.Material.Filled.EventNote" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.EventNote" Class="mr-2"/>
                                 Drafts (@_league.Drafts.Count)
                             </MudText>
                         </CardHeaderContent>
@@ -166,7 +176,8 @@ else
                     <MudCardContent>
                         @if (_league.Drafts.Any())
                         {
-                            <MudTable Items="@_league.Drafts" Dense="true" Hover="true" Striped="true">
+                            <MudTable Items="@_league.Drafts" Dense="true" Hover="true"
+                                      Striped="true">
                                 <HeaderContent>
                                     <MudTh>Draft</MudTh>
                                     <MudTh>Status</MudTh>
@@ -176,7 +187,8 @@ else
                                 <RowTemplate>
                                     <MudTd>Draft @context.Id.ToString().Substring(0, 8)</MudTd>
                                     <MudTd>
-                                        <MudChip T="string" Size="Size.Small" Color="@GetDraftStateColor(context.State)">
+                                        <MudChip T="string" Size="Size.Small"
+                                                 Color="@GetDraftStateColor(context.State)">
                                             @GetDraftStateText(context.State)
                                         </MudChip>
                                     </MudTd>
@@ -194,7 +206,8 @@ else
                         }
                         else
                         {
-                            <MudAlert Severity="Severity.Info">Inga drafts har skapats ännu.</MudAlert>
+                            <MudAlert Severity="Severity.Info">Inga drafts har skapats ännu.
+                            </MudAlert>
                         }
                     </MudCardContent>
                 </MudCard>
@@ -205,21 +218,36 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h5">
-                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2"/>
                                 Ligastatus
                             </MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
                         <div class="d-flex gap-4 flex-wrap">
-                            <MudChip T="string" Color="@(_league.IsGroupStageCompleted ? Color.Success : Color.Default)">
-                                Gruppspel: @(_league.IsGroupStageCompleted ? "Slutfört" : "Pågår")
+                            <MudChip T="string" Color="@(_league.IsGroupStageCompleted
+                                                           ? Color.Success
+                                                           : Color.Default)">
+                                Gruppspel: @(
+                                               _league.IsGroupStageCompleted
+                                                   ? "Slutfört"
+                                                   : "Pågår")
                             </MudChip>
-                            <MudChip T="string" Color="@(_league.IsKnockoutDraftCompleted ? Color.Success : Color.Default)">
-                                Slutspelsdraft: @(_league.IsKnockoutDraftCompleted ? "Slutfört" : "Ej startat")
+                            <MudChip T="string" Color="@(_league.IsKnockoutDraftCompleted
+                                                           ? Color.Success
+                                                           : Color.Default)">
+                                Slutspelsdraft: @(
+                                                    _league.IsKnockoutDraftCompleted
+                                                        ? "Slutfört"
+                                                        : "Ej startat")
                             </MudChip>
-                            <MudChip T="string" Color="@(_league.IsTournamentCompleted ? Color.Success : Color.Default)">
-                                Turnering: @(_league.IsTournamentCompleted ? "Slutfört" : "Pågår")
+                            <MudChip T="string" Color="@(_league.IsTournamentCompleted
+                                                           ? Color.Success
+                                                           : Color.Default)">
+                                Turnering: @(
+                                               _league.IsTournamentCompleted
+                                                   ? "Slutfört"
+                                                   : "Pågår")
                             </MudChip>
                         </div>
                     </MudCardContent>
@@ -239,7 +267,7 @@ else
     private bool _hasTeamInLeague;
     private Team? _myTeamInLeague;
     private bool _isJoining;
-    private JoinLeagueWithTeamModel _joinModel = new();
+    private readonly JoinLeagueWithTeamModel _joinModel = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -253,7 +281,9 @@ else
         }
 
         // Load managers separately since Manager is its own aggregate
-        var managerIds = _league.Teams.Select(t => t.ManagerId).Distinct().ToList();
+        var managerIds = _league.Teams.Select(t => t.ManagerId)
+            .Distinct()
+            .ToList();
         var managers = await DbContext.Managers
             .Where(m => managerIds.Contains(m.Id))
             .ToListAsync();
@@ -305,12 +335,13 @@ else
         try
         {
             var handler = new CreateTeamCommandHandler(DbContext);
-            var result = await handler.Handle(new CreateTeamCommand
-            {
-                Name = new TeamName(_joinModel.TeamName.Trim()),
-                ManagerId = _currentManagerId.Value,
-                LeagueId = _league.Id
-            });
+            var result = await handler.Handle(
+                new CreateTeamCommand
+                {
+                    Name = new TeamName(_joinModel.TeamName.Trim()),
+                    ManagerId = _currentManagerId.Value,
+                    LeagueId = _league.Id
+                });
 
             if (result.IsFailure)
             {
@@ -331,7 +362,9 @@ else
 
             UpdateMyTeamState();
 
-            var managerIds = _league.Teams.Select(t => t.ManagerId).Distinct().ToList();
+            var managerIds = _league.Teams.Select(t => t.ManagerId)
+                .Distinct()
+                .ToList();
             var managers = await DbContext.Managers
                 .Where(m => managerIds.Contains(m.Id))
                 .ToListAsync();
@@ -347,12 +380,9 @@ else
         }
     }
 
-    private string GetManagerName(Guid managerId)
-    {
-        return _managers.TryGetValue(managerId, out var manager)
-            ? manager.Name.Name
-            : "Okänd manager";
-    }
+    private string GetManagerName(Guid managerId) => _managers.TryGetValue(managerId, out var manager)
+        ? manager.Name.Name
+        : "Okänd manager";
 
     private Color GetDraftStateColor(DraftState state) => state switch
     {

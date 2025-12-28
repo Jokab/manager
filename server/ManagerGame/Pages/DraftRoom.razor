@@ -1,15 +1,14 @@
 @page "/draft/{Id:guid}"
-@using ManagerGame.Core
-@using ManagerGame.Core.Drafting
-@using ManagerGame.Domain
-@using ManagerGame.Services
-@using Microsoft.AspNetCore.SignalR.Client
-@using Microsoft.EntityFrameworkCore
-@using MudBlazor
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @inject CurrentManagerService CurrentManager
+@using ManagerGame.Core
+@using ManagerGame.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor
+@using Position=ManagerGame.Domain.Position
 @implements IAsyncDisposable
 
 <PageTitle>Draft - Fantasy Manager</PageTitle>
@@ -17,7 +16,7 @@
 @if (_isLoading)
 {
     <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
-        <MudProgressCircular Indeterminate="true" />
+        <MudProgressCircular Indeterminate="true"/>
     </MudContainer>
 }
 else if (_draft is null)
@@ -40,17 +39,21 @@ else
                         </MudText>
                     </div>
                     <div class="d-flex align-center gap-2">
-                        <MudChip T="string" Size="Size.Medium" Color="@GetDraftStateColor(_draft.State)">
+                        <MudChip T="string" Size="Size.Medium"
+                                 Color="@GetDraftStateColor(_draft.State)">
                             @GetDraftStateText(_draft.State)
                         </MudChip>
                         @if (_hubConnection?.State == HubConnectionState.Connected)
                         {
-                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.Wifi">
+                            <MudChip T="string" Size="Size.Small" Color="Color.Success"
+                                     Icon="@Icons.Material.Filled.Wifi">
                                 Live
                             </MudChip>
                         }
-                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="@($"/league/{_draft.LeagueId}")">
-                            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1" /> Tillbaka
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary"
+                                   Href="@($"/league/{_draft.LeagueId}")">
+                            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-1"/>
+                            Tillbaka
                         </MudButton>
                     </div>
                 </div>
@@ -60,10 +63,13 @@ else
             @if (_draft.State == DraftState.Created)
             {
                 <MudItem xs="12">
-                    <MudPaper Class="pa-4 mb-4" Elevation="2" Style="background: linear-gradient(135deg, #1a237e 0%, #283593 100%);">
+                    <MudPaper Class="pa-4 mb-4" Elevation="2"
+                              Style="background: linear-gradient(135deg, #1a237e 0%, #283593 100%);">
                         <div class="d-flex align-center justify-space-between">
                             <div>
-                                <MudText Typo="Typo.h6" Style="color: white;">Draft har inte startat ännu</MudText>
+                                <MudText Typo="Typo.h6" Style="color: white;">Draft har inte startat
+                                    ännu
+                                </MudText>
                                 <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.7);">
                                     @_participants.Count lag deltar
                                 </MudText>
@@ -75,7 +81,8 @@ else
                                        Disabled="@(_isStartingDraft || _participants.Count < 2)">
                                 @if (_isStartingDraft)
                                 {
-                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true"
+                                                         Class="mr-2"/>
                                 }
                                 Starta Draft
                             </MudButton>
@@ -91,9 +98,12 @@ else
                 var isMyTurn = _myTeam?.Id == _nextTeamId.Value;
                 <MudItem xs="12">
                     <MudPaper Class="pa-4 mb-4" Elevation="3"
-                              Style="@(isMyTurn ? "background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);" : "background: linear-gradient(135deg, #424242 0%, #616161 100%);")">
+                              Style="@(isMyTurn
+                                         ? "background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);"
+                                         : "background: linear-gradient(135deg, #424242 0%, #616161 100%);")">
                         <div class="d-flex align-center gap-4">
-                            <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Large" Style="color: white;" />
+                            <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Large"
+                                     Style="color: white;"/>
                             <div>
                                 <MudText Typo="Typo.h5" Style="color: white;">
                                     @if (isMyTurn)
@@ -102,7 +112,10 @@ else
                                     }
                                     else
                                     {
-                                        <span>Väntar på: @(nextTeam is not null ? _teamNames.GetValueOrDefault(nextTeam.TeamId, "Okänt lag") : "...")</span>
+                                        <span>Väntar på: @(
+                                                             nextTeam is not null
+                                                                 ? _teamNames.GetValueOrDefault(nextTeam.TeamId, "Okänt lag")
+                                                                 : "...")</span>
                                     }
                                 </MudText>
                                 <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.7);">
@@ -118,9 +131,11 @@ else
             @if (_draft.State == DraftState.Finished)
             {
                 <MudItem xs="12">
-                    <MudPaper Class="pa-4 mb-4" Elevation="2" Style="background: linear-gradient(135deg, #1b5e20 0%, #388e3c 100%);">
+                    <MudPaper Class="pa-4 mb-4" Elevation="2"
+                              Style="background: linear-gradient(135deg, #1b5e20 0%, #388e3c 100%);">
                         <div class="d-flex align-center gap-4">
-                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Style="color: white;" />
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large"
+                                     Style="color: white;"/>
                             <MudText Typo="Typo.h5" Style="color: white;">
                                 Draft är slutförd! 🎉
                             </MudText>
@@ -135,7 +150,7 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h6">
-                                <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.Groups" Class="mr-2"/>
                                 Deltagare
                             </MudText>
                         </CardHeaderContent>
@@ -149,19 +164,26 @@ else
                                 var isCurrentPicker = _nextTeamId == participant.TeamId;
                                 var isMe = _myTeam?.Id == participant.TeamId;
                                 <MudListItem T="DraftParticipant"
-                                             Style="@(isCurrentPicker ? "background-color: rgba(76, 175, 80, 0.15); border-left: 3px solid #4caf50;" : "")">
-                                    <div class="d-flex justify-space-between align-center" style="width: 100%;">
+                                             Style="@(isCurrentPicker
+                                                        ? "background-color: rgba(76, 175, 80, 0.15); border-left: 3px solid #4caf50;"
+                                                        : "")">
+                                    <div class="d-flex justify-space-between align-center"
+                                         style="width: 100%;">
                                         <div class="d-flex align-center gap-2">
                                             @if (isCurrentPicker)
                                             {
-                                                <MudIcon Icon="@Icons.Material.Filled.ArrowRight" Color="Color.Success" Size="Size.Small" />
+                                                <MudIcon Icon="@Icons.Material.Filled.ArrowRight"
+                                                         Color="Color.Success" Size="Size.Small"/>
                                             }
                                             <div>
                                                 <MudText Typo="Typo.body1">
                                                     <strong>@teamName</strong>
                                                     @if (isMe)
                                                     {
-                                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Class="ml-2">Du</MudChip>
+                                                        <MudChip T="string" Size="Size.Small"
+                                                                 Color="Color.Primary" Class="ml-2">
+                                                            Du
+                                                        </MudChip>
                                                     }
                                                 </MudText>
                                             </div>
@@ -183,7 +205,7 @@ else
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h6">
-                                <MudIcon Icon="@Icons.Material.Filled.SportsSoccer" Class="mr-2" />
+                                <MudIcon Icon="@Icons.Material.Filled.SportsSoccer" Class="mr-2"/>
                                 Tillgängliga spelare (@_availablePlayers.Count)
                             </MudText>
                         </CardHeaderContent>
@@ -194,8 +216,9 @@ else
                                           AdornmentIcon="@Icons.Material.Filled.Search"
                                           Immediate="true"
                                           Class="mr-4"
-                                          Style="width: 200px;" />
-                            <MudSelect T="string" @bind-Value="_positionFilter" Label="Position" Style="width: 140px;">
+                                          Style="width: 200px;"/>
+                            <MudSelect T="string" @bind-Value="_positionFilter" Label="Position"
+                                       Style="width: 140px;">
                                 <MudSelectItem Value="@("")">Alla</MudSelectItem>
                                 <MudSelectItem Value="@("Goalkeeper")">Målvakt</MudSelectItem>
                                 <MudSelectItem Value="@("Defender")">Försvarare</MudSelectItem>
@@ -205,7 +228,8 @@ else
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent Style="max-height: 600px; overflow-y: auto;">
-                        <MudTable Items="@FilteredPlayers" Dense="true" Hover="true" Striped="true" FixedHeader="true">
+                        <MudTable Items="@FilteredPlayers" Dense="true" Hover="true" Striped="true"
+                                  FixedHeader="true">
                             <HeaderContent>
                                 <MudTh>Namn</MudTh>
                                 <MudTh>Position</MudTh>
@@ -218,21 +242,30 @@ else
                                     var isMyTurn = _myTeam?.Id == _nextTeamId;
                                     var canPick = _draft.State == DraftState.Started && isMyTurn && !isPicked;
                                 }
-                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
+                                <MudTd Style="@(isPicked
+                                                  ? "opacity: 0.4;"
+                                                  : "")">
                                     <MudText>@context.Name.Name</MudText>
                                 </MudTd>
-                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
-                                    <MudChip T="string" Size="Size.Small" Color="@GetPositionColor(context.Position)">
+                                <MudTd Style="@(isPicked
+                                                  ? "opacity: 0.4;"
+                                                  : "")">
+                                    <MudChip T="string" Size="Size.Small"
+                                             Color="@GetPositionColor(context.Position)">
                                         @GetPositionText(context.Position)
                                     </MudChip>
                                 </MudTd>
-                                <MudTd Style="@(isPicked ? "opacity: 0.4;" : "")">
-                                    <MudText Typo="Typo.body2">@GetCountryCode(context.Country.Country)</MudText>
+                                <MudTd Style="@(isPicked
+                                                  ? "opacity: 0.4;"
+                                                  : "")">
+                                    <MudText
+                                        Typo="Typo.body2">@GetCountryCode(context.Country.Country)</MudText>
                                 </MudTd>
                                 <MudTd>
                                     @if (isPicked)
                                     {
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Disabled="true">
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Default"
+                                                 Disabled="true">
                                             Vald
                                         </MudChip>
                                     }
@@ -261,7 +294,7 @@ else
                         <MudCardHeader>
                             <CardHeaderContent>
                                 <MudText Typo="Typo.h6">
-                                    <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2" />
+                                    <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2"/>
                                     Senaste val
                                 </MudText>
                             </CardHeaderContent>
@@ -269,31 +302,33 @@ else
                         <MudCardContent>
                             <MudSimpleTable Dense="true" Hover="true">
                                 <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Lag</th>
-                                        <th>Spelare</th>
-                                        <th>Position</th>
-                                    </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Lag</th>
+                                    <th>Spelare</th>
+                                    <th>Position</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var pick in _draft.Picks.OrderByDescending(p => p.PickNumber).Take(10))
-                                    {
-                                        var player = _allPlayers.FirstOrDefault(p => p.Id == pick.PlayerId);
-                                        <tr>
-                                            <td>@pick.PickNumber</td>
-                                            <td>@_teamNames.GetValueOrDefault(pick.TeamId, "Okänt")</td>
-                                            <td>@(player?.Name.Name ?? "Okänd")</td>
-                                            <td>
-                                                @if (player is not null)
-                                                {
-                                                    <MudChip T="string" Size="Size.Small" Color="@GetPositionColor(player.Position)">
-                                                        @GetPositionText(player.Position)
-                                                    </MudChip>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
+                                @foreach (var pick in _draft.Picks.OrderByDescending(p => p.PickNumber)
+                                    .Take(10))
+                                {
+                                    var player = _allPlayers.FirstOrDefault(p => p.Id == pick.PlayerId);
+                                    <tr>
+                                        <td>@pick.PickNumber</td>
+                                        <td>@_teamNames.GetValueOrDefault(pick.TeamId, "Okänt")</td>
+                                        <td>@(player?.Name.Name ?? "Okänd")</td>
+                                        <td>
+                                            @if (player is not null)
+                                            {
+                                                <MudChip T="string" Size="Size.Small"
+                                                         Color="@GetPositionColor(player.Position)">
+                                                    @GetPositionText(player.Position)
+                                                </MudChip>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
                                 </tbody>
                             </MudSimpleTable>
                         </MudCardContent>
@@ -308,7 +343,7 @@ else
     [Parameter]
     public Guid Id { get; set; }
 
-    private ManagerGame.Domain.Draft? _draft;
+    private Draft? _draft;
     private League? _league;
     private List<DraftParticipant> _participants = [];
     private List<Player> _allPlayers = [];
@@ -328,9 +363,9 @@ else
 
     private IEnumerable<Player> FilteredPlayers => _allPlayers
         .Where(p => string.IsNullOrEmpty(_searchText) ||
-                    p.Name.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+            p.Name.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
         .Where(p => string.IsNullOrEmpty(_positionFilter) ||
-                    p.Position.ToString() == _positionFilter)
+            p.Position.ToString() == _positionFilter)
         .OrderBy(p => _pickedPlayerIds.Contains(p.Id))
         .ThenBy(p => p.Position)
         .ThenBy(p => p.Name.Name);
@@ -352,7 +387,8 @@ else
         // Find my team in this draft
         if (_draft is not null)
         {
-            var myTeamIds = _participants.Select(p => p.TeamId).ToList();
+            var myTeamIds = _participants.Select(p => p.TeamId)
+                .ToList();
             var teams = await DbContext.Teams
                 .Where(t => myTeamIds.Contains(t.Id) && t.ManagerId == CurrentManager.ManagerId.Value)
                 .ToListAsync();
@@ -380,18 +416,22 @@ else
         _nextTeamId = _draft.PeekNextTeamId();
 
         // Load team names
-        var teamIds = _participants.Select(p => p.TeamId).ToList();
-        var teams = await DbContext.Teams.Where(t => teamIds.Contains(t.Id)).ToListAsync();
-        _teamNames = teams.ToDictionary(t => t.Id, t => t.Name.Name);
+        var teamIds = _participants.Select(p => p.TeamId)
+            .ToList();
+        var teams = await DbContext.Teams.Where(t => teamIds.Contains(t.Id))
+            .ToListAsync();
+        _teamNames = teams.ToDictionary(keySelector: t => t.Id, elementSelector: t => t.Name.Name);
 
         // Load all players
         _allPlayers = await DbContext.Players.ToListAsync();
 
         // Get picked player IDs (from draft picks)
-        _pickedPlayerIds = _draft.Picks.Select(p => p.PlayerId).ToHashSet();
+        _pickedPlayerIds = _draft.Picks.Select(p => p.PlayerId)
+            .ToHashSet();
 
         // Available = all players not yet picked
-        _availablePlayers = _allPlayers.Where(p => !_pickedPlayerIds.Contains(p.Id)).ToList();
+        _availablePlayers = _allPlayers.Where(p => !_pickedPlayerIds.Contains(p.Id))
+            .ToList();
 
         _isLoading = false;
     }
@@ -403,55 +443,55 @@ else
             .WithAutomaticReconnect()
             .Build();
 
-        _hubConnection.On<object>("PlayerPicked", async (data) =>
-        {
-            await InvokeAsync(async () =>
-            {
-                _isPicking = false;
-                await LoadDraftData();
-                Snackbar.Add("En spelare har valts!", Severity.Info);
-                StateHasChanged();
+        _hubConnection.On<object>(
+            "PlayerPicked",
+            handler: async _ => {
+                await InvokeAsync(async () => {
+                    _isPicking = false;
+                    await LoadDraftData();
+                    Snackbar.Add("En spelare har valts!", Severity.Info);
+                    StateHasChanged();
+                });
             });
-        });
 
-        _hubConnection.On<object>("DraftStarted", async (data) =>
-        {
-            await InvokeAsync(async () =>
-            {
-                _isStartingDraft = false;
-                await LoadDraftData();
-                Snackbar.Add("Draft har startat! 🎉", Severity.Success);
-                StateHasChanged();
+        _hubConnection.On<object>(
+            "DraftStarted",
+            handler: async _ => {
+                await InvokeAsync(async () => {
+                    _isStartingDraft = false;
+                    await LoadDraftData();
+                    Snackbar.Add("Draft har startat! 🎉", Severity.Success);
+                    StateHasChanged();
+                });
             });
-        });
 
-        _hubConnection.On<string>("PickError", async (error) =>
-        {
-            await InvokeAsync(() =>
-            {
-                Snackbar.Add($"Fel: {error}", Severity.Error);
-                _isPicking = false;
-                StateHasChanged();
+        _hubConnection.On<string>(
+            "PickError",
+            handler: async error => {
+                await InvokeAsync(() => {
+                    Snackbar.Add($"Fel: {error}", Severity.Error);
+                    _isPicking = false;
+                    StateHasChanged();
+                });
             });
-        });
 
-        _hubConnection.On<string>("DraftError", async (error) =>
-        {
-            await InvokeAsync(() =>
-            {
-                Snackbar.Add($"Draft fel: {error}", Severity.Error);
-                _isStartingDraft = false;
-                StateHasChanged();
+        _hubConnection.On<string>(
+            "DraftError",
+            handler: async error => {
+                await InvokeAsync(() => {
+                    Snackbar.Add($"Draft fel: {error}", Severity.Error);
+                    _isStartingDraft = false;
+                    StateHasChanged();
+                });
             });
-        });
 
-        _hubConnection.On<object>("JoinedDraft", async (data) =>
-        {
-            await InvokeAsync(() =>
-            {
-                Snackbar.Add("Ansluten till draft", Severity.Success);
+        _hubConnection.On<object>(
+            "JoinedDraft",
+            handler: async _ => {
+                await InvokeAsync(() => {
+                    Snackbar.Add("Ansluten till draft", Severity.Success);
+                });
             });
-        });
 
         try
         {
@@ -472,7 +512,7 @@ else
         try
         {
             // Use SignalR to start the draft so all clients get notified
-            await _hubConnection.SendAsync("StartDraft", _draft.Id, 11); // 11 picks per team for testing
+            await _hubConnection.SendAsync("StartDraft", _draft.Id, 11);// 11 picks per team for testing
         }
         catch (Exception ex)
         {
@@ -488,7 +528,11 @@ else
         _isPicking = true;
         try
         {
-            await _hubConnection.SendAsync("PickPlayer", player.Id, _draft.Id, _myTeam.Id);
+            await _hubConnection.SendAsync(
+                "PickPlayer",
+                player.Id,
+                _draft.Id,
+                _myTeam.Id);
         }
         catch (Exception ex)
         {
@@ -513,21 +557,21 @@ else
         _ => "Okänd"
     };
 
-    private Color GetPositionColor(ManagerGame.Domain.Position position) => position switch
+    private Color GetPositionColor(Position position) => position switch
     {
-        ManagerGame.Domain.Position.Goalkeeper => Color.Warning,
-        ManagerGame.Domain.Position.Defender => Color.Info,
-        ManagerGame.Domain.Position.Midfielder => Color.Success,
-        ManagerGame.Domain.Position.Forward => Color.Error,
+        Position.Goalkeeper => Color.Warning,
+        Position.Defender => Color.Info,
+        Position.Midfielder => Color.Success,
+        Position.Forward => Color.Error,
         _ => Color.Default
     };
 
-    private string GetPositionText(ManagerGame.Domain.Position position) => position switch
+    private string GetPositionText(Position position) => position switch
     {
-        ManagerGame.Domain.Position.Goalkeeper => "MV",
-        ManagerGame.Domain.Position.Defender => "FÖR",
-        ManagerGame.Domain.Position.Midfielder => "MF",
-        ManagerGame.Domain.Position.Forward => "ANF",
+        Position.Goalkeeper => "MV",
+        Position.Defender => "FÖR",
+        Position.Midfielder => "MF",
+        Position.Forward => "ANF",
         _ => "?"
     };
 
