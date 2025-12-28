@@ -1,32 +1,40 @@
-using System.Net;
-using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
+using ManagerGame.Core.Managers;
+using ManagerGame.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test.Api;
 
 public class RegisterManagerTest : IClassFixture<Fixture>
 {
     private readonly Fixture _fixture;
-    private readonly HttpClient _httpClient;
 
     public RegisterManagerTest(Fixture fixture)
     {
         _fixture = fixture;
-        _httpClient = fixture.CreateDefaultClient();
     }
 
     [Fact]
     public async Task Test()
     {
-        var db = TestDbFactory.Create(_fixture);
+        using var scope = _fixture.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
 
-        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
+        var email = $"jakob{Guid.NewGuid()}@jakobsson.com";
+        var result = await handler.Handle(new RegisterManagerCommand
+        {
+            Name = new ManagerName("Jakob"),
+            Email = new Email(email)
+        });
 
-        Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
-        Assert.NotNull(manager);
-        Assert.Equal("Jakob", manager.Name);
-        Assert.Contains("@jakobsson.com", manager.Email.EmailAddress);
-        Assert.NotEqual(Guid.Empty, manager.Id);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal("Jakob", result.Value.Name.Name);
+        Assert.Equal(email, result.Value.Email.EmailAddress);
+        Assert.NotEqual(Guid.Empty, result.Value.Id);
+        
+        db.ChangeTracker.Clear();
         Assert.Single(db.Managers);
         Assert.NotEqual(Guid.Empty, db.Managers.First().Id);
     }

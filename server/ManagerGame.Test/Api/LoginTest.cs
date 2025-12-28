@@ -1,59 +1,46 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Text;
-using ManagerGame.Api;
-using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
-using Microsoft.Extensions.Configuration;
+using ManagerGame.Core.Managers;
+using ManagerGame.Domain;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ManagerGame.Test.Api;
 
 public class LoginTest : IClassFixture<Fixture>
 {
-    private readonly IConfiguration _configuration;
     private readonly Fixture _fixture;
-    private readonly HttpClient _httpClient;
 
     public LoginTest(Fixture fixture)
     {
         _fixture = fixture;
-        _httpClient = fixture.CreateDefaultClient();
-        _configuration = fixture.Services.GetService<IConfiguration>()!;
     }
 
     [Fact]
-    public async Task GeneratesJwtTokenForManager()
+    public async Task CanLoginWithManagerEmail()
     {
-        var db = TestDbFactory.Create(_fixture);
+        using var scope = _fixture.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var registerHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+        var loginHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<LoginCommand, LoginResponse>>();
 
-        var (createManagerResponse, manager) = await _httpClient.PostManager<ManagerDto>();
-        var request = new LoginRequest { ManagerEmail = manager!.Email.EmailAddress };
-
-        var (loginResponse, login) = await _httpClient.Post<LoginResponseDto>("/api/login", request);
-
-        db.ChangeTracker.Clear();
-
-        Assert.Equal(HttpStatusCode.OK, createManagerResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        Assert.Equal(manager.Id, login!.Manager.Id);
-        Assert.NotNull(ValidateToken(login.Token));
-    }
-
-    private SecurityToken ValidateToken(string authToken)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var validationParameters = new TokenValidationParameters
+        // Register manager
+        var email = $"jakob{Guid.NewGuid()}@jakobsson.com";
+        var managerResult = await registerHandler.Handle(new RegisterManagerCommand
         {
-            ValidateLifetime = true,
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!))
-        };
+            Name = new ManagerName("Jakob"),
+            Email = new Email(email)
+        });
+        Assert.True(managerResult.IsSuccess);
+        var manager = managerResult.Value!;
 
-        tokenHandler.ValidateToken(authToken, validationParameters, out var validatedToken);
+        // Login
+        var loginResult = await loginHandler.Handle(new LoginCommand
+        {
+            ManagerEmail = new Email(email)
+        });
 
-        return validatedToken;
+        Assert.True(loginResult.IsSuccess);
+        Assert.NotNull(loginResult.Value);
+        Assert.Equal(manager.Id, loginResult.Value.Manager.Id);
+        Assert.NotNull(loginResult.Value.Token);
     }
 }

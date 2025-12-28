@@ -1,53 +1,48 @@
-using System.Net;
-using ManagerGame.Api.Dtos;
 using ManagerGame.Core;
+using ManagerGame.Core.Leagues;
+using ManagerGame.Core.Managers;
 using ManagerGame.Core.Teams;
-using Xunit;
+using ManagerGame.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test.Api;
 
 public class SignPlayerTest : IClassFixture<Fixture>
 {
     private readonly Fixture _fixture;
-    private readonly HttpClient _httpClient;
-    private readonly ITestOutputHelper _output;
 
-
-    public SignPlayerTest(Fixture fixture, ITestOutputHelper output)
+    public SignPlayerTest(Fixture fixture)
     {
         _fixture = fixture;
-        _httpClient = fixture.CreateDefaultClient();
-        _output = output;
     }
 
     [Fact]
     public async Task SignFirstPlayer()
     {
-        var db = TestDbFactory.Create(_fixture);
+        using var scope = _fixture.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var registerHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+        var leagueHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateLeagueRequest, League>>();
+        var teamHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
+        var signHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<SignPlayerRequest, Team>>();
 
-        var (_, _, newTeam) = await Seed.SeedAndLogin(_httpClient);
+        var (manager, leagueId, team) = await Seed.SeedAndLogin(_fixture.Services);
 
         var player = TestData.Player();
         db.Players.Add(player);
         await db.SaveChangesAsync();
 
-        var (httpResponseMessage, _) =
-            await _httpClient.Post<SignPlayerDto>("/api/teams/sign", new SignPlayerRequest(newTeam.Id, player.Id));
+        var signResult = await signHandler.Handle(new SignPlayerRequest(team.Id, player.Id));
+        Assert.True(signResult.IsSuccess);
 
-        if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-        {
-            var body = await httpResponseMessage.Content.ReadAsStringAsync();
-            _output.WriteLine($"POST /api/teams/sign failed: {(int)httpResponseMessage.StatusCode} {httpResponseMessage.StatusCode}");
-            _output.WriteLine(body);
-        }
+        db.ChangeTracker.Clear();
+        var updatedTeam = await db.Teams2.Find(team.Id);
+        Assert.NotNull(updatedTeam);
 
-        var (_, team) = await _httpClient.Get<TeamDto>($"/api/teams/{newTeam.Id}");
-
-        Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-        Assert.Single(team!.Players);
-
-        Assert.Equal("Jakob", team.Players.First().Name);
-        Assert.Equal(Position.Defender.ToString(), team.Players.First().Position);
-        Assert.Equal(Country.Se.ToString(), team.Players.First().Country);
+        Assert.Single(updatedTeam.Players);
+        Assert.Equal("Jakob", updatedTeam.Players.First().Player.Name.Name);
+        Assert.Equal(Position.Defender, updatedTeam.Players.First().Player.Position);
+        Assert.Equal(Country.Se, updatedTeam.Players.First().Player.Country.Country);
     }
 }

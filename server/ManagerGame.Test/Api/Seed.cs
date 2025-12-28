@@ -1,46 +1,66 @@
-using System.Net;
-using System.Net.Http.Headers;
-using ManagerGame.Api;
-using ManagerGame.Api.Dtos;
-using ManagerGame.Api.Requests;
+using ManagerGame.Core;
 using ManagerGame.Core.Leagues;
+using ManagerGame.Core.Managers;
+using ManagerGame.Core.Teams;
+using ManagerGame.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test.Api;
 
 public static class Seed
 {
-    public static async Task<(ManagerDto manager, string token)> SeedManagerAndLogin(HttpClient httpClient)
+    public static async Task<(Manager manager, LoginResponse loginResponse)> SeedManagerAndLogin(IServiceProvider services)
     {
-        var (_, manager) = await httpClient.PostManager<ManagerDto>();
-        var (_, login) = await httpClient.Post<LoginResponseDto>("/api/login",
-            new LoginRequest { ManagerEmail = manager!.Email.EmailAddress });
+        using var scope = services.CreateScope();
+        var registerHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+        var loginHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<LoginCommand, LoginResponse>>();
 
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
+        var email = $"jakob{Guid.NewGuid()}@jakobsson.com";
+        var managerResult = await registerHandler.Handle(new RegisterManagerCommand
+        {
+            Name = new ManagerName("Jakob"),
+            Email = new Email(email)
+        });
+        Assert.True(managerResult.IsSuccess);
+        var manager = managerResult.Value!;
 
-        return (manager, login.Token);
+        var loginResult = await loginHandler.Handle(new LoginCommand
+        {
+            ManagerEmail = new Email(email)
+        });
+        Assert.True(loginResult.IsSuccess);
+
+        return (manager, loginResult.Value!);
     }
 
-    public static async Task<(ManagerDto manager, Guid leagueId, TeamDto team)> SeedAndLogin(HttpClient httpClient)
+    public static async Task<(Manager manager, Guid leagueId, Team team)> SeedAndLogin(IServiceProvider services)
     {
-        var (_, manager) = await httpClient.PostManager<ManagerDto>();
-        var (_, login) =
-            await httpClient.Post<LoginResponseDto>("/api/login",
-                new LoginRequest { ManagerEmail = manager!.Email.EmailAddress });
+        using var scope = services.CreateScope();
+        var registerHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+        var leagueHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateLeagueRequest, League>>();
+        var teamHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
 
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.Token);
+        var email = $"jakob{Guid.NewGuid()}@jakobsson.com";
+        var managerResult = await registerHandler.Handle(new RegisterManagerCommand
+        {
+            Name = new ManagerName("Jakob"),
+            Email = new Email(email)
+        });
+        Assert.True(managerResult.IsSuccess);
+        var manager = managerResult.Value!;
 
-        var (_, createLeagueDto) =
-            await httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
-        Assert.NotNull(createLeagueDto);
+        var leagueResult = await leagueHandler.Handle(new CreateLeagueRequest { Name = "Test League" });
+        Assert.True(leagueResult.IsSuccess);
+        var league = leagueResult.Value!;
 
-        var leagueId = createLeagueDto.Id;
-        CreateTeamRequest createTeamRequest = new()
-            { Name = $"Lag-{Guid.NewGuid()}", ManagerId = manager!.Id, LeagueId = leagueId };
+        var teamResult = await teamHandler.Handle(new CreateTeamCommand
+        {
+            Name = new TeamName($"Lag-{Guid.NewGuid()}"),
+            ManagerId = manager.Id,
+            LeagueId = league.Id
+        });
+        Assert.True(teamResult.IsSuccess);
 
-        var (createTeamResponseMessage, team) = await httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
-
-        Assert.Equal(HttpStatusCode.OK, createTeamResponseMessage.StatusCode);
-
-        return (manager, leagueId, team!);
+        return (manager, league.Id, teamResult.Value!);
     }
 }

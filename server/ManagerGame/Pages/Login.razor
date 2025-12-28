@@ -1,0 +1,88 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using ManagerGame.Core
+@using ManagerGame.Domain
+@using ManagerGame.Services
+@using MudBlazor
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject CurrentManagerService CurrentManager
+
+<PageTitle>Logga in - Fantasy Manager</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="my-4 pt-4">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Logga in</MudText>
+        </MudCardHeader>
+        <MudForm @ref="form" Model="@loginModel" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudCardContent>
+                <MudTextField @bind-Value="loginModel.Email" Label="E-post" Required="true"
+                                RequiredError="E-postadress krävs"
+                                Validation="@(new EmailAddressAttribute() { ErrorMessage = "Ogiltig e-postadress" })"/>
+
+                @* <MudTextField @bind-Value="loginModel.Password" Label="Lösenord" Required="true" RequiredError="Lösenord krävs" *@
+                @*                 InputType="InputType.Password" /> *@
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="HandleLogin">Logga in</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="register">Inget konto? Registrera dig här</MudButton>
+            </MudCardActions>
+        </MudForm>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private LoginModel loginModel = new();
+    private bool success;
+    private string[] errors = { };
+    private MudForm? form;
+
+    private async Task HandleLogin()
+    {
+        if (form is null)
+            return;
+
+        await form.Validate();
+
+        if (success)
+        {
+            try
+            {
+                var managers = await DbContext.Managers2.GetAll();
+
+                // In a real application, you would authenticate properly with hashed passwords
+                var manager = managers.FirstOrDefault(m =>
+                    m.Email.EmailAddress == loginModel.Email);
+
+                if (manager == null)
+                {
+                    Snackbar.Add("Ogiltig e-post eller lösenord", Severity.Error);
+                    return;
+                }
+
+                // Simulate successful login
+                // In a real app, you would use authentication services
+                await CurrentManager.SetManagerAsync(manager.Id);
+
+                // Redirect to dashboard on successful login
+                NavigationManager.NavigateTo("/dashboard", true);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Inloggning misslyckades: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "E-postadress krävs")]
+        [EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Lösenord krävs")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

@@ -1,68 +1,67 @@
-using System.Net;
-using ManagerGame.Api.Dtos;
-using ManagerGame.Api.Requests;
 using ManagerGame.Core;
 using ManagerGame.Core.Leagues;
+using ManagerGame.Core.Managers;
+using ManagerGame.Core.Teams;
+using ManagerGame.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManagerGame.Test.Api;
 
 public class CreateTeamTest : IClassFixture<Fixture>
 {
     private readonly Fixture _fixture;
-    private readonly HttpClient _httpClient;
 
     public CreateTeamTest(Fixture fixture)
     {
         _fixture = fixture;
-        _httpClient = fixture.CreateDefaultClient();
     }
 
     [Fact]
     public async Task CreateTeam()
     {
-        var db = TestDbFactory.Create(_fixture);
-        var (manager, _) = await Seed.SeedManagerAndLogin(_httpClient);
-        var (_, createLeagueDto) = await _httpClient.Post<CreateLeagueDto>("/api/leagues", new CreateLeagueRequest { Name = "Test League" });
-        Assert.NotNull(createLeagueDto);
+        using var scope = _fixture.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var registerHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<RegisterManagerCommand, Manager>>();
+        var leagueHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateLeagueRequest, League>>();
+        var teamHandler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTeamCommand, Team>>();
 
-        var createTeamRequest = new CreateTeamRequest { Name = "Lag2", ManagerId = manager.Id, LeagueId = createLeagueDto.Id };
+        // Register manager
+        var email = $"jakob{Guid.NewGuid()}@jakobsson.com";
+        var managerResult = await registerHandler.Handle(new RegisterManagerCommand
+        {
+            Name = new ManagerName("Jakob"),
+            Email = new Email(email)
+        });
+        Assert.True(managerResult.IsSuccess);
+        var manager = managerResult.Value!;
 
-        var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams", createTeamRequest);
+        // Create league
+        var leagueResult = await leagueHandler.Handle(new CreateLeagueRequest { Name = "Test League" });
+        Assert.True(leagueResult.IsSuccess);
+        var league = leagueResult.Value!;
 
-        Assert.Equal(HttpStatusCode.OK, createTeamResponse.StatusCode);
+        // Create team
+        var teamResult = await teamHandler.Handle(new CreateTeamCommand
+        {
+            Name = new TeamName("Lag2"),
+            ManagerId = manager.Id,
+            LeagueId = league.Id
+        });
 
-        Assert.Equal(manager.Id, team!.ManagerId);
-        Assert.Equal("Lag2", team.Name);
+        Assert.True(teamResult.IsSuccess);
+        var team = teamResult.Value!;
+        Assert.Equal(manager.Id, team.ManagerId);
+        Assert.Equal("Lag2", team.Name.Name);
 
-        Assert.Single(db.Teams);
-        var createdManagerInDb = db.Managers.Include(m => m.Teams).First(x => x.Id == manager.Id);
+        db.ChangeTracker.Clear();
+        var allTeams = await db.Teams2.GetAll();
+        Assert.Single(allTeams);
+        var createdManagerInDb = await db.Managers
+            .Include(m => m.Teams)
+            .FirstAsync(x => x.Id == manager.Id);
         var createdTeamInDb = createdManagerInDb.Teams.First(x => x.Id == team.Id);
         Assert.Equal(manager.Id, createdTeamInDb.ManagerId);
         Assert.Equal("Lag2", createdTeamInDb.Name.Name);
-    }
-}
-
-public class UnauthorizedTeamTest : IClassFixture<Fixture>
-{
-    private readonly HttpClient _httpClient;
-
-    public UnauthorizedTeamTest(Fixture fixture)
-    {
-        _httpClient = fixture.CreateDefaultClient();
-    }
-
-    [Fact]
-    public async Task UnauthorizedIfNotLoggedIn()
-    {
-        var (_, manager) = await _httpClient.PostManager<ManagerDto>();
-
-        _httpClient.DefaultRequestHeaders.Authorization = null;
-
-        var (createTeamResponse, team) = await _httpClient.Post<TeamDto>("/api/teams",
-            new CreateTeamRequest { Name = "Lag", ManagerId = manager!.Id, LeagueId = Guid.NewGuid() });
-
-        Assert.Equal(HttpStatusCode.Unauthorized, createTeamResponse.StatusCode);
-        Assert.Null(team);
     }
 }

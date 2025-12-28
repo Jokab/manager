@@ -1,52 +1,48 @@
-using System.Text;
 using System.Text.Json.Serialization;
 using ManagerGame;
-using ManagerGame.Api;
 using ManagerGame.Core;
 using ManagerGame.Core.Drafting;
 using ManagerGame.Core.Leagues;
 using ManagerGame.Core.Managers;
 using ManagerGame.Core.Teams;
+using ManagerGame.Hubs;
+using ManagerGame.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+using MudBlazor;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddAuthentication().AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        // ValidAudience = configuration["JWT:ValidAudience"],
-        // ValidIssuer = configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]!))
-    };
-});
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("user",
-        policy =>
-            policy
-                .RequireClaim("id"));
+// Blazor Server services
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 
-builder.Services.AddCors();
+// MudBlazor services
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+    config.SnackbarConfiguration.PreventDuplicates = true;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 3000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 builder.Services.AddSignalR();
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
 builder.Services.AddScoped<ITeamSigningService, TeamSigningService>();
+builder.Services.AddScoped<ProtectedLocalStorage>();
+builder.Services.AddScoped<CurrentManagerService>();
+
 RegisterCommandHandlers();
 
+// Database configuration
 if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Testing"))
 {
     var connectionString =
@@ -66,24 +62,23 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapHub<TestHub>("/chatHub");
-
-if (app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
-app.MapApi();
+// SignalR hub
+app.MapHub<DraftHub>("/drafthub");
+
+// Blazor routing
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 if (args.Contains("seed"))
 {
@@ -156,7 +151,7 @@ async Task SeedDb(IServiceScope serviceScope,
     var minMidfieldersRemaining = 4;
 
     static Player Player(Country country = Country.Se,
-        Position position = Position.Defender)
+        ManagerGame.Domain.Position position = ManagerGame.Domain.Position.Defender)
     {
         return new Player(
             new PlayerName("Jakob"),
@@ -167,25 +162,25 @@ async Task SeedDb(IServiceScope serviceScope,
     var players = Enumerable.Range(0, countriesToChooseFrom).SelectMany(i =>
         Enumerable.Range(0, Team.PlayersFromSameCountryLimit).Select(_ =>
         {
-            Position position;
+            ManagerGame.Domain.Position position;
             if (goalkeepersRemaining > 0)
             {
                 goalkeepersRemaining--;
-                position = Position.Goalkeeper;
+                position = ManagerGame.Domain.Position.Goalkeeper;
             }
             else if (minDefendersRemaining > 0)
             {
                 minDefendersRemaining--;
-                position = Position.Defender;
+                position = ManagerGame.Domain.Position.Defender;
             }
             else if (minMidfieldersRemaining > 0)
             {
                 minMidfieldersRemaining--;
-                position = Position.Midfielder;
+                position = ManagerGame.Domain.Position.Midfielder;
             }
             else
             {
-                position = Position.Forward;
+                position = ManagerGame.Domain.Position.Forward;
             }
 
             return Player((Country)i, position);
