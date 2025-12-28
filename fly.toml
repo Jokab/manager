@@ -16,8 +16,14 @@ primary_region = 'fra'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  # Keep 1 machine running to avoid cold starts and WebSocket issues
+  min_machines_running = 1
   processes = ['app']
+
+  [http_service.concurrency]
+    type = 'requests'
+    hard_limit = 250
+    soft_limit = 200
 
   [[http_service.checks]]
     interval = '30s'

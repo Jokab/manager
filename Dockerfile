@@ -11,7 +11,7 @@ RUN dotnet restore ./server/ManagerGame/ManagerGame.csproj
 
 # Copy the rest of the source and publish
 COPY server ./server
-RUN dotnet publish ./server/ManagerGame/ManagerGame.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish ./server/ManagerGame/ManagerGame.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
